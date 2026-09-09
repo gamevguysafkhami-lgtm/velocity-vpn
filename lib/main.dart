@@ -1,8 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -83,9 +88,35 @@ class I18n {
     'receipt_title': {'en': 'Velocity VIP Activation', 'fa': 'فعال‌سازی اشتراک VIP ولوسیتی'},
     'receipt_desc': {'en': 'Upload transaction slip or purchase via Telegram support', 'fa': 'تصویر رسید یا کد پیگیری را جهت فعال‌سازی اشتراک ارسال نمایید'},
     'import_config': {'en': 'Import Config / URL', 'fa': 'وارد کردن کانفیگ / لینک'},
-    'import_prompt': {'en': 'Paste vless://, vmess://, trojan://, ss://, or hysteria2:// URL', 'fa': 'لینک کانفیگ (vless, vmess, trojan, ss, hysteria2) را وارد کنید'},
+    'import_prompt': {'en': 'Paste vless://, vmess://, trojan://, ss://, hysteria2:// or Subscription URL (http/https)', 'fa': 'لینک کانفیگ (vless, vmess, trojan, ss, hysteria2) یا لینک سابسکریپشن (http/https) را وارد کنید'},
     'import_btn': {'en': 'Import & Test', 'fa': 'وارد کردن و تست'},
     'cancel': {'en': 'Cancel', 'fa': 'انصراف'},
+    'no_nodes_available': {
+      'en': 'No servers found. Please add a subscription link via Import.',
+      'fa': 'هیچ سروری یافت نشد. لطفاً از طریق دکمه Import لینک سابسکریپشن اضافه کنید.',
+    },
+    'no_active_subscription': {
+      'en': 'No Active Subscription',
+      'fa': 'بدون اشتراک فعال',
+    },
+    'subscription_quota': {
+      'en': 'Subscription Quota',
+      'fa': 'حجم و اعتبار اشتراک',
+    },
+    'subscription_imported': {
+      'en': 'Subscription successfully imported & saved!',
+      'fa': 'سابسکریپشن با موفقیت دریافت و ذخیره شد!',
+    },
+    'fetching_sub': {
+      'en': 'Fetching subscription & parsing nodes...',
+      'fa': 'در حال دریافت سابسکریپشن و بررسی سرورها...',
+    },
+    'import_failed': {
+      'en': 'Failed to fetch or parse subscription URL',
+      'fa': 'خطا در دریافت یا پردازش لینک سابسکریپشن',
+    },
+    'delete_node': {'en': 'Delete Node', 'fa': 'حذف سرور'},
+    'clear_all_nodes': {'en': 'Clear All Nodes', 'fa': 'حذف همه سرورها'},
     'tx_id': {'en': 'Transaction Hash / Ref ID', 'fa': 'کد پیگیری یا هش تراکنش'},
     'tx_placeholder': {'en': 'e.g. 0x9f2a... or Ref #847291', 'fa': 'مثال: کد رهگیری یا هش تراکنش'},
     'plan_select': {'en': 'Select Velocity Plan', 'fa': 'انتخاب پلن اشتراک ولوسیتی'},
@@ -104,6 +135,10 @@ class I18n {
       'fa': 'خرید آنی و پشتیبانی ۲۴ ساعته از طریق کانال رسمی تلگرام ولوسیتی.'
     },
     'open_telegram': {'en': 'Open Telegram', 'fa': 'ورود به تلگرام'},
+    'telegram_checkout_btn': {
+      'en': 'Contact Telegram Support to Buy & Activate',
+      'fa': 'ارتباط با پشتیبانی تلگرام جهت خرید و فعالسازی',
+    },
     'close': {'en': 'Close', 'fa': 'بستن'},
     'connected_time': {'en': 'Duration', 'fa': 'مدت زمان اتصال'},
     // Setup Wizard Strings
@@ -360,6 +395,99 @@ extension VpnProtocolExt on VpnProtocol {
   }
 }
 
+class SubscriptionInfo {
+  final int uploadBytes;
+  final int downloadBytes;
+  final int totalBytes;
+  final int expireTimestamp; // unix timestamp in seconds
+  final String rawHeader;
+  final String subUrl;
+
+  const SubscriptionInfo({
+    this.uploadBytes = 0,
+    this.downloadBytes = 0,
+    this.totalBytes = 0,
+    this.expireTimestamp = 0,
+    this.rawHeader = '',
+    this.subUrl = '',
+  });
+
+  bool get hasQuota => totalBytes > 0;
+  
+  double get usedGb => (uploadBytes + downloadBytes) / (1024 * 1024 * 1024);
+  double get totalGb => totalBytes / (1024 * 1024 * 1024);
+  double get remainingGb => totalGb > usedGb ? (totalGb - usedGb) : 0.0;
+
+  int get remainingDays {
+    if (expireTimestamp <= 0) return 0;
+    final nowSec = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    final diffSec = expireTimestamp - nowSec;
+    if (diffSec <= 0) return 0;
+    return (diffSec / 86400).ceil();
+  }
+
+  String quotaDisplay(bool isFa) {
+    if (!hasQuota) return isFa ? 'نامحدود' : 'Unlimited';
+    return '${usedGb.toStringAsFixed(1)} GB / ${totalGb.toStringAsFixed(1)} GB';
+  }
+
+  String remainingDisplay(bool isFa) {
+    if (expireTimestamp <= 0) {
+      if (hasQuota) {
+        return isFa ? '${remainingGb.toStringAsFixed(1)} GB باقیمانده' : '${remainingGb.toStringAsFixed(1)} GB Remaining';
+      }
+      return isFa ? 'بدون اشتراک فعال' : 'No Active Subscription';
+    }
+    final days = remainingDays;
+    return isFa ? '$days روز باقیمانده' : '$days Days Remaining';
+  }
+
+  Map<String, dynamic> toJson() => {
+    'uploadBytes': uploadBytes,
+    'downloadBytes': downloadBytes,
+    'totalBytes': totalBytes,
+    'expireTimestamp': expireTimestamp,
+    'rawHeader': rawHeader,
+    'subUrl': subUrl,
+  };
+
+  factory SubscriptionInfo.fromJson(Map<String, dynamic> json) => SubscriptionInfo(
+    uploadBytes: json['uploadBytes'] as int? ?? 0,
+    downloadBytes: json['downloadBytes'] as int? ?? 0,
+    totalBytes: json['totalBytes'] as int? ?? 0,
+    expireTimestamp: json['expireTimestamp'] as int? ?? 0,
+    rawHeader: json['rawHeader'] as String? ?? '',
+    subUrl: json['subUrl'] as String? ?? '',
+  );
+
+  static SubscriptionInfo fromHeader(String? header, String subUrl) {
+    if (header == null || header.trim().isEmpty) {
+      return SubscriptionInfo(subUrl: subUrl);
+    }
+    int up = 0, down = 0, tot = 0, exp = 0;
+    final parts = header.split(';');
+    for (var part in parts) {
+      final kv = part.split('=');
+      if (kv.length == 2) {
+        final key = kv[0].trim().toLowerCase();
+        final val = int.tryParse(kv[1].trim()) ?? 0;
+        if (key == 'upload') up = val;
+        else if (key == 'download') down = val;
+        else if (key == 'total') tot = val;
+        else if (key == 'expire') exp = val;
+      }
+    }
+    return SubscriptionInfo(
+      uploadBytes: up,
+      downloadBytes: down,
+      totalBytes: tot,
+      expireTimestamp: exp,
+      rawHeader: header,
+      subUrl: subUrl,
+    );
+  }
+}
+
 class ServerProfile {
   final String id;
   String name;
@@ -368,6 +496,7 @@ class ServerProfile {
   final String host;
   final int port;
   final String sni;
+  final String rawUrl;
   int? pingMs;
   bool isTesting;
   String trafficUsage;
@@ -383,10 +512,43 @@ class ServerProfile {
     required this.host,
     required this.port,
     required this.sni,
+    this.rawUrl = '',
     this.pingMs,
     this.isTesting = false,
-    this.trafficUsage = '0.0 GB / 300 GB',
+    this.trafficUsage = '0.0 GB',
   });
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'countryCode': countryCode,
+    'protocol': protocol.name,
+    'host': host,
+    'port': port,
+    'sni': sni,
+    'rawUrl': rawUrl,
+    'pingMs': pingMs,
+    'trafficUsage': trafficUsage,
+  };
+
+  factory ServerProfile.fromJson(Map<String, dynamic> json) {
+    VpnProtocol proto = VpnProtocol.vless;
+    try {
+      proto = VpnProtocol.values.firstWhere((p) => p.name == json['protocol']);
+    } catch (_) {}
+    return ServerProfile(
+      id: json['id'] as String? ?? DateTime.now().millisecondsSinceEpoch.toString(),
+      name: json['name'] as String? ?? 'Node',
+      countryCode: json['countryCode'] as String? ?? '🌐',
+      protocol: proto,
+      host: json['host'] as String? ?? '127.0.0.1',
+      port: json['port'] as int? ?? 443,
+      sni: json['sni'] as String? ?? '',
+      rawUrl: json['rawUrl'] as String? ?? '',
+      pingMs: json['pingMs'] as int?,
+      trafficUsage: json['trafficUsage'] as String? ?? '0.0 GB',
+    );
+  }
 
   Color get pingColor {
     if (pingMs == null) return VelocityColors.textMuted;
@@ -409,40 +571,79 @@ class ServerProfile {
 // Link Parser Engine (Sing-box & v2rayNG URI parser)
 // ---------------------------------------------------------------------------
 class ConfigLinkParser {
-  static ServerProfile parse(String rawUrl) {
+  static String detectCountryFlag(String name, String host) {
+    final lower = '$name $host'.toLowerCase();
+    if (lower.contains('de') || lower.contains('germany') || lower.contains('frankfurt') || lower.contains('berlin')) return '🇩🇪';
+    if (lower.contains('fi') || lower.contains('finland') || lower.contains('helsinki')) return '🇫🇮';
+    if (lower.contains('nl') || lower.contains('netherlands') || lower.contains('amsterdam')) return '🇳🇱';
+    if (lower.contains('us') || lower.contains('usa') || lower.contains('united states') || lower.contains('ashburn') || lower.contains('los angeles') || lower.contains('miami') || lower.contains('chicago')) return '🇺🇸';
+    if (lower.contains('sg') || lower.contains('singapore')) return '🇸🇬';
+    if (lower.contains('gb') || lower.contains('uk') || lower.contains('london') || lower.contains('united kingdom')) return '🇬🇧';
+    if (lower.contains('fr') || lower.contains('france') || lower.contains('paris')) return '🇫🇷';
+    if (lower.contains('tr') || lower.contains('turkey') || lower.contains('istanbul')) return '🇹🇷';
+    if (lower.contains('ca') || lower.contains('canada') || lower.contains('toronto')) return '🇨🇦';
+    if (lower.contains('jp') || lower.contains('japan') || lower.contains('tokyo')) return '🇯🇵';
+    if (lower.contains('ir') || lower.contains('iran') || lower.contains('tehran')) return '🇮🇷';
+    if (lower.contains('ae') || lower.contains('uae') || lower.contains('dubai')) return '🇦🇪';
+    return '🌐';
+  }
+
+  static ServerProfile? parse(String rawUrl) {
     final trimmed = rawUrl.trim();
+    if (trimmed.isEmpty) return null;
     VpnProtocol protocol = VpnProtocol.vless;
-    String name = 'Velocity Custom Node';
-    String host = 'node.velocity.net';
+    String name = 'Velocity Node';
+    String host = '127.0.0.1';
     int port = 443;
-    String sni = host;
+    String sni = '';
 
     try {
       if (trimmed.startsWith('vmess://')) {
         protocol = VpnProtocol.vmess;
-        final base64Part = trimmed.substring(8);
-        final decoded = utf8.decode(base64.decode(base64.normalize(base64Part)));
+        final base64Part = trimmed.substring(8).trim();
+        final normalized = base64.normalize(base64Part.replaceAll('\r', '').replaceAll('\n', '').replaceAll(' ', ''));
+        final decoded = utf8.decode(base64.decode(normalized));
         final json = jsonDecode(decoded) as Map<String, dynamic>;
         name = json['ps']?.toString() ?? 'Velocity VMess';
         host = json['add']?.toString() ?? 'custom.vmess.com';
         port = int.tryParse(json['port']?.toString() ?? '443') ?? 443;
-        sni = json['host']?.toString() ?? host;
+        sni = json['sni']?.toString() ?? json['host']?.toString() ?? host;
+      } else if (trimmed.startsWith('ss://')) {
+        protocol = VpnProtocol.shadowsocks;
+        final withoutScheme = trimmed.substring(5);
+        String configPart = withoutScheme;
+        if (withoutScheme.contains('#')) {
+          final hashIdx = withoutScheme.indexOf('#');
+          name = Uri.decodeComponent(withoutScheme.substring(hashIdx + 1));
+          configPart = withoutScheme.substring(0, hashIdx);
+        }
+        if (configPart.contains('@')) {
+          final atParts = configPart.split('@');
+          final hostPort = atParts[1].split(':');
+          host = hostPort[0];
+          port = int.tryParse(hostPort.length > 1 ? hostPort[1] : '8388') ?? 8388;
+        } else {
+          try {
+            final decoded = utf8.decode(base64.decode(base64.normalize(configPart)));
+            if (decoded.contains('@')) {
+              final atParts = decoded.split('@');
+              final hostPort = atParts[1].split(':');
+              host = hostPort[0];
+              port = int.tryParse(hostPort.length > 1 ? hostPort[1] : '8388') ?? 8388;
+            }
+          } catch (_) {}
+        }
       } else {
         final uri = Uri.parse(trimmed);
-        switch (uri.scheme.toLowerCase()) {
-          case 'vless':
-            protocol = VpnProtocol.vless;
-            break;
-          case 'trojan':
-            protocol = VpnProtocol.trojan;
-            break;
-          case 'ss':
-            protocol = VpnProtocol.shadowsocks;
-            break;
-          case 'hy2':
-          case 'hysteria2':
-            protocol = VpnProtocol.hysteria2;
-            break;
+        final scheme = uri.scheme.toLowerCase();
+        if (scheme == 'vless') {
+          protocol = VpnProtocol.vless;
+        } else if (scheme == 'trojan') {
+          protocol = VpnProtocol.trojan;
+        } else if (scheme == 'hy2' || scheme == 'hysteria2') {
+          protocol = VpnProtocol.hysteria2;
+        } else if (scheme == 'ss') {
+          protocol = VpnProtocol.shadowsocks;
         }
         if (uri.fragment.isNotEmpty) {
           name = Uri.decodeComponent(uri.fragment);
@@ -453,23 +654,58 @@ class ConfigLinkParser {
         if (uri.hasPort) {
           port = uri.port;
         }
-        sni = uri.queryParameters['sni'] ?? uri.queryParameters['peer'] ?? host;
+        sni = uri.queryParameters['sni'] ?? uri.queryParameters['peer'] ?? uri.queryParameters['host'] ?? host;
       }
     } catch (_) {
       name = 'Velocity Custom (${trimmed.split('://').first.toUpperCase()})';
     }
 
+    final flag = detectCountryFlag(name, host);
+
     return ServerProfile(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: '${DateTime.now().microsecondsSinceEpoch}_${math.Random().nextInt(9999)}',
       name: name,
-      countryCode: '🌐',
+      countryCode: flag,
       protocol: protocol,
       host: host,
       port: port,
       sni: sni,
-      pingMs: 95 + math.Random().nextInt(40),
-      trafficUsage: '0.0 GB / 300 GB',
+      rawUrl: trimmed,
+      pingMs: null,
+      trafficUsage: '0.0 GB',
     );
+  }
+
+  static List<ServerProfile> parseMultiple(String content) {
+    final List<ServerProfile> results = [];
+    String text = content.trim();
+    if (text.isEmpty) return results;
+
+    // Check if whole text is base64 encoded
+    if (!text.contains('://')) {
+      try {
+        final normalized = base64.normalize(text.replaceAll('\r', '').replaceAll('\n', '').replaceAll(' ', ''));
+        text = utf8.decode(base64.decode(normalized));
+      } catch (_) {}
+    }
+
+    final lines = text.split(RegExp(r'[\r\n]+'));
+    for (var line in lines) {
+      final trimmed = line.trim();
+      if (trimmed.isEmpty) continue;
+      if (trimmed.startsWith('vless://') ||
+          trimmed.startsWith('vmess://') ||
+          trimmed.startsWith('trojan://') ||
+          trimmed.startsWith('ss://') ||
+          trimmed.startsWith('hysteria2://') ||
+          trimmed.startsWith('hy2://')) {
+        final profile = parse(trimmed);
+        if (profile != null) {
+          results.add(profile);
+        }
+      }
+    }
+    return results;
   }
 }
 
@@ -653,6 +889,77 @@ class _VelocityVpnAppState extends State<VelocityVpnApp> {
 }
 
 // ---------------------------------------------------------------------------
+// Velocity Foreground Local Notifications Service
+// ---------------------------------------------------------------------------
+class VelocityNotificationService {
+  static final FlutterLocalNotificationsPlugin _notificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+  static bool _isInitialized = false;
+
+  static Future<void> init() async {
+    if (_isInitialized) return;
+    try {
+      const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+      const initSettings = InitializationSettings(android: androidSettings);
+      await _notificationsPlugin.initialize(initSettings);
+      _isInitialized = true;
+    } catch (e) {
+      debugPrint('Error initializing notifications: $e');
+    }
+  }
+
+  static Future<void> requestPermissions() async {
+    try {
+      final androidImplementation = _notificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>();
+      if (androidImplementation != null) {
+        await androidImplementation.requestNotificationsPermission();
+      }
+    } catch (e) {
+      debugPrint('Error requesting notification permission: $e');
+    }
+  }
+
+  static Future<void> showVpnConnectedNotification({
+    required String serverName,
+    required int pingMs,
+  }) async {
+    try {
+      await init();
+      const androidDetails = AndroidNotificationDetails(
+        'velocity_vpn_channel',
+        'Velocity VPN Service',
+        channelDescription: 'Ongoing foreground VPN connection status',
+        importance: Importance.low,
+        priority: Priority.low,
+        ongoing: true,
+        autoCancel: false,
+        showWhen: false,
+        icon: '@mipmap/ic_launcher',
+      );
+      const notifDetails = NotificationDetails(android: androidDetails);
+      await _notificationsPlugin.show(
+        1001,
+        'Velocity VPN: متصل به $serverName',
+        'تونل امن فعال است | پینگ: ${pingMs}ms',
+        notifDetails,
+      );
+    } catch (e) {
+      debugPrint('Error showing VPN notification: $e');
+    }
+  }
+
+  static Future<void> cancelVpnNotification() async {
+    try {
+      await _notificationsPlugin.cancel(1001);
+    } catch (e) {
+      debugPrint('Error cancelling VPN notification: $e');
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Home Screen (Core VPN Dashboard)
 // ---------------------------------------------------------------------------
 class HomeScreen extends StatefulWidget {
@@ -688,66 +995,11 @@ class _HomeScreenState extends State<HomeScreen>
   double _totalDownloadMb = 168.4;
   double _totalUploadMb = 44.1;
 
-  // Velocity Official Nodes
-  final List<ServerProfile> _servers = [
-    ServerProfile(
-      id: 'vel-node-1',
-      name: 'Velocity DE-Frankfurt Turbo',
-      countryCode: '🇩🇪',
-      protocol: VpnProtocol.vless,
-      host: 'fra-velocity.node.net',
-      port: 443,
-      sni: 'speed.cloudflare.com',
-      pingMs: 74,
-      trafficUsage: '18.4 GB / 300 GB',
-    ),
-    ServerProfile(
-      id: 'vel-node-2',
-      name: 'Velocity FI-Helsinki Gaming UDP',
-      countryCode: '🇫🇮',
-      protocol: VpnProtocol.hysteria2,
-      host: 'hel-velocity.node.net',
-      port: 8443,
-      sni: 'hel.apple.com',
-      pingMs: 88,
-      trafficUsage: '42.0 GB / 300 GB',
-    ),
-    ServerProfile(
-      id: 'vel-node-3',
-      name: 'Velocity NL-Amsterdam VIP gRPC',
-      countryCode: '🇳🇱',
-      protocol: VpnProtocol.trojan,
-      host: 'ams-velocity.node.net',
-      port: 443,
-      sni: 'ams.microsoft.com',
-      pingMs: 105,
-      trafficUsage: '95.1 GB / 300 GB',
-    ),
-    ServerProfile(
-      id: 'vel-node-4',
-      name: 'Velocity US-Ashburn Cloud Direct',
-      countryCode: '🇺🇸',
-      protocol: VpnProtocol.vmess,
-      host: 'iad-velocity.node.net',
-      port: 2053,
-      sni: 'iad.aws.amazon.com',
-      pingMs: 158,
-      trafficUsage: '8.3 GB / 300 GB',
-    ),
-    ServerProfile(
-      id: 'vel-node-5',
-      name: 'Velocity SG-Singapore FastPool',
-      countryCode: '🇸🇬',
-      protocol: VpnProtocol.shadowsocks,
-      host: 'sin-velocity.node.net',
-      port: 9000,
-      sni: 'sg.google.com',
-      pingMs: 176,
-      trafficUsage: '2.1 GB / 300 GB',
-    ),
-  ];
+  // Velocity Official Nodes (Empty by default, populated dynamically via subscription import)
+  final List<ServerProfile> _servers = [];
 
-  late ServerProfile _selectedServer;
+  ServerProfile? _selectedServer;
+  SubscriptionInfo? _subscriptionInfo;
 
   // First-launch and permissions lifecycle
   bool _hasCompletedOnboarding = false;
@@ -944,7 +1196,8 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
-    _selectedServer = _servers.first;
+    VelocityNotificationService.init();
+    _loadPersistedData();
 
     _pulseController = AnimationController(
       vsync: this,
@@ -963,8 +1216,57 @@ class _HomeScreenState extends State<HomeScreen>
     });
   }
 
+  Future<void> _loadPersistedData() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final serversJson = prefs.getString('saved_servers');
+      final selectedId = prefs.getString('selected_server_id');
+      final subJson = prefs.getString('subscription_info');
+
+      if (serversJson != null && serversJson.isNotEmpty) {
+        final List<dynamic> decodedList = jsonDecode(serversJson);
+        final loadedServers = decodedList.map((item) => ServerProfile.fromJson(item as Map<String, dynamic>)).toList();
+        if (loadedServers.isNotEmpty) {
+          setState(() {
+            _servers.clear();
+            _servers.addAll(loadedServers);
+            if (selectedId != null) {
+              _selectedServer = _servers.firstWhere((s) => s.id == selectedId, orElse: () => _servers.first);
+            } else {
+              _selectedServer = _servers.first;
+            }
+          });
+        }
+      }
+
+      if (subJson != null && subJson.isNotEmpty) {
+        final subMap = jsonDecode(subJson) as Map<String, dynamic>;
+        setState(() {
+          _subscriptionInfo = SubscriptionInfo.fromJson(subMap);
+        });
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _savePersistedData() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final serversJson = jsonEncode(_servers.map((s) => s.toJson()).toList());
+      await prefs.setString('saved_servers', serversJson);
+      if (_selectedServer != null) {
+        await prefs.setString('selected_server_id', _selectedServer!.id);
+      } else {
+        await prefs.remove('selected_server_id');
+      }
+      if (_subscriptionInfo != null) {
+        await prefs.setString('subscription_info', jsonEncode(_subscriptionInfo!.toJson()));
+      }
+    } catch (_) {}
+  }
+
   @override
   void dispose() {
+    VelocityNotificationService.cancelVpnNotification();
     _pulseController.dispose();
     _trafficTimer?.cancel();
     _durationTimer?.cancel();
@@ -987,7 +1289,7 @@ class _HomeScreenState extends State<HomeScreen>
             _hasCompletedOnboarding = true;
             _selectedRegion = region;
             _routingMode = mode;
-            if (region == 'iran') {
+            if (region == 'iran' && _servers.isNotEmpty) {
               // Pre-select the lowest ping Reality or Hysteria2 server
               _selectedServer = _servers.firstWhere(
                 (s) => s.protocol == VpnProtocol.hysteria2 || s.protocol == VpnProtocol.vless,
@@ -1186,6 +1488,25 @@ class _HomeScreenState extends State<HomeScreen>
   // -------------------------------------------------------------------------
   void _toggleVpn() async {
     if (_vpnState == VpnState.disconnected) {
+      if (_selectedServer == null || _servers.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: VelocityColors.surfaceElevated,
+            content: Text(
+              I18n.t('no_nodes_available'),
+              style: const TextStyle(color: VelocityColors.neonYellow, fontWeight: FontWeight.bold),
+            ),
+            action: SnackBarAction(
+              label: I18n.t('import_config'),
+              textColor: VelocityColors.electricCyan,
+              onPressed: _showImportDialog,
+            ),
+          ),
+        );
+        _showImportDialog();
+        return;
+      }
+
       // Step 1: Verify VPNService system permission
       if (!_vpnPermissionGranted) {
         final acceptedVpn = await _showVpnPermissionDialog();
@@ -1212,6 +1533,9 @@ class _HomeScreenState extends State<HomeScreen>
         }
       }
 
+      // Request notification permissions for Android 13+
+      await VelocityNotificationService.requestPermissions();
+
       // Connecting sequence with accelerated neon pulse
       _pulseController.duration = const Duration(milliseconds: 700);
       _pulseController.repeat(reverse: true);
@@ -1229,11 +1553,20 @@ class _HomeScreenState extends State<HomeScreen>
         _connectedSeconds = 0;
       });
       _startTelemetry();
+
+      // Show real foreground notification in status bar
+      if (_selectedServer != null) {
+        await VelocityNotificationService.showVpnConnectedNotification(
+          serverName: _selectedServer!.name,
+          pingMs: _selectedServer!.pingMs,
+        );
+      }
     } else if (_vpnState == VpnState.connected) {
       setState(() => _vpnState = VpnState.disconnecting);
       await Future.delayed(const Duration(milliseconds: 600));
       if (!mounted) return;
       _stopTelemetry();
+      await VelocityNotificationService.cancelVpnNotification();
       setState(() {
         _vpnState = VpnState.disconnected;
         _downloadSpeedKb = 0;
@@ -1294,79 +1627,13 @@ class _HomeScreenState extends State<HomeScreen>
   // -------------------------------------------------------------------------
   // Telegram Support / Channel Action
   // -------------------------------------------------------------------------
-  void _openTelegramSupport() {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: VelocityColors.surfaceDark,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: VelocityColors.borderDark),
-        ),
-        title: Row(
-          children: [
-            const VelocityEmblemWidget(size: 26),
-            const SizedBox(width: 10),
-            const Text(
-              'Velocity Support',
-              style: TextStyle(color: VelocityColors.textPrimary, fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              I18n.t('telegram_direct_buy'),
-              style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 12, height: 1.5),
-            ),
-            const SizedBox(height: 14),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: VelocityColors.surfaceElevated,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: VelocityColors.borderDark),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Official Channel:', style: TextStyle(color: VelocityColors.electricCyan, fontSize: 11, fontWeight: FontWeight.bold)),
-                  Text(I18n.t('telegram_channel'), style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 13, fontFamily: 'monospace')),
-                  const SizedBox(height: 8),
-                  const Text('VIP Sales Desk:', style: TextStyle(color: VelocityColors.neonYellow, fontSize: 11, fontWeight: FontWeight.bold)),
-                  Text(I18n.t('telegram_support_user'), style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 13, fontFamily: 'monospace')),
-                ],
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(I18n.t('close'), style: const TextStyle(color: VelocityColors.textSecondary)),
-          ),
-          ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: VelocityColors.electricCyan,
-              foregroundColor: VelocityColors.pureBlack,
-            ),
-            icon: const Icon(Icons.send_rounded, size: 16),
-            label: Text(I18n.t('open_telegram'), style: const TextStyle(fontWeight: FontWeight.bold)),
-            onPressed: () {
-              Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  backgroundColor: VelocityColors.surfaceElevated,
-                  content: Text('Telegram: ${I18n.t('telegram_channel')}', style: const TextStyle(color: VelocityColors.electricCyan)),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-    );
+  void _openTelegramSupport() async {
+    try {
+      final uri = Uri.parse('https://t.me/Velocity_Support');
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      debugPrint('Could not launch Telegram: $e');
+    }
   }
 
   void _openReceiptUploadScreen() {
@@ -1681,7 +1948,7 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   // -------------------------------------------------------------------------
-  // Status Indicator
+  // Status Indicator & Subscription Quota Header
   // -------------------------------------------------------------------------
   Widget _buildStatusHeader() {
     Color statusColor;
@@ -1705,6 +1972,8 @@ class _HomeScreenState extends State<HomeScreen>
         statusText = I18n.t('status_disconnected');
         break;
     }
+
+    final isFa = I18n.currentLang == AppLanguage.fa;
 
     return Column(
       children: [
@@ -1749,6 +2018,48 @@ class _HomeScreenState extends State<HomeScreen>
             ),
           ),
         ],
+        const SizedBox(height: 6),
+        // Real Subscription Quota & Expiry Badge
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: VelocityColors.surfaceElevated,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: _subscriptionInfo != null && _subscriptionInfo!.hasQuota
+                  ? VelocityColors.neonGreen.withOpacity(0.35)
+                  : VelocityColors.borderDark,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                _subscriptionInfo != null && _subscriptionInfo!.hasQuota
+                    ? Icons.cloud_done_rounded
+                    : Icons.cloud_queue_rounded,
+                color: _subscriptionInfo != null && _subscriptionInfo!.hasQuota
+                    ? VelocityColors.neonGreen
+                    : VelocityColors.textMuted,
+                size: 13,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                _subscriptionInfo != null
+                    ? '${_subscriptionInfo!.quotaDisplay(isFa)} • ${_subscriptionInfo!.remainingDisplay(isFa)}'
+                    : I18n.t('no_active_subscription'),
+                style: TextStyle(
+                  color: _subscriptionInfo != null && _subscriptionInfo!.hasQuota
+                      ? VelocityColors.neonGreen
+                      : VelocityColors.textMuted,
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w600,
+                  fontFamily: isFa ? 'Vazirmatn' : 'monospace',
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -1994,9 +2305,75 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   // -------------------------------------------------------------------------
-  // Active Server Card
+  // Active Server Card (Empty State & Active Node Display)
   // -------------------------------------------------------------------------
   Widget _buildActiveServerCard() {
+    if (_selectedServer == null || _servers.isEmpty) {
+      return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          color: VelocityColors.surfaceDark,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: VelocityColors.electricCyan.withOpacity(0.4), width: 1.2),
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: _showImportDialog,
+            borderRadius: BorderRadius.circular(16),
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: VelocityColors.electricCyan.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: VelocityColors.electricCyan.withOpacity(0.4)),
+                    ),
+                    child: const Icon(Icons.cloud_download_rounded, color: VelocityColors.electricCyan, size: 24),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          I18n.t('no_nodes_available'),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: VelocityColors.textPrimary,
+                            height: 1.3,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          '+ ${I18n.t('import_config')}',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: VelocityColors.electricCyan,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Icon(Icons.arrow_forward_ios, size: 14, color: VelocityColors.electricCyan),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    final server = _selectedServer!;
+
     return InkWell(
       onTap: _showServerBottomSheet,
       borderRadius: BorderRadius.circular(16),
@@ -2020,7 +2397,7 @@ class _HomeScreenState extends State<HomeScreen>
                 border: Border.all(color: VelocityColors.borderDark),
               ),
               child: Text(
-                _selectedServer.countryCode,
+                server.countryCode,
                 style: const TextStyle(fontSize: 22),
               ),
             ),
@@ -2043,7 +2420,7 @@ class _HomeScreenState extends State<HomeScreen>
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
-                          _selectedServer.protocol.label,
+                          server.protocol.label,
                           style: const TextStyle(
                             fontSize: 9,
                             color: VelocityColors.electricCyan,
@@ -2055,7 +2432,7 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    _selectedServer.name,
+                    server.name,
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -2071,14 +2448,14 @@ class _HomeScreenState extends State<HomeScreen>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
               decoration: BoxDecoration(
-                color: _selectedServer.pingColor.withOpacity(0.12),
+                color: server.pingColor.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: _selectedServer.pingColor, width: 1),
+                border: Border.all(color: server.pingColor, width: 1),
               ),
               child: Text(
-                _selectedServer.pingDisplay,
+                server.pingDisplay,
                 style: TextStyle(
-                  color: _selectedServer.pingColor,
+                  color: server.pingColor,
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
                 ),
@@ -2168,6 +2545,19 @@ class _HomeScreenState extends State<HomeScreen>
                         ),
                         Row(
                           children: [
+                            if (_servers.isNotEmpty)
+                              IconButton(
+                                icon: const Icon(Icons.delete_sweep_rounded, color: VelocityColors.neonPink, size: 20),
+                                tooltip: I18n.t('clear_all_nodes'),
+                                onPressed: () {
+                                  setState(() {
+                                    _servers.clear();
+                                    _selectedServer = null;
+                                  });
+                                  _savePersistedData();
+                                  setSheetState(() {});
+                                },
+                              ),
                             IconButton(
                               icon: const Icon(Icons.add_link, color: VelocityColors.electricCyan),
                               tooltip: I18n.t('import_config'),
@@ -2176,140 +2566,177 @@ class _HomeScreenState extends State<HomeScreen>
                                 _showImportDialog();
                               },
                             ),
-                            OutlinedButton.icon(
-                              style: OutlinedButton.styleFrom(
-                                side: const BorderSide(color: VelocityColors.electricCyan),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            if (_servers.isNotEmpty)
+                              OutlinedButton.icon(
+                                style: OutlinedButton.styleFrom(
+                                  side: const BorderSide(color: VelocityColors.electricCyan),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                ),
+                                onPressed: () async {
+                                  await _pingAllServers();
+                                  setSheetState(() {});
+                                },
+                                icon: const Icon(Icons.bolt, color: VelocityColors.electricCyan, size: 16),
+                                label: Text(
+                                  I18n.t('ping_all'),
+                                  style: const TextStyle(color: VelocityColors.electricCyan, fontSize: 11),
+                                ),
                               ),
-                              onPressed: () async {
-                                await _pingAllServers();
-                                setSheetState(() {});
-                              },
-                              icon: const Icon(Icons.bolt, color: VelocityColors.electricCyan, size: 16),
-                              label: Text(
-                                I18n.t('ping_all'),
-                                style: const TextStyle(color: VelocityColors.electricCyan, fontSize: 11),
-                              ),
-                            ),
                           ],
                         ),
                       ],
                     ),
                   ),
 
-                  // Search Bar & Sort by Lowest Ping Action
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            height: 38,
-                            decoration: BoxDecoration(
-                              color: VelocityColors.pureBlack,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: VelocityColors.borderDark),
-                            ),
-                            child: TextField(
-                              onChanged: (val) => setSheetState(() => searchQuery = val),
-                              style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12),
-                              decoration: InputDecoration(
-                                hintText: I18n.t('search_nodes'),
-                                hintStyle: const TextStyle(color: VelocityColors.textMuted, fontSize: 11),
-                                prefixIcon: const Icon(Icons.search_rounded, size: 16, color: VelocityColors.textMuted),
-                                border: InputBorder.none,
-                                contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                  if (_servers.isNotEmpty) ...[
+                    // Search Bar & Sort by Lowest Ping Action
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              height: 38,
+                              decoration: BoxDecoration(
+                                color: VelocityColors.pureBlack,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: VelocityColors.borderDark),
+                              ),
+                              child: TextField(
+                                onChanged: (val) => setSheetState(() => searchQuery = val),
+                                style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12),
+                                decoration: InputDecoration(
+                                  hintText: I18n.t('search_nodes'),
+                                  hintStyle: const TextStyle(color: VelocityColors.textMuted, fontSize: 11),
+                                  prefixIcon: const Icon(Icons.search_rounded, size: 16, color: VelocityColors.textMuted),
+                                  border: InputBorder.none,
+                                  contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        InkWell(
-                          onTap: () => setSheetState(() => sortByLowestPing = !sortByLowestPing),
-                          borderRadius: BorderRadius.circular(10),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: sortByLowestPing
-                                  ? VelocityColors.neonGreen.withOpacity(0.18)
-                                  : VelocityColors.surfaceElevated,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: sortByLowestPing ? VelocityColors.neonGreen : VelocityColors.borderDark,
-                              ),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.speed_rounded,
-                                  size: 16,
-                                  color: sortByLowestPing ? VelocityColors.neonGreen : VelocityColors.textSecondary,
+                          const SizedBox(width: 8),
+                          InkWell(
+                            onTap: () => setSheetState(() => sortByLowestPing = !sortByLowestPing),
+                            borderRadius: BorderRadius.circular(10),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: sortByLowestPing
+                                    ? VelocityColors.neonGreen.withOpacity(0.18)
+                                    : VelocityColors.surfaceElevated,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: sortByLowestPing ? VelocityColors.neonGreen : VelocityColors.borderDark,
                                 ),
-                                const SizedBox(width: 5),
-                                Text(
-                                  I18n.t('sort_lowest_ping'),
-                                  style: TextStyle(
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.speed_rounded,
+                                    size: 16,
                                     color: sortByLowestPing ? VelocityColors.neonGreen : VelocityColors.textSecondary,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    I18n.t('sort_lowest_ping'),
+                                    style: TextStyle(
+                                      color: sortByLowestPing ? VelocityColors.neonGreen : VelocityColors.textSecondary,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
 
-                  // Protocol Filter Chips
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                    child: Row(
-                      children: ['ALL', 'VLESS', 'HYSTERIA2', 'TROJAN', 'VMESS'].map<Widget>((proto) {
-                        final isChipSelected = selectedProtocolFilter == proto;
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 6),
-                          child: ChoiceChip(
-                            label: Text(proto),
-                            selected: isChipSelected,
-                            selectedColor: VelocityColors.electricCyan.withOpacity(0.2),
-                            backgroundColor: VelocityColors.pureBlack,
-                            side: BorderSide(
-                              color: isChipSelected ? VelocityColors.electricCyan : VelocityColors.borderDark,
+                    // Protocol Filter Chips
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                      child: Row(
+                        children: ['ALL', 'VLESS', 'HYSTERIA2', 'TROJAN', 'VMESS', 'SHADOWSOCKS'].map<Widget>((proto) {
+                          final isChipSelected = selectedProtocolFilter == proto;
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 6),
+                            child: ChoiceChip(
+                              label: Text(proto),
+                              selected: isChipSelected,
+                              selectedColor: VelocityColors.electricCyan.withOpacity(0.2),
+                              backgroundColor: VelocityColors.pureBlack,
+                              side: BorderSide(
+                                color: isChipSelected ? VelocityColors.electricCyan : VelocityColors.borderDark,
+                              ),
+                              labelStyle: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: isChipSelected ? VelocityColors.electricCyan : VelocityColors.textMuted,
+                              ),
+                              onSelected: (selected) {
+                                if (selected) {
+                                  setSheetState(() => selectedProtocolFilter = proto);
+                                }
+                              },
                             ),
-                            labelStyle: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              color: isChipSelected ? VelocityColors.electricCyan : VelocityColors.textMuted,
-                            ),
-                            onSelected: (selected) {
-                              if (selected) {
-                                setSheetState(() => selectedProtocolFilter = proto);
-                              }
-                            },
-                          ),
-                        );
-                      }).toList(),
+                          );
+                        }).toList(),
+                      ),
                     ),
-                  ),
 
-                  const Divider(color: VelocityColors.borderDark, height: 1),
+                    const Divider(color: VelocityColors.borderDark, height: 1),
+                  ],
+
                   Expanded(
                     child: displayServers.isEmpty
                         ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.search_off_rounded, size: 36, color: VelocityColors.textMuted),
-                                const SizedBox(height: 8),
-                                Text(
-                                  I18n.t('no_nodes_found'),
-                                  style: const TextStyle(color: VelocityColors.textMuted, fontSize: 13),
-                                ),
-                              ],
+                            child: Padding(
+                              padding: const EdgeInsets.all(24),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: VelocityColors.electricCyan.withOpacity(0.1),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(Icons.cloud_off_rounded, size: 42, color: VelocityColors.electricCyan),
+                                  ),
+                                  const SizedBox(height: 14),
+                                  Text(
+                                    I18n.t('no_nodes_available'),
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      color: VelocityColors.textPrimary,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: VelocityColors.electricCyan,
+                                      foregroundColor: VelocityColors.pureBlack,
+                                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      _showImportDialog();
+                                    },
+                                    icon: const Icon(Icons.add_link, size: 18),
+                                    label: Text(
+                                      I18n.t('import_config'),
+                                      style: const TextStyle(fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           )
                         : ListView.builder(
@@ -2317,7 +2744,7 @@ class _HomeScreenState extends State<HomeScreen>
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             itemBuilder: (context, index) {
                               final server = displayServers[index];
-                              final isSelected = server.id == _selectedServer.id;
+                              final isSelected = _selectedServer != null && server.id == _selectedServer!.id;
 
                               return Container(
                                 margin: const EdgeInsets.only(bottom: 8),
@@ -2334,6 +2761,7 @@ class _HomeScreenState extends State<HomeScreen>
                                 child: ListTile(
                                   onTap: () {
                                     setState(() => _selectedServer = server);
+                                    _savePersistedData();
                                     Navigator.pop(context);
                                   },
                                   leading: Container(
@@ -2377,26 +2805,45 @@ class _HomeScreenState extends State<HomeScreen>
                                       ),
                                       const SizedBox(width: 8),
                                       Text(
-                                        server.trafficUsage,
+                                        '${server.host}:${server.port}',
                                         style: const TextStyle(color: VelocityColors.textMuted, fontSize: 10),
                                       ),
                                     ],
                                   ),
-                                  trailing: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: server.pingColor.withOpacity(0.12),
-                                      borderRadius: BorderRadius.circular(6),
-                                      border: Border.all(color: server.pingColor),
-                                    ),
-                                    child: Text(
-                                      server.pingDisplay,
-                                      style: TextStyle(
-                                        color: server.pingColor,
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: server.pingColor.withOpacity(0.12),
+                                          borderRadius: BorderRadius.circular(6),
+                                          border: Border.all(color: server.pingColor),
+                                        ),
+                                        child: Text(
+                                          server.pingDisplay,
+                                          style: TextStyle(
+                                            color: server.pingColor,
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                      IconButton(
+                                        icon: const Icon(Icons.close_rounded, size: 16, color: VelocityColors.textMuted),
+                                        tooltip: I18n.t('delete_node'),
+                                        onPressed: () {
+                                          setState(() {
+                                            _servers.removeWhere((s) => s.id == server.id);
+                                            if (_selectedServer?.id == server.id) {
+                                              _selectedServer = _servers.isNotEmpty ? _servers.first : null;
+                                            }
+                                          });
+                                          _savePersistedData();
+                                          setSheetState(() {});
+                                        },
+                                      ),
+                                    ],
                                   ),
                                 ),
                               );
@@ -2526,98 +2973,214 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   // -------------------------------------------------------------------------
-  // Import Config Dialog
+  // Import Config / Subscription URL Dialog with Real HTTP & Header Parsing
   // -------------------------------------------------------------------------
   void _showImportDialog() {
     final controller = TextEditingController();
+    bool isLoading = false;
+
     showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: VelocityColors.surfaceDark,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: VelocityColors.borderDark),
-          ),
-          title: Row(
-            children: [
-              const Icon(Icons.add_link, color: VelocityColors.electricCyan),
-              const SizedBox(width: 8),
-              Text(
-                I18n.t('import_config'),
-                style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 16),
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: VelocityColors.surfaceDark,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: const BorderSide(color: VelocityColors.borderDark),
               ),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                I18n.t('import_prompt'),
-                style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 12),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: controller,
-                maxLines: 3,
-                style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12),
-                decoration: InputDecoration(
-                  hintText: 'vless://..., vmess://..., trojan://..., hysteria2://...',
-                  hintStyle: const TextStyle(color: VelocityColors.textMuted, fontSize: 11),
-                  filled: true,
-                  fillColor: VelocityColors.pureBlack,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: VelocityColors.borderDark),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: VelocityColors.electricCyan),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(I18n.t('cancel'), style: const TextStyle(color: VelocityColors.textSecondary)),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: VelocityColors.electricCyan,
-                foregroundColor: VelocityColors.pureBlack,
-              ),
-              onPressed: () async {
-                final text = controller.text.trim();
-                if (text.isNotEmpty) {
-                  final newProfile = ConfigLinkParser.parse(text);
-                  // Run immediate ping health-check
-                  final ping = await _simulatePing(newProfile.address, newProfile.port);
-                  newProfile.pingMs = ping;
-                  setState(() {
-                    _servers.insert(0, newProfile);
-                    _selectedServer = newProfile;
-                  });
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Row(
-                        children: [
-                          const Icon(Icons.check_circle, color: VelocityColors.neonGreen, size: 18),
-                          const SizedBox(width: 8),
-                          Text('${I18n.t('import_success')}: ${newProfile.name} (${newProfile.pingDisplay})'),
-                        ],
-                      ),
-                      backgroundColor: VelocityColors.surfaceElevated,
-                      duration: const Duration(seconds: 3),
+              title: Row(
+                children: [
+                  const Icon(Icons.add_link, color: VelocityColors.electricCyan),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      I18n.t('import_config'),
+                      style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 16, fontWeight: FontWeight.bold),
                     ),
-                  );
-                }
-              },
-              child: Text(I18n.t('import_btn')),
-            ),
-          ],
+                  ),
+                ],
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    I18n.t('import_prompt'),
+                    style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 12),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: controller,
+                    enabled: !isLoading,
+                    maxLines: 4,
+                    style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12),
+                    decoration: InputDecoration(
+                      hintText: 'https://sub.example.com/api/v1/client/subscribe?token=...\nor vless://, vmess://, trojan://, ss://, hy2://',
+                      hintStyle: const TextStyle(color: VelocityColors.textMuted, fontSize: 11),
+                      filled: true,
+                      fillColor: VelocityColors.pureBlack,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: VelocityColors.borderDark),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: VelocityColors.electricCyan),
+                      ),
+                    ),
+                  ),
+                  if (isLoading) ...[
+                    const SizedBox(height: 14),
+                    Row(
+                      children: [
+                        const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(VelocityColors.electricCyan),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            I18n.t('fetching_sub'),
+                            style: const TextStyle(color: VelocityColors.electricCyan, fontSize: 11),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: isLoading ? null : () => Navigator.pop(dialogContext),
+                  child: Text(I18n.t('cancel'), style: const TextStyle(color: VelocityColors.textSecondary)),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: VelocityColors.electricCyan,
+                    foregroundColor: VelocityColors.pureBlack,
+                  ),
+                  onPressed: isLoading
+                      ? null
+                      : () async {
+                          final input = controller.text.trim();
+                          if (input.isEmpty) return;
+
+                          setDialogState(() => isLoading = true);
+
+                          try {
+                            List<ServerProfile> parsedProfiles = [];
+                            SubscriptionInfo? fetchedSub;
+
+                            if (input.startsWith('http://') || input.startsWith('https://')) {
+                              // Real HTTP/HTTPS Subscription fetch
+                              final uri = Uri.parse(input);
+                              final response = await http.get(
+                                uri,
+                                headers: {
+                                  'User-Agent': 'v2rayNG/1.8.0 sing-box/1.8.0 VelocityVPN/1.0',
+                                  'Accept': '*/*',
+                                },
+                              ).timeout(const Duration(seconds: 15));
+
+                              if (response.statusCode >= 200 && response.statusCode < 300) {
+                                // Extract subscription-userinfo header
+                                String? userInfoHeader;
+                                response.headers.forEach((k, v) {
+                                  if (k.toLowerCase() == 'subscription-userinfo') {
+                                    userInfoHeader = v;
+                                  }
+                                });
+
+                                fetchedSub = SubscriptionInfo.fromHeader(userInfoHeader, input);
+                                parsedProfiles = ConfigLinkParser.parseMultiple(response.body);
+                              } else {
+                                throw Exception('HTTP ${response.statusCode}');
+                              }
+                            } else {
+                              // Direct configs or multi-line/base64 pasted
+                              parsedProfiles = ConfigLinkParser.parseMultiple(input);
+                              if (parsedProfiles.isEmpty) {
+                                final single = ConfigLinkParser.parse(input);
+                                if (single != null) {
+                                  parsedProfiles = [single];
+                                }
+                              }
+                            }
+
+                            if (parsedProfiles.isEmpty) {
+                              if (!mounted) return;
+                              setDialogState(() => isLoading = false);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  backgroundColor: VelocityColors.neonPink,
+                                  content: Text(I18n.t('import_failed')),
+                                ),
+                              );
+                              return;
+                            }
+
+                            // Run initial ping measurements on imported servers
+                            for (var p in parsedProfiles) {
+                              p.pingMs = await _simulatePing(p.host, p.port);
+                            }
+
+                            setState(() {
+                              if (fetchedSub != null) {
+                                _subscriptionInfo = fetchedSub;
+                              }
+                              for (var p in parsedProfiles.reversed) {
+                                _servers.insert(0, p);
+                              }
+                              _selectedServer = _servers.first;
+                            });
+
+                            await _savePersistedData();
+
+                            if (Navigator.canPop(dialogContext)) {
+                              Navigator.pop(dialogContext);
+                            }
+
+                            if (!mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                backgroundColor: VelocityColors.surfaceElevated,
+                                duration: const Duration(seconds: 4),
+                                content: Row(
+                                  children: [
+                                    const Icon(Icons.check_circle, color: VelocityColors.neonGreen, size: 20),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        '${I18n.t('subscription_imported')} (+${parsedProfiles.length} ${I18n.t('servers_count')})',
+                                        style: const TextStyle(color: VelocityColors.neonGreen, fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          } catch (err) {
+                            if (!mounted) return;
+                            setDialogState(() => isLoading = false);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                backgroundColor: VelocityColors.neonPink,
+                                content: Text('${I18n.t('import_failed')}: $err'),
+                              ),
+                            );
+                          }
+                        },
+                  child: Text(I18n.t('import_btn')),
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -2625,7 +3188,7 @@ class _HomeScreenState extends State<HomeScreen>
 }
 
 // ---------------------------------------------------------------------------
-// Velocity VIP Activation & Receipt Upload Screen
+// Velocity VIP Activation & Telegram Checkout Screen
 // ---------------------------------------------------------------------------
 class ReceiptUploadScreen extends StatefulWidget {
   final bool isFa;
@@ -2648,115 +3211,15 @@ class ReceiptUploadScreen extends StatefulWidget {
 }
 
 class _ReceiptUploadScreenState extends State<ReceiptUploadScreen> {
-  final _txIdController = TextEditingController();
   int _selectedPlanIndex = 0;
-  bool _imageAttached = false;
-  bool _isSubmitting = false;
 
-  void _copyToClipboard(String text, String label) {
-    Clipboard.setData(ClipboardData(text: text));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: VelocityColors.surfaceElevated,
-        content: Text(
-          '$label copied to clipboard!',
-          style: const TextStyle(color: VelocityColors.electricCyan, fontWeight: FontWeight.bold),
-        ),
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
-
-  void _submitReceipt(List<VelocityPlan> activePlans) async {
-    if (_txIdController.text.trim().isEmpty && !_imageAttached) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: VelocityColors.neonPink,
-          content: Text('Please enter Ref ID or attach receipt image proof'),
-        ),
-      );
-      return;
+  Future<void> _launchTelegramSupport() async {
+    try {
+      final uri = Uri.parse('https://t.me/Velocity_Support');
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      debugPrint('Error launching telegram: $e');
     }
-
-    setState(() => _isSubmitting = true);
-    await Future.delayed(const Duration(milliseconds: 1400));
-    if (!mounted) return;
-    setState(() => _isSubmitting = false);
-
-    VelocityPlan? chosenPlan;
-    if (activePlans.isNotEmpty && _selectedPlanIndex < activePlans.length) {
-      chosenPlan = activePlans[_selectedPlanIndex];
-      widget.onPlanPurchased?.call(chosenPlan);
-    }
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: VelocityColors.surfaceDark,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: VelocityColors.neonGreen),
-          ),
-          title: const Row(
-            children: [
-              Icon(Icons.check_circle, color: VelocityColors.neonGreen),
-              SizedBox(width: 8),
-              Text(
-                'Proof Submitted',
-                style: TextStyle(color: VelocityColors.neonGreen, fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                I18n.t('receipt_success'),
-                style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 13),
-              ),
-              if (chosenPlan != null) ...[
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: VelocityColors.pureBlack,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: VelocityColors.electricCyan.withOpacity(0.4)),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.bolt, color: VelocityColors.neonYellow, size: 18),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          'Activated: ${chosenPlan.name} (${chosenPlan.dataQuota})',
-                          style: const TextStyle(color: VelocityColors.electricCyan, fontSize: 12, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ],
-          ),
-          actions: [
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: VelocityColors.neonGreen,
-                foregroundColor: VelocityColors.pureBlack,
-              ),
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pop(context);
-              },
-              child: Text(I18n.t('close')),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override
@@ -2794,7 +3257,7 @@ class _ReceiptUploadScreenState extends State<ReceiptUploadScreen> {
               children: [
                 // Telegram Direct Activation Card
                 InkWell(
-                  onTap: widget.onOpenTelegram,
+                  onTap: _launchTelegramSupport,
                   borderRadius: BorderRadius.circular(14),
                   child: Container(
                     padding: const EdgeInsets.all(14),
@@ -2986,206 +3449,39 @@ class _ReceiptUploadScreenState extends State<ReceiptUploadScreen> {
                     );
                   }),
 
-                const SizedBox(height: 12),
+                const SizedBox(height: 20),
 
-                // Payment Gateways with Quick Copy
-                Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: VelocityColors.surfaceDark,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: VelocityColors.borderDark),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Row(
-                        children: [
-                          Icon(Icons.currency_exchange, color: VelocityColors.neonYellow, size: 16),
-                          SizedBox(width: 6),
-                          Text(
-                            'Official Velocity Payment Gateways:',
-                            style: TextStyle(color: VelocityColors.neonYellow, fontSize: 12, fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      // USDT TRC20
-                      InkWell(
-                        onTap: () => _copyToClipboard('TQk8mVELOCITY983xLp24VpNd78Qz', 'USDT Address'),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                          margin: const EdgeInsets.only(bottom: 6),
-                          decoration: BoxDecoration(
-                            color: VelocityColors.pureBlack,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: VelocityColors.borderDark),
-                          ),
-                          child: const Row(
-                            children: [
-                              Icon(Icons.monetization_on_outlined, color: VelocityColors.neonGreen, size: 15),
-                              SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  'USDT (TRC-20): TQk8mVELOCITY983xLp24VpNd78Qz',
-                                  style: TextStyle(color: VelocityColors.textPrimary, fontSize: 10.5, fontFamily: 'monospace'),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              Icon(Icons.copy, color: VelocityColors.electricCyan, size: 14),
-                            ],
-                          ),
-                        ),
-                      ),
-                      // TON / Telegram Wallet
-                      InkWell(
-                        onTap: () => _copyToClipboard('EQBvVELOCITY_CORE_TON_4421', 'TON Address'),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: VelocityColors.pureBlack,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: VelocityColors.borderDark),
-                          ),
-                          child: const Row(
-                            children: [
-                              Icon(Icons.account_balance_wallet_outlined, color: VelocityColors.electricCyan, size: 15),
-                              SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  'TON / Telegram: EQBvVELOCITY_CORE_TON_4421',
-                                  style: TextStyle(color: VelocityColors.textPrimary, fontSize: 10.5, fontFamily: 'monospace'),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              Icon(Icons.copy, color: VelocityColors.electricCyan, size: 14),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                // Transaction Hash Field
-                Text(
-                  I18n.t('tx_id'),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: VelocityColors.electricCyan,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: _txIdController,
-                  style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 13),
-                  decoration: InputDecoration(
-                    hintText: I18n.t('tx_placeholder'),
-                    hintStyle: const TextStyle(color: VelocityColors.textMuted, fontSize: 12),
-                    filled: true,
-                    fillColor: VelocityColors.surfaceDark,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: VelocityColors.borderDark),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: VelocityColors.electricCyan),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                // Simulated Image Attachment
-                InkWell(
-                  onTap: () => setState(() => _imageAttached = true),
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 22),
-                    decoration: BoxDecoration(
-                      color: _imageAttached
-                          ? VelocityColors.neonGreen.withOpacity(0.08)
-                          : VelocityColors.surfaceDark,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: _imageAttached ? VelocityColors.neonGreen : VelocityColors.borderDark,
-                        width: 1.5,
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        Icon(
-                          _imageAttached ? Icons.check_circle : Icons.cloud_upload_outlined,
-                          size: 36,
-                          color: _imageAttached ? VelocityColors.neonGreen : VelocityColors.electricCyan,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          _imageAttached
-                              ? I18n.t('receipt_attached')
-                              : I18n.t('upload_image_btn'),
-                          style: TextStyle(
-                            color: _imageAttached ? VelocityColors.neonGreen : VelocityColors.textPrimary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
-                          ),
-                        ),
-                        if (_imageAttached)
-                          const Padding(
-                            padding: EdgeInsets.only(top: 4),
-                            child: Text(
-                              'velocity_receipt_2026.png (1.4 MB)',
-                              style: TextStyle(color: VelocityColors.textSecondary, fontSize: 10),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                // Submit Button
+                // Telegram Action Button
                 SizedBox(
                   width: double.infinity,
-                  height: 52,
+                  height: 54,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: VelocityColors.electricCyan,
                       foregroundColor: VelocityColors.pureBlack,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      elevation: 4,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      elevation: 6,
+                      shadowColor: VelocityColors.electricCyan.withOpacity(0.4),
                     ),
-                    onPressed: _isSubmitting ? null : () => _submitReceipt(activePlans),
-                    child: _isSubmitting
-                        ? const SizedBox(
-                            width: 22,
-                            height: 22,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.5,
-                              valueColor: AlwaysStoppedAnimation<Color>(VelocityColors.pureBlack),
+                    onPressed: _launchTelegramSupport,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.send_rounded, size: 20),
+                        const SizedBox(width: 10),
+                        Flexible(
+                          child: Text(
+                            I18n.t('telegram_checkout_btn'),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 0.3,
                             ),
-                          )
-                        : Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.send_rounded, size: 20),
-                              const SizedBox(width: 8),
-                              Text(
-                                I18n.t('submit_receipt'),
-                                style: const TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                            ],
                           ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),
