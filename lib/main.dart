@@ -1558,7 +1558,7 @@ class _HomeScreenState extends State<HomeScreen>
       if (_selectedServer != null) {
         await VelocityNotificationService.showVpnConnectedNotification(
           serverName: _selectedServer!.name,
-          pingMs: _selectedServer!.pingMs,
+          pingMs: _selectedServer!.pingMs ?? 0,
         );
       }
     } else if (_vpnState == VpnState.connected) {
