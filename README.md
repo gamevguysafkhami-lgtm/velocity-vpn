@@ -68,12 +68,13 @@
 </div>
 
 | پلتفرم / سیستم‌عامل | نسخه و معماری | راهنمای نصب و نکات اختصاصی | وضعیت |
+| پلتفرم / سیستم‌عامل | نسخه و معماری | لینک دریافت مستقیم | وضعیت |
 | :--- | :--- | :--- | :--- |
-| **Android (سامسونگ، پیکسل و...)** | `Universal APK` (ARM64 / ARMv7) | دانلود مستقیم فایل `.apk` از بخش Releases یا تب Actions گیت‌هاب و فعال‌سازی Allow Unknown Sources. | 🟢 استیبل |
-| **Xiaomi (MIUI / HyperOS)** | `APK بهینه‌شده` | نصب فایل APK. در صورت بروز وقفه در پس‌زمینه: خاموش کردن Battery Saver برای برنامه و فعال‌سازی Auto-start. | 🟢 استیبل |
-| **Windows** | `Windows x64 (.exe / .zip)` | دانلود سورس یا پکیج ریلیز، اجرای فایل خروجی در ویندوز ۱۰ و ۱۱، بدون نیاز به پیش‌نیاز اضافه. | 🟡 آزمایشی |
-| **macOS** | `Apple Silicon (M1/M2/M3) & Intel` | نیازمند کامپایل محلی یا نصب فایل `.dmg` خروجی بیلد مک با دسترسی روت برای رابط TUN. | 🟡 آزمایشی |
-| **iOS (iPhone / iPad)** | `IPA / TestFlight` | به دلیل سیاست‌های امنیتی اپل، کلاینت نیازمند ساین با Apple Developer یا نصب از طریق AltStore / TrollStore است. | 🔄 در حال آماده‌سازی |
+| **Android (سامسونگ، پیکسل و...)** | `Universal APK` | [⬇️ **دانلود مستقیم APK**](https://github.com/gamevguysafkhami-lgtm/velocity-vpn/releases/latest/download/Velocity-VPN-Universal-Release.apk) | 🟢 استیبل |
+| **Xiaomi (MIUI / HyperOS)** | `APK بهینه‌شده` | [⬇️ **دانلود مستقیم APK**](https://github.com/gamevguysafkhami-lgtm/velocity-vpn/releases/latest/download/Velocity-VPN-Universal-Release.apk) | 🟢 استیبل |
+| **Windows** | `Windows x64 (.exe / .zip)` | [صفحه دانلود ریلیزها](https://github.com/gamevguysafkhami-lgtm/velocity-vpn/releases) | 🟡 آزمایشی |
+| **macOS** | `Apple Silicon & Intel` | نیازمند بیلد لوکال / Releases | 🟡 آزمایشی |
+| **iOS (iPhone / iPad)** | `IPA / TestFlight` | از طریق AltStore / TrollStore | 🔄 در حال آماده‌سازی |
 
 <div dir="rtl">
 
