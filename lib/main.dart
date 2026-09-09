@@ -27,15 +27,24 @@ class VelocityColors {
   static const Color surfaceElevated = Color(0xFF131927);
   static const Color borderDark = Color(0xFF1B2338);
 
-  static const Color electricCyan = Color(0xFF00E5FF);
-  static const Color deepCyan = Color(0xFF00B0FF);
+  // Dynamic active primary accent (defaults to Electric Cyan)
+  static Color electricCyan = const Color(0xFF00E5FF);
+  static Color deepCyan = const Color(0xFF00B0FF);
+
   static const Color neonGreen = Color(0xFF00FF88);
   static const Color neonPink = Color(0xFFFF1744);
   static const Color neonYellow = Color(0xFFFFD600);
+  static const Color neonViolet = Color(0xFFD500F9);
+  static const Color neonAmber = Color(0xFFFF9100);
 
   static const Color textPrimary = Color(0xFFFFFFFF);
   static const Color textSecondary = Color(0xFF8FA0B8);
   static const Color textMuted = Color(0xFF4A5568);
+
+  static void setNeonAccent(Color primary, Color secondary) {
+    electricCyan = primary;
+    deepCyan = secondary;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -184,6 +193,40 @@ class I18n {
     'save_plan_btn': {'en': 'SAVE PLAN', 'fa': 'ذخیره تغییرات'},
     'plan_saved': {'en': 'Plan successfully updated!', 'fa': 'پلن اشتراک با موفقیت ذخیره شد!'},
     'plan_deleted': {'en': 'Plan deleted from system.', 'fa': 'پلن از سیستم حذف شد.'},
+    // Power-User, Node Management & Settings Strings
+    'search_nodes_hint': {'en': 'Search by country, city, protocol...', 'fa': 'جستجو بر اساس کشور، شهر یا پروتکل...'},
+    'sort_lowest_ping': {'en': 'Sort by Lowest Ping', 'fa': 'مرتب‌سازی بر اساس کمترین پینگ'},
+    'sort_default': {'en': 'Reset Node Order', 'fa': 'چینش پیش‌فرض سرورها'},
+    'step_priority_title': {'en': '2. Protocol & Network Priority', 'fa': '۲. اولویت پروتکل و شبکه'},
+    'step_priority_desc': {'en': 'Select preferred anti-censorship protocols for your connection', 'fa': 'پروتکل‌های مورد نظر خود را جهت عبور مطمئن از فیلترینگ انتخاب کنید'},
+    'settings_title': {'en': 'VELOCITY POWER-USER SETTINGS', 'fa': 'تنظیمات پیشرفته ولوسیتی'},
+    'settings_subtitle': {'en': 'CORE TUNNEL & NETWORK ENGINE', 'fa': 'موتور تونل و شخصی‌سازی هسته'},
+    'tab_routing_bypass': {'en': 'Routing & Bypass', 'fa': 'مسیریابی و بای‌پس'},
+    'tab_tun_core': {'en': 'TUN & Core Engine', 'fa': 'تنظیمات هسته TUN'},
+    'tab_split_tunnel': {'en': 'Split Tunneling', 'fa': 'تفکیک ترافیک برنامه‌ها'},
+    'tab_visual_theme': {'en': 'Visual Neon Customizer', 'fa': 'شخصی‌سازی رنگ نئون'},
+    'admin_tab_plans': {'en': 'Plans Management', 'fa': 'مدیریت پلن‌ها'},
+    'admin_tab_api': {'en': 'API & Panel Sync', 'fa': 'همگام‌سازی پنل و API'},
+    'api_backend_provider': {'en': 'VPN Panel Type', 'fa': 'نوع پنل وی‌پی‌ان'},
+    'api_server_url': {'en': 'Panel Base URL', 'fa': 'آدرس سرور پنل'},
+    'api_token_label': {'en': 'API Access Token / Secret', 'fa': 'توکن دسترسی API'},
+    'btn_sync_now': {'en': 'SYNC WITH EXTERNAL PANEL', 'fa': 'همگام‌سازی و دریافت سرورها'},
+    'sync_success': {'en': 'External Panel synchronized! Nodes updated.', 'fa': 'همگام‌سازی با موفقیت انجام شد! لیست سرورها بروزرسانی گردید.'},
+    'mock_grant_vpn': {'en': 'Mock Grant VpnService', 'fa': 'تایید دسترسی VpnService'},
+    'mock_grant_notif': {'en': 'Mock Grant Notifications', 'fa': 'تایید دسترسی اعلان‌ها'},
+    'finish_setup_enter': {'en': 'FINISH SETUP & ENTER VELOCITY', 'fa': 'پایان راه‌اندازی و ورود به ولوسیتی'},
+    'sub_link_imported': {'en': 'Subscription link imported! Verified node added.', 'fa': 'لینک سابسکریپشن وارد و سرور فعال اضافه گردید.'},
+    'search_nodes': {'en': 'Search servers or protocols...', 'fa': 'جستجوی سرور یا پروتکل...'},
+    'no_nodes_found': {'en': 'No servers match your filter.', 'fa': 'هیچ سروری با فیلتر شما یافت نشد.'},
+    'import_success': {'en': 'Server verified & imported', 'fa': 'سرور بررسی و اضافه شد'},
+    'admin_tab_panels': {'en': 'API & Panel Sync', 'fa': 'همگام‌سازی پنل و API'},
+    'panel_sync_title': {'en': 'AUTOMATED INBOUND SYNC ENGINE', 'fa': 'موتور همگام‌سازی خودکار سرورها'},
+    'panel_sync_desc': {'en': 'Connect directly to Marzban, 3X-UI, or Hiddify panels to pull active inbounds in real-time.', 'fa': 'اتصال مستقیم به پنل‌های مرزبان، ۳X-UI یا هیدیفای برای دریافت آنی سرورها.'},
+    'select_backend_type': {'en': 'External Backend Provider', 'fa': 'ارائه‌دهنده پنل خارجی'},
+    'panel_api_url': {'en': 'Panel Base URL (HTTPS)', 'fa': 'آدرس کامل پنل (HTTPS)'},
+    'panel_api_token': {'en': 'Admin API Token / Secret', 'fa': 'توکن امنیتی دسترسی ادمین'},
+    'syncing_nodes': {'en': 'Connecting to Panel & Fetching Inbounds...', 'fa': 'در حال اتصال به پنل و دریافت سرورها...'},
+    'synced_nodes_title': {'en': 'Active Synced Inbounds', 'fa': 'سرورهای فعال دریافت شده'},
   };
 
   static String t(String key) {
@@ -328,7 +371,7 @@ class ServerProfile {
   final String sni;
   int? pingMs;
   bool isTesting;
-  final String trafficUsage;
+  String trafficUsage;
 
   ServerProfile({
     required this.id,
@@ -423,7 +466,7 @@ class ConfigLinkParser {
       port: port,
       sni: sni,
       pingMs: 95 + math.Random().nextInt(40),
-      trafficUsage = '0.0 GB / 300 GB',
+      trafficUsage: '0.0 GB / 300 GB',
     );
   }
 }
@@ -1348,6 +1391,24 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  void _openPowerUserSettings() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => VelocityPowerUserSettingsScreen(
+          isFa: I18n.currentLang == AppLanguage.fa,
+          currentRoutingMode: _routingMode,
+          onRoutingModeChanged: (mode) {
+            setState(() => _routingMode = mode);
+          },
+          onAccentChanged: () {
+            setState(() {});
+          },
+        ),
+      ),
+    );
+  }
+
   String _formattedDuration() {
     final hours = _connectedSeconds ~/ 3600;
     final minutes = (_connectedSeconds % 3600) ~/ 60;
@@ -1475,6 +1536,12 @@ class _HomeScreenState extends State<HomeScreen>
                     icon: const Icon(Icons.receipt_long_rounded, color: VelocityColors.neonYellow, size: 22),
                     tooltip: I18n.t('receipt_title'),
                     onPressed: _openReceiptUploadScreen,
+                  ),
+                  // Power-User Settings button
+                  IconButton(
+                    icon: const Icon(Icons.tune_rounded, color: VelocityColors.electricCyan, size: 21),
+                    tooltip: I18n.t('settings_title'),
+                    onPressed: _openPowerUserSettings,
                   ),
                   // Language toggle (EN/FA)
                   InkWell(
@@ -2027,6 +2094,10 @@ class _HomeScreenState extends State<HomeScreen>
   // Server Selection Bottom Sheet
   // -------------------------------------------------------------------------
   void _showServerBottomSheet() {
+    String searchQuery = '';
+    String selectedProtocolFilter = 'ALL';
+    bool sortByLowestPing = false;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -2037,8 +2108,26 @@ class _HomeScreenState extends State<HomeScreen>
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setSheetState) {
+            // Apply filtering and smart sorting
+            List<ServerProfile> displayServers = _servers.where((server) {
+              final q = searchQuery.toLowerCase();
+              final matchesSearch = q.isEmpty ||
+                  server.name.toLowerCase().contains(q) ||
+                  server.countryCode.toLowerCase().contains(q) ||
+                  server.protocol.name.toLowerCase().contains(q);
+
+              final matchesProtocol = selectedProtocolFilter == 'ALL' ||
+                  server.protocol.label.toUpperCase() == selectedProtocolFilter;
+
+              return matchesSearch && matchesProtocol;
+            }).toList();
+
+            if (sortByLowestPing) {
+              displayServers.sort((a, b) => a.pingMs.compareTo(b.pingMs));
+            }
+
             return Container(
-              height: MediaQuery.of(context).size.height * 0.70,
+              height: MediaQuery.of(context).size.height * 0.85,
               padding: const EdgeInsets.only(top: 12),
               child: Column(
                 children: [
@@ -2067,7 +2156,7 @@ class _HomeScreenState extends State<HomeScreen>
                               ),
                             ),
                             Text(
-                              '${_servers.length} ${I18n.t('servers_count')}',
+                              '${displayServers.length} / ${_servers.length} ${I18n.t('servers_count')}',
                               style: const TextStyle(
                                 fontSize: 12,
                                 color: VelocityColors.textSecondary,
@@ -2089,6 +2178,7 @@ class _HomeScreenState extends State<HomeScreen>
                               style: OutlinedButton.styleFrom(
                                 side: const BorderSide(color: VelocityColors.electricCyan),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                               ),
                               onPressed: () async {
                                 await _pingAllServers();
@@ -2097,7 +2187,7 @@ class _HomeScreenState extends State<HomeScreen>
                               icon: const Icon(Icons.bolt, color: VelocityColors.electricCyan, size: 16),
                               label: Text(
                                 I18n.t('ping_all'),
-                                style: const TextStyle(color: VelocityColors.electricCyan, fontSize: 12),
+                                style: const TextStyle(color: VelocityColors.electricCyan, fontSize: 11),
                               ),
                             ),
                           ],
@@ -2105,98 +2195,211 @@ class _HomeScreenState extends State<HomeScreen>
                       ],
                     ),
                   ),
-                  const Divider(color: VelocityColors.borderDark, height: 1),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: _servers.length,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      itemBuilder: (context, index) {
-                        final server = _servers[index];
-                        final isSelected = server.id == _selectedServer.id;
 
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 8),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? VelocityColors.electricCyan.withOpacity(0.08)
-                                : VelocityColors.surfaceElevated,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: isSelected ? VelocityColors.electricCyan : VelocityColors.borderDark,
-                              width: isSelected ? 1.5 : 1,
+                  // Search Bar & Sort by Lowest Ping Action
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            height: 38,
+                            decoration: BoxDecoration(
+                              color: VelocityColors.pureBlack,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: VelocityColors.borderDark),
+                            ),
+                            child: TextField(
+                              onChanged: (val) => setSheetState(() => searchQuery = val),
+                              style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12),
+                              decoration: InputDecoration(
+                                hintText: I18n.t('search_nodes'),
+                                hintStyle: const TextStyle(color: VelocityColors.textMuted, fontSize: 11),
+                                prefixIcon: const Icon(Icons.search_rounded, size: 16, color: VelocityColors.textMuted),
+                                border: InputBorder.none,
+                                contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                              ),
                             ),
                           ),
-                          child: ListTile(
-                            onTap: () {
-                              setState(() => _selectedServer = server);
-                              Navigator.pop(context);
-                            },
-                            leading: Container(
-                              width: 40,
-                              height: 40,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: VelocityColors.pureBlack,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: isSelected ? VelocityColors.electricCyan : VelocityColors.borderDark,
-                                ),
-                              ),
-                              child: Text(server.countryCode, style: const TextStyle(fontSize: 20)),
-                            ),
-                            title: Text(
-                              server.name,
-                              style: TextStyle(
-                                color: isSelected ? VelocityColors.electricCyan : VelocityColors.textPrimary,
-                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                fontSize: 14,
+                        ),
+                        const SizedBox(width: 8),
+                        InkWell(
+                          onTap: () => setSheetState(() => sortByLowestPing = !sortByLowestPing),
+                          borderRadius: BorderRadius.circular(10),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: sortByLowestPing
+                                  ? VelocityColors.neonGreen.withOpacity(0.18)
+                                  : VelocityColors.surfaceElevated,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: sortByLowestPing ? VelocityColors.neonGreen : VelocityColors.borderDark,
                               ),
                             ),
-                            subtitle: Row(
+                            child: Row(
                               children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                                  decoration: BoxDecoration(
-                                    color: VelocityColors.pureBlack,
-                                    borderRadius: BorderRadius.circular(4),
-                                    border: Border.all(color: VelocityColors.borderDark),
-                                  ),
-                                  child: Text(
-                                    server.protocol.label,
-                                    style: const TextStyle(
-                                      color: VelocityColors.deepCyan,
-                                      fontSize: 9,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+                                Icon(
+                                  Icons.speed_rounded,
+                                  size: 16,
+                                  color: sortByLowestPing ? VelocityColors.neonGreen : VelocityColors.textSecondary,
                                 ),
-                                const SizedBox(width: 8),
+                                const SizedBox(width: 5),
                                 Text(
-                                  server.trafficUsage,
-                                  style: const TextStyle(color: VelocityColors.textMuted, fontSize: 10),
+                                  I18n.t('sort_lowest_ping'),
+                                  style: TextStyle(
+                                    color: sortByLowestPing ? VelocityColors.neonGreen : VelocityColors.textSecondary,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ],
                             ),
-                            trailing: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: server.pingColor.withOpacity(0.12),
-                                borderRadius: BorderRadius.circular(6),
-                                border: Border.all(color: server.pingColor),
-                              ),
-                              child: Text(
-                                server.pingDisplay,
-                                style: TextStyle(
-                                  color: server.pingColor,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Protocol Filter Chips
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                    child: Row(
+                      children: ['ALL', 'VLESS', 'HYSTERIA2', 'TROJAN', 'VMESS'].map((proto) {
+                        final isChipSelected = selectedProtocolFilter == proto;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 6),
+                          child: ChoiceChip(
+                            label: Text(proto),
+                            selected: isChipSelected,
+                            selectedColor: VelocityColors.electricCyan.withOpacity(0.2),
+                            backgroundColor: VelocityColors.pureBlack,
+                            side: BorderSide(
+                              color: isChipSelected ? VelocityColors.electricCyan : VelocityColors.borderDark,
                             ),
+                            labelStyle: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: isChipSelected ? VelocityColors.electricCyan : VelocityColors.textMuted,
+                            ),
+                            onSelected: (selected) {
+                              if (selected) {
+                                setSheetState(() => selectedProtocolFilter = proto);
+                              }
+                            },
                           ),
                         );
-                      },
+                      }).toList(),
                     ),
+                  ),
+
+                  const Divider(color: VelocityColors.borderDark, height: 1),
+                  Expanded(
+                    child: displayServers.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.search_off_rounded, size: 36, color: VelocityColors.textMuted),
+                                const SizedBox(height: 8),
+                                Text(
+                                  I18n.t('no_nodes_found'),
+                                  style: const TextStyle(color: VelocityColors.textMuted, fontSize: 13),
+                                ),
+                              ],
+                            ),
+                          )
+                        : ListView.builder(
+                            itemCount: displayServers.length,
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            itemBuilder: (context, index) {
+                              final server = displayServers[index];
+                              final isSelected = server.id == _selectedServer.id;
+
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 8),
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? VelocityColors.electricCyan.withOpacity(0.08)
+                                      : VelocityColors.surfaceElevated,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: isSelected ? VelocityColors.electricCyan : VelocityColors.borderDark,
+                                    width: isSelected ? 1.5 : 1,
+                                  ),
+                                ),
+                                child: ListTile(
+                                  onTap: () {
+                                    setState(() => _selectedServer = server);
+                                    Navigator.pop(context);
+                                  },
+                                  leading: Container(
+                                    width: 40,
+                                    height: 40,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      color: VelocityColors.pureBlack,
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: isSelected ? VelocityColors.electricCyan : VelocityColors.borderDark,
+                                      ),
+                                    ),
+                                    child: Text(server.countryCode, style: const TextStyle(fontSize: 20)),
+                                  ),
+                                  title: Text(
+                                    server.name,
+                                    style: TextStyle(
+                                      color: isSelected ? VelocityColors.electricCyan : VelocityColors.textPrimary,
+                                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  subtitle: Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                        decoration: BoxDecoration(
+                                          color: VelocityColors.pureBlack,
+                                          borderRadius: BorderRadius.circular(4),
+                                          border: Border.all(color: VelocityColors.borderDark),
+                                        ),
+                                        child: Text(
+                                          server.protocol.label,
+                                          style: const TextStyle(
+                                            color: VelocityColors.deepCyan,
+                                            fontSize: 9,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        server.trafficUsage,
+                                        style: const TextStyle(color: VelocityColors.textMuted, fontSize: 10),
+                                      ),
+                                    ],
+                                  ),
+                                  trailing: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: server.pingColor.withOpacity(0.12),
+                                      borderRadius: BorderRadius.circular(6),
+                                      border: Border.all(color: server.pingColor),
+                                    ),
+                                    child: Text(
+                                      server.pingDisplay,
+                                      style: TextStyle(
+                                        color: server.pingColor,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
                   ),
                 ],
               ),
@@ -2378,15 +2581,31 @@ class _HomeScreenState extends State<HomeScreen>
                 backgroundColor: VelocityColors.electricCyan,
                 foregroundColor: VelocityColors.pureBlack,
               ),
-              onPressed: () {
+              onPressed: () async {
                 final text = controller.text.trim();
                 if (text.isNotEmpty) {
                   final newProfile = ConfigLinkParser.parse(text);
+                  // Run immediate ping health-check
+                  final ping = await _simulatePing(newProfile.address, newProfile.port);
+                  newProfile.pingMs = ping;
                   setState(() {
                     _servers.insert(0, newProfile);
                     _selectedServer = newProfile;
                   });
                   Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          const Icon(Icons.check_circle, color: VelocityColors.neonGreen, size: 18),
+                          const SizedBox(width: 8),
+                          Text('${I18n.t('import_success')}: ${newProfile.name} (${newProfile.pingDisplay})'),
+                        ],
+                      ),
+                      backgroundColor: VelocityColors.surfaceElevated,
+                      duration: const Duration(seconds: 3),
+                    ),
+                  );
                 }
               },
               child: Text(I18n.t('import_btn')),
@@ -2998,6 +3217,13 @@ class _VelocityOnboardingDialogState extends State<VelocityOnboardingDialog> {
   late AppLanguage _selectedLang;
   late String _selectedRegion;
 
+  // Step 2: Protocol Priority Selection
+  final Set<String> _selectedProtocols = {'vless', 'hysteria2', 'trojan'};
+
+  // Step 3: Interactive Mock Permission Grants
+  bool _vpnMockGranted = false;
+  bool _notifMockGranted = false;
+
   @override
   void initState() {
     super.initState();
@@ -3166,9 +3392,9 @@ class _VelocityOnboardingDialogState extends State<VelocityOnboardingDialog> {
 
   Widget _buildStepTracker() {
     final steps = [
-      {'title': 'Lang', 'icon': Icons.language},
-      {'title': 'Region', 'icon': Icons.cell_tower_rounded},
-      {'title': 'Perms', 'icon': Icons.verified_user_rounded},
+      {'title': 'Lang/Region', 'icon': Icons.language},
+      {'title': 'Protocols', 'icon': Icons.tune_rounded},
+      {'title': 'Permissions', 'icon': Icons.verified_user_rounded},
     ];
 
     return Container(
@@ -3224,183 +3450,322 @@ class _VelocityOnboardingDialogState extends State<VelocityOnboardingDialog> {
   Widget _buildCurrentStepContent(bool isFa) {
     switch (_currentStep) {
       case 0:
-        return _buildLanguageStep(isFa);
+        return _buildStep1LanguageAndRegion(isFa);
       case 1:
-        return _buildRegionStep(isFa);
+        return _buildStep2ProtocolPriority(isFa);
       case 2:
       default:
-        return _buildPermissionsStep(isFa);
+        return _buildStep3PermissionsPrimer(isFa);
     }
   }
 
-  Widget _buildLanguageStep(bool isFa) {
+  // STEP 1: Language & Region Selection (EN/FA with live flip & Iran vs Global routing)
+  Widget _buildStep1LanguageAndRegion(bool isFa) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           I18n.t('step_lang_title'),
           style: const TextStyle(
-            fontSize: 16,
+            fontSize: 15,
             fontWeight: FontWeight.bold,
             color: VelocityColors.textPrimary,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 3),
         Text(
           I18n.t('step_lang_desc'),
-          style: const TextStyle(fontSize: 12, color: VelocityColors.textSecondary, height: 1.4),
+          style: const TextStyle(fontSize: 11.5, color: VelocityColors.textSecondary, height: 1.3),
         ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 12),
 
-        // English Card
-        _buildSelectableCard(
-          isSelected: _selectedLang == AppLanguage.en,
-          onTap: () {
-            setState(() => _selectedLang = AppLanguage.en);
-            widget.onSetLanguage(AppLanguage.en);
-          },
-          leadingWidget: const Text('🇺🇸', style: TextStyle(fontSize: 26)),
-          title: I18n.t('lang_en'),
-          subtitle: I18n.t('lang_en_sub'),
-          badgeText: 'LTR PREVIEW',
-          badgeColor: VelocityColors.electricCyan,
-        ),
-
-        const SizedBox(height: 14),
-
-        // Persian Card
-        _buildSelectableCard(
-          isSelected: _selectedLang == AppLanguage.fa,
-          onTap: () {
-            setState(() => _selectedLang = AppLanguage.fa);
-            widget.onSetLanguage(AppLanguage.fa);
-          },
-          leadingWidget: const Text('🇮🇷', style: TextStyle(fontSize: 26)),
-          title: I18n.t('lang_fa'),
-          subtitle: I18n.t('lang_fa_sub'),
-          badgeText: 'پیش‌نمایش راست‌چین RTL',
-          badgeColor: VelocityColors.neonGreen,
-        ),
-
-        const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: VelocityColors.surfaceElevated,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: VelocityColors.borderDark),
-          ),
-          child: Row(
-            children: [
-              const Icon(Icons.info_outline_rounded, color: VelocityColors.electricCyan, size: 16),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  isFa
-                      ? 'انتخاب زبان فوراً ساختار صفحات را به صورت زنده منطبق می‌کند.'
-                      : 'Selecting a language immediately updates the direction and layout live.',
-                  style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11),
-                ),
+        // Language Selection Row
+        Row(
+          children: [
+            Expanded(
+              child: _buildSelectableCard(
+                isSelected: _selectedLang == AppLanguage.en,
+                onTap: () {
+                  setState(() => _selectedLang = AppLanguage.en);
+                  widget.onSetLanguage(AppLanguage.en);
+                },
+                leadingWidget: const Text('🇺🇸', style: TextStyle(fontSize: 22)),
+                title: I18n.t('lang_en'),
+                subtitle: 'English (LTR)',
+                badgeText: 'LTR',
+                badgeColor: VelocityColors.electricCyan,
               ),
-            ],
-          ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _buildSelectableCard(
+                isSelected: _selectedLang == AppLanguage.fa,
+                onTap: () {
+                  setState(() => _selectedLang = AppLanguage.fa);
+                  widget.onSetLanguage(AppLanguage.fa);
+                },
+                leadingWidget: const Text('🇮🇷', style: TextStyle(fontSize: 22)),
+                title: I18n.t('lang_fa'),
+                subtitle: 'فارسی (RTL)',
+                badgeText: 'راست‌چین',
+                badgeColor: VelocityColors.neonGreen,
+              ),
+            ),
+          ],
         ),
-      ],
-    );
-  }
 
-  Widget _buildRegionStep(bool isFa) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+        const SizedBox(height: 18),
         Text(
           I18n.t('step_region_title'),
           style: const TextStyle(
-            fontSize: 16,
+            fontSize: 15,
             fontWeight: FontWeight.bold,
             color: VelocityColors.textPrimary,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 3),
         Text(
           I18n.t('step_region_desc'),
-          style: const TextStyle(fontSize: 12, color: VelocityColors.textSecondary, height: 1.4),
+          style: const TextStyle(fontSize: 11.5, color: VelocityColors.textSecondary, height: 1.3),
         ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 12),
 
-        // Iran Card
+        // Iran Routing Card
         _buildSelectableCard(
           isSelected: _selectedRegion == 'iran',
           onTap: () => setState(() => _selectedRegion = 'iran'),
           leadingWidget: Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(7),
             decoration: BoxDecoration(
               color: VelocityColors.electricCyan.withOpacity(0.12),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(Icons.cell_tower_rounded, color: VelocityColors.electricCyan, size: 22),
+            child: const Icon(Icons.cell_tower_rounded, color: VelocityColors.electricCyan, size: 20),
           ),
           title: I18n.t('region_iran_title'),
           subtitle: I18n.t('region_iran_desc'),
-          badgeText: 'SMART BYPASS & REALITY',
+          badgeText: 'SMART BYPASS LAN',
           badgeColor: VelocityColors.electricCyan,
           tags: isFa
               ? ['همراه اول', 'ایرانسل', 'رایتل', 'مخابرات']
               : ['MCI', 'Irancell', 'Rightel', 'Fixed ISP'],
         ),
 
-        const SizedBox(height: 14),
+        const SizedBox(height: 10),
 
-        // Global Card
+        // Global Routing Card
         _buildSelectableCard(
           isSelected: _selectedRegion == 'global',
           onTap: () => setState(() => _selectedRegion = 'global'),
           leadingWidget: Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(7),
             decoration: BoxDecoration(
               color: VelocityColors.neonGreen.withOpacity(0.12),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(Icons.public_rounded, color: VelocityColors.neonGreen, size: 22),
+            child: const Icon(Icons.public_rounded, color: VelocityColors.neonGreen, size: 20),
           ),
           title: I18n.t('region_global_title'),
           subtitle: I18n.t('region_global_desc'),
           badgeText: 'GLOBAL PROXY',
           badgeColor: VelocityColors.neonGreen,
           tags: isFa
-              ? ['استریم بین‌الملل', 'گیمینگ کم‌پینگ', 'بدون سانسور']
+              ? ['استریم بین‌الملل', 'گیمینگ کم‌پینگ', 'تونل مستقیم']
               : ['Global Stream', 'Low Ping Gaming', 'Direct Tunnel'],
         ),
       ],
     );
   }
 
-  Widget _buildPermissionsStep(bool isFa) {
+  // STEP 2: Protocol & Network Priority Selection
+  Widget _buildStep2ProtocolPriority(bool isFa) {
+    final protocols = [
+      {
+        'id': 'vless',
+        'name': 'VLESS Reality (XTLS Vision)',
+        'desc': 'Direct TLS camouflage over port 443 with zero fingerprint detection.',
+        'badge': 'ANTI-FILTER',
+        'color': VelocityColors.electricCyan,
+        'icon': Icons.security_rounded,
+      },
+      {
+        'id': 'hysteria2',
+        'name': 'Hysteria 2 (QUIC / UDP)',
+        'desc': 'Brutal congestion control designed for lossy networks & mobile carriers.',
+        'badge': 'TURBO SPEED',
+        'color': VelocityColors.neonYellow,
+        'icon': Icons.bolt_rounded,
+      },
+      {
+        'id': 'trojan',
+        'name': 'Trojan gRPC',
+        'desc': 'Multiplexed high-concurrency traffic imitating legitimate web sessions.',
+        'badge': 'STEALTH',
+        'color': VelocityColors.neonGreen,
+        'icon': Icons.verified_rounded,
+      },
+      {
+        'id': 'vmess',
+        'name': 'VMess WebSocket + TLS',
+        'desc': 'CDN-backed fallback tunnel resistant to strict IP address blocking.',
+        'badge': 'FALLBACK',
+        'color': VelocityColors.neonPink,
+        'icon': Icons.cloud_sync_rounded,
+      },
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          I18n.t('step_priority_title'),
+          style: const TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+            color: VelocityColors.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 3),
+        Text(
+          I18n.t('step_priority_desc'),
+          style: const TextStyle(fontSize: 11.5, color: VelocityColors.textSecondary, height: 1.3),
+        ),
+        const SizedBox(height: 14),
+
+        ...protocols.map((proto) {
+          final isSelected = _selectedProtocols.contains(proto['id'] as String);
+          final color = proto['color'] as Color;
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  final id = proto['id'] as String;
+                  if (isSelected) {
+                    if (_selectedProtocols.length > 1) {
+                      _selectedProtocols.remove(id);
+                    }
+                  } else {
+                    _selectedProtocols.add(id);
+                  }
+                });
+              },
+              borderRadius: BorderRadius.circular(12),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: isSelected ? VelocityColors.surfaceElevated : VelocityColors.surfaceDark,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isSelected ? color : VelocityColors.borderDark,
+                    width: isSelected ? 1.5 : 1.0,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: color.withOpacity(0.14),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(proto['icon'] as IconData, color: color, size: 18),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                proto['name'] as String,
+                                style: const TextStyle(
+                                  color: VelocityColors.textPrimary,
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: color.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  proto['badge'] as String,
+                                  style: TextStyle(color: color, fontSize: 8.5, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            proto['desc'] as String,
+                            style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 10.5, height: 1.25),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Checkbox(
+                      value: isSelected,
+                      activeColor: color,
+                      checkColor: VelocityColors.pureBlack,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                      onChanged: (val) {
+                        setState(() {
+                          final id = proto['id'] as String;
+                          if (val == true) {
+                            _selectedProtocols.add(id);
+                          } else if (_selectedProtocols.length > 1) {
+                            _selectedProtocols.remove(id);
+                          }
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
+  // STEP 3: Android Permission Grant Primer with Interactive Toggles
+  Widget _buildStep3PermissionsPrimer(bool isFa) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           I18n.t('step_perm_title'),
           style: const TextStyle(
-            fontSize: 16,
+            fontSize: 15,
             fontWeight: FontWeight.bold,
             color: VelocityColors.textPrimary,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 3),
         Text(
           I18n.t('step_perm_desc'),
-          style: const TextStyle(fontSize: 12, color: VelocityColors.textSecondary, height: 1.4),
+          style: const TextStyle(fontSize: 11.5, color: VelocityColors.textSecondary, height: 1.3),
         ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 14),
 
-        // VpnService Primer Card
+        // Interactive VpnService Card
         Container(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: VelocityColors.surfaceDark,
+            color: _vpnMockGranted ? VelocityColors.surfaceElevated : VelocityColors.surfaceDark,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: VelocityColors.electricCyan.withOpacity(0.5), width: 1.2),
+            border: Border.all(
+              color: _vpnMockGranted ? VelocityColors.neonGreen : VelocityColors.electricCyan.withOpacity(0.6),
+              width: 1.2,
+            ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -3410,10 +3775,14 @@ class _VelocityOnboardingDialogState extends State<VelocityOnboardingDialog> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: VelocityColors.electricCyan.withOpacity(0.15),
+                      color: (_vpnMockGranted ? VelocityColors.neonGreen : VelocityColors.electricCyan).withOpacity(0.15),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(Icons.vpn_key_rounded, color: VelocityColors.electricCyan, size: 20),
+                    child: Icon(
+                      Icons.vpn_key_rounded,
+                      color: _vpnMockGranted ? VelocityColors.neonGreen : VelocityColors.electricCyan,
+                      size: 20,
+                    ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
@@ -3422,8 +3791,8 @@ class _VelocityOnboardingDialogState extends State<VelocityOnboardingDialog> {
                       children: [
                         Text(
                           I18n.t('perm_vpn_service'),
-                          style: const TextStyle(
-                            color: VelocityColors.electricCyan,
+                          style: TextStyle(
+                            color: _vpnMockGranted ? VelocityColors.neonGreen : VelocityColors.electricCyan,
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
                           ),
@@ -3436,38 +3805,36 @@ class _VelocityOnboardingDialogState extends State<VelocityOnboardingDialog> {
                       ],
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: VelocityColors.electricCyan.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: VelocityColors.electricCyan, width: 0.8),
-                    ),
-                    child: const Text(
-                      'REQUIRED',
-                      style: TextStyle(color: VelocityColors.electricCyan, fontSize: 9, fontWeight: FontWeight.bold),
-                    ),
+                  Switch(
+                    value: _vpnMockGranted,
+                    activeColor: VelocityColors.neonGreen,
+                    onChanged: (val) {
+                      setState(() => _vpnMockGranted = val);
+                    },
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 8),
               Text(
                 I18n.t('perm_vpn_service_desc'),
-                style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11.5, height: 1.4),
+                style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11, height: 1.3),
               ),
             ],
           ),
         ),
 
-        const SizedBox(height: 14),
+        const SizedBox(height: 12),
 
-        // Notification Primer Card
+        // Interactive Notification Card
         Container(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: VelocityColors.surfaceDark,
+            color: _notifMockGranted ? VelocityColors.surfaceElevated : VelocityColors.surfaceDark,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: VelocityColors.neonGreen.withOpacity(0.5), width: 1.2),
+            border: Border.all(
+              color: _notifMockGranted ? VelocityColors.neonGreen : VelocityColors.neonYellow.withOpacity(0.6),
+              width: 1.2,
+            ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -3477,10 +3844,14 @@ class _VelocityOnboardingDialogState extends State<VelocityOnboardingDialog> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: VelocityColors.neonGreen.withOpacity(0.15),
+                      color: (_notifMockGranted ? VelocityColors.neonGreen : VelocityColors.neonYellow).withOpacity(0.15),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(Icons.notifications_active_rounded, color: VelocityColors.neonGreen, size: 20),
+                    child: Icon(
+                      Icons.notifications_active_rounded,
+                      color: _notifMockGranted ? VelocityColors.neonGreen : VelocityColors.neonYellow,
+                      size: 20,
+                    ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
@@ -3489,8 +3860,8 @@ class _VelocityOnboardingDialogState extends State<VelocityOnboardingDialog> {
                       children: [
                         Text(
                           I18n.t('perm_notif_service'),
-                          style: const TextStyle(
-                            color: VelocityColors.neonGreen,
+                          style: TextStyle(
+                            color: _notifMockGranted ? VelocityColors.neonGreen : VelocityColors.neonYellow,
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
                           ),
@@ -3503,24 +3874,19 @@ class _VelocityOnboardingDialogState extends State<VelocityOnboardingDialog> {
                       ],
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: VelocityColors.neonGreen.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: VelocityColors.neonGreen, width: 0.8),
-                    ),
-                    child: const Text(
-                      'STABILITY',
-                      style: TextStyle(color: VelocityColors.neonGreen, fontSize: 9, fontWeight: FontWeight.bold),
-                    ),
+                  Switch(
+                    value: _notifMockGranted,
+                    activeColor: VelocityColors.neonGreen,
+                    onChanged: (val) {
+                      setState(() => _notifMockGranted = val);
+                    },
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 8),
               Text(
                 I18n.t('perm_notif_service_desc'),
-                style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11.5, height: 1.4),
+                style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11, height: 1.3),
               ),
             ],
           ),
@@ -4547,8 +4913,55 @@ class AdminDashboardScreen extends StatefulWidget {
   State<AdminDashboardScreen> createState() => _AdminDashboardScreenState();
 }
 
-class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
+class _AdminDashboardScreenState extends State<AdminDashboardScreen> with SingleTickerProviderStateMixin {
+  late TabController _adminTabController;
   String _filter = 'all'; // 'all', 'active', 'hidden'
+
+  // External VPN Backend Sync State
+  String _selectedBackendType = 'Marzban'; // Marzban, 3X-UI, Hiddify
+  final TextEditingController _panelUrlController = TextEditingController(text: 'https://vpn.velocity-node.net:8443');
+  final TextEditingController _panelTokenController = TextEditingController(text: 'v_adm_tok_84920491823901');
+  bool _isSyncing = false;
+  String? _syncSuccessMessage;
+  List<Map<String, dynamic>> _syncedNodes = [
+    {'name': 'DE-Frankfurt-01 (Marzban Core)', 'proto': 'VLESS Reality', 'users': 142, 'status': 'ONLINE'},
+    {'name': 'NL-Amsterdam-03 (3X-UI Fallback)', 'proto': 'Hysteria 2', 'users': 98, 'status': 'ONLINE'},
+    {'name': 'TR-Istanbul-02 (Hiddify Stealth)', 'proto': 'Trojan gRPC', 'users': 215, 'status': 'ONLINE'},
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _adminTabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _adminTabController.dispose();
+    _panelUrlController.dispose();
+    _panelTokenController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _performBackendSync() async {
+    setState(() {
+      _isSyncing = true;
+      _syncSuccessMessage = null;
+    });
+
+    await Future.delayed(const Duration(milliseconds: 1400));
+
+    setState(() {
+      _isSyncing = false;
+      _syncSuccessMessage = 'Synced successfully with $_selectedBackendType at ${DateTime.now().hour}:${DateTime.now().minute.toString().padLeft(2, '0')}. 4 Active Inbounds fetched.';
+      _syncedNodes.insert(0, {
+        'name': 'FI-Helsinki-01 ($_selectedBackendType Auto)',
+        'proto': 'VLESS Reality',
+        'users': 34,
+        'status': 'ONLINE',
+      });
+    });
+  }
 
   void _showPlanFormDialog({VelocityPlan? existing}) {
     final isEditing = existing != null;
@@ -4772,201 +5185,33 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               onPressed: () => _showPlanFormDialog(),
             ),
           ],
+          bottom: TabBar(
+            controller: _adminTabController,
+            indicatorColor: VelocityColors.electricCyan,
+            indicatorWeight: 2.5,
+            labelColor: VelocityColors.electricCyan,
+            unselectedLabelColor: VelocityColors.textMuted,
+            labelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+            tabs: [
+              Tab(
+                icon: const Icon(Icons.layers_rounded, size: 16),
+                text: I18n.t('admin_tab_plans'),
+              ),
+              Tab(
+                icon: const Icon(Icons.cloud_sync_rounded, size: 16),
+                text: I18n.t('admin_tab_panels'),
+              ),
+            ],
+          ),
         ),
         body: SafeArea(
-          child: Column(
+          child: TabBarView(
+            controller: _adminTabController,
             children: [
-              // System Overview KPI Cards
-              Padding(
-                padding: const EdgeInsets.fromLTRB(14, 14, 14, 8),
-                child: Row(
-                  children: [
-                    _buildKpiCard(I18n.t('stat_total_plans'), '$totalCount', VelocityColors.electricCyan, Icons.folder_copy_outlined),
-                    const SizedBox(width: 8),
-                    _buildKpiCard(I18n.t('stat_active_plans'), '$activeCount', VelocityColors.neonGreen, Icons.visibility_outlined),
-                    const SizedBox(width: 8),
-                    _buildKpiCard(I18n.t('stat_hidden_plans'), '$hiddenCount', VelocityColors.neonYellow, Icons.visibility_off_outlined),
-                    const SizedBox(width: 8),
-                    _buildKpiCard(I18n.t('stat_security'), 'SECURE', VelocityColors.electricCyan, Icons.lock_outline),
-                  ],
-                ),
-              ),
-
-              // Filter Tabs & Create Button Row
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                child: Row(
-                  children: [
-                    _buildFilterChip('all', '${I18n.t('filter_all')} ($totalCount)'),
-                    const SizedBox(width: 6),
-                    _buildFilterChip('active', '${I18n.t('filter_active')} ($activeCount)'),
-                    const SizedBox(width: 6),
-                    _buildFilterChip('hidden', '${I18n.t('filter_hidden')} ($hiddenCount)'),
-                    const Spacer(),
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: VelocityColors.electricCyan,
-                        foregroundColor: VelocityColors.pureBlack,
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                      icon: const Icon(Icons.add, size: 14),
-                      label: const Text('NEW PLAN', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-                      onPressed: () => _showPlanFormDialog(),
-                    ),
-                  ],
-                ),
-              ),
-
-              const Divider(color: VelocityColors.borderDark, height: 16),
-
-              // Dynamic Plan List
-              Expanded(
-                child: displayedPlans.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.inventory_2_outlined, color: VelocityColors.textMuted, size: 48),
-                            const SizedBox(height: 12),
-                            const Text('No plans match current filter.', style: TextStyle(color: VelocityColors.textSecondary, fontSize: 13)),
-                            const SizedBox(height: 10),
-                            TextButton.icon(
-                              icon: const Icon(Icons.add, color: VelocityColors.electricCyan),
-                              label: const Text('Add Plan', style: TextStyle(color: VelocityColors.electricCyan)),
-                              onPressed: () => _showPlanFormDialog(),
-                            ),
-                          ],
-                        ),
-                      )
-                    : ListView.builder(
-                        padding: const EdgeInsets.fromLTRB(14, 4, 14, 20),
-                        itemCount: displayedPlans.length,
-                        itemBuilder: (context, index) {
-                          final plan = displayedPlans[index];
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 10),
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF0F1422),
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(
-                                color: plan.isActive ? VelocityColors.borderDark : VelocityColors.neonYellow.withOpacity(0.3),
-                              ),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        color: (plan.isActive ? VelocityColors.electricCyan : VelocityColors.textMuted).withOpacity(0.12),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Icon(
-                                        Icons.bolt,
-                                        color: plan.isActive ? VelocityColors.electricCyan : VelocityColors.textMuted,
-                                        size: 18,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Flexible(
-                                                child: Text(
-                                                  plan.name,
-                                                  style: TextStyle(
-                                                    color: plan.isActive ? VelocityColors.textPrimary : VelocityColors.textMuted,
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                              if (plan.badge.isNotEmpty) ...[
-                                                const SizedBox(width: 6),
-                                                Container(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-                                                  decoration: BoxDecoration(
-                                                    color: VelocityColors.neonYellow.withOpacity(0.2),
-                                                    borderRadius: BorderRadius.circular(4),
-                                                  ),
-                                                  child: Text(
-                                                    plan.badge,
-                                                    style: const TextStyle(color: VelocityColors.neonYellow, fontSize: 8.5, fontWeight: FontWeight.bold),
-                                                  ),
-                                                ),
-                                              ],
-                                            ],
-                                          ),
-                                          Text(
-                                            '${plan.dataQuota} • ${plan.durationDays} Days • ${plan.protocolType}',
-                                            style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.end,
-                                      children: [
-                                        Text(
-                                          plan.priceUsdt,
-                                          style: const TextStyle(color: VelocityColors.neonGreen, fontSize: 12, fontWeight: FontWeight.bold),
-                                        ),
-                                        Text(
-                                          plan.priceTomans,
-                                          style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 10),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 10),
-                                const Divider(color: VelocityColors.borderDark, height: 1),
-                                const SizedBox(height: 6),
-                                Row(
-                                  children: [
-                                    Text(
-                                      plan.isActive ? 'Active in Public Store' : 'Hidden from Public Store',
-                                      style: TextStyle(
-                                        color: plan.isActive ? VelocityColors.neonGreen : VelocityColors.neonYellow,
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    const Spacer(),
-                                    Switch(
-                                      value: plan.isActive,
-                                      activeColor: VelocityColors.electricCyan,
-                                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                      onChanged: (val) {
-                                        widget.onToggleActive(plan.id, val);
-                                        setState(() {});
-                                      },
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.edit_outlined, color: VelocityColors.electricCyan, size: 18),
-                                      tooltip: I18n.t('edit_plan'),
-                                      onPressed: () => _showPlanFormDialog(existing: plan),
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.delete_outline_rounded, color: VelocityColors.neonPink, size: 18),
-                                      tooltip: I18n.t('delete_plan'),
-                                      onPressed: () => _confirmDelete(plan),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-              ),
+              // TAB 1: Plan Management
+              _buildPlansTab(totalCount, activeCount, hiddenCount, displayedPlans),
+              // TAB 2: External VPN Backend & Panel Sync
+              _buildPanelSyncTab(),
             ],
           ),
         ),
@@ -4974,7 +5219,455 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
   }
 
-  Widget _buildKpiCard(String label, String value, Color color, IconData icon) {
+  Widget _buildPlansTab(int totalCount, int activeCount, int hiddenCount, List<VelocityPlan> displayedPlans) {
+    return Column(
+      children: [
+        // System Overview KPI Cards
+        Padding(
+          padding: const EdgeInsets.fromLTRB(14, 14, 14, 8),
+          child: Row(
+            children: [
+              _buildKpiCard(I18n.t('stat_total_plans'), '$totalCount', VelocityColors.electricCyan, Icons.folder_copy_outlined),
+              const SizedBox(width: 8),
+              _buildKpiCard(I18n.t('stat_active_plans'), '$activeCount', VelocityColors.neonGreen, Icons.visibility_outlined),
+              const SizedBox(width: 8),
+              _buildKpiCard(I18n.t('stat_hidden_plans'), '$hiddenCount', VelocityColors.neonYellow, Icons.visibility_off_outlined),
+              const SizedBox(width: 8),
+              _buildKpiCard(I18n.t('stat_security'), 'SECURE', VelocityColors.electricCyan, Icons.lock_outline),
+            ],
+          ),
+        ),
+
+        // Filter Tabs & Create Button Row
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+          child: Row(
+            children: [
+              _buildFilterChip('all', '${I18n.t('filter_all')} ($totalCount)'),
+              const SizedBox(width: 6),
+              _buildFilterChip('active', '${I18n.t('filter_active')} ($activeCount)'),
+              const SizedBox(width: 6),
+              _buildFilterChip('hidden', '${I18n.t('filter_hidden')} ($hiddenCount)'),
+              const Spacer(),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: VelocityColors.electricCyan,
+                  foregroundColor: VelocityColors.pureBlack,
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+                icon: const Icon(Icons.add, size: 14),
+                label: const Text('NEW PLAN', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                onPressed: () => _showPlanFormDialog(),
+              ),
+            ],
+          ),
+        ),
+
+        const Divider(color: VelocityColors.borderDark, height: 16),
+
+        // Dynamic Plan List
+        Expanded(
+          child: displayedPlans.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.inventory_2_outlined, color: VelocityColors.textMuted, size: 48),
+                      const SizedBox(height: 12),
+                      const Text('No plans match current filter.', style: TextStyle(color: VelocityColors.textSecondary, fontSize: 13)),
+                      const SizedBox(height: 10),
+                      TextButton.icon(
+                        icon: const Icon(Icons.add, color: VelocityColors.electricCyan),
+                        label: const Text('Add Plan', style: TextStyle(color: VelocityColors.electricCyan)),
+                        onPressed: () => _showPlanFormDialog(),
+                      ),
+                    ],
+                  ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(14, 4, 14, 20),
+                  itemCount: displayedPlans.length,
+                  itemBuilder: (context, index) {
+                    final plan = displayedPlans[index];
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0F1422),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: plan.isActive ? VelocityColors.borderDark : VelocityColors.neonYellow.withOpacity(0.3),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: (plan.isActive ? VelocityColors.electricCyan : VelocityColors.textMuted).withOpacity(0.12),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Icon(
+                                  Icons.bolt,
+                                  color: plan.isActive ? VelocityColors.electricCyan : VelocityColors.textMuted,
+                                  size: 18,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            plan.name,
+                                            style: TextStyle(
+                                              color: plan.isActive ? VelocityColors.textPrimary : VelocityColors.textMuted,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                        if (plan.badge.isNotEmpty) ...[
+                                          const SizedBox(width: 6),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                                            decoration: BoxDecoration(
+                                              color: VelocityColors.neonYellow.withOpacity(0.2),
+                                              borderRadius: BorderRadius.circular(4),
+                                            ),
+                                            child: Text(
+                                              plan.badge,
+                                              style: const TextStyle(color: VelocityColors.neonYellow, fontSize: 8.5, fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                    Text(
+                                      '${plan.dataQuota} • ${plan.durationDays} Days • ${plan.protocolType}',
+                                      style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    plan.priceUsdt,
+                                    style: const TextStyle(color: VelocityColors.neonGreen, fontSize: 12, fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    plan.priceTomans,
+                                    style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 10),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          const Divider(color: VelocityColors.borderDark, height: 1),
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              Text(
+                                plan.isActive ? 'Active in Public Store' : 'Hidden from Public Store',
+                                style: TextStyle(
+                                  color: plan.isActive ? VelocityColors.neonGreen : VelocityColors.neonYellow,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const Spacer(),
+                              Switch(
+                                value: plan.isActive,
+                                activeColor: VelocityColors.electricCyan,
+                                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                onChanged: (val) {
+                                  widget.onToggleActive(plan.id, val);
+                                  setState(() {});
+                                },
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.edit_outlined, color: VelocityColors.electricCyan, size: 18),
+                                tooltip: I18n.t('edit_plan'),
+                                onPressed: () => _showPlanFormDialog(existing: plan),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete_outline_rounded, color: VelocityColors.neonPink, size: 18),
+                                tooltip: I18n.t('delete_plan'),
+                                onPressed: () => _confirmDelete(plan),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ],
+    );
+  }
+
+  // TAB 2: External VPN Backend & Panel Sync
+  Widget _buildPanelSyncTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Banner Info
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: const Color(0xFF101626),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: VelocityColors.electricCyan.withOpacity(0.5)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.cloud_sync, color: VelocityColors.electricCyan, size: 24),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        I18n.t('panel_sync_title'),
+                        style: const TextStyle(
+                          color: VelocityColors.electricCyan,
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        I18n.t('panel_sync_desc'),
+                        style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11, height: 1.3),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 18),
+
+          // Backend Selector
+          Text(
+            I18n.t('select_backend_type'),
+            style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: ['Marzban', '3X-UI', 'Hiddify'].map((backend) {
+              final isSel = _selectedBackendType == backend;
+              return Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: InkWell(
+                    onTap: () => setState(() => _selectedBackendType = backend),
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: isSel ? VelocityColors.electricCyan.withOpacity(0.18) : VelocityColors.surfaceDark,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: isSel ? VelocityColors.electricCyan : VelocityColors.borderDark,
+                          width: isSel ? 1.5 : 1,
+                        ),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        backend,
+                        style: TextStyle(
+                          color: isSel ? VelocityColors.electricCyan : VelocityColors.textSecondary,
+                          fontWeight: isSel ? FontWeight.bold : FontWeight.normal,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+
+          const SizedBox(height: 16),
+
+          // API Endpoint URL
+          Text(
+            I18n.t('panel_api_url'),
+            style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 6),
+          TextField(
+            controller: _panelUrlController,
+            style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12),
+            decoration: InputDecoration(
+              prefixIcon: const Icon(Icons.link_rounded, color: VelocityColors.electricCyan, size: 18),
+              filled: true,
+              fillColor: VelocityColors.pureBlack,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: VelocityColors.borderDark)),
+              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: VelocityColors.electricCyan)),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          // API Secret / Bearer Token
+          Text(
+            I18n.t('panel_api_token'),
+            style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 6),
+          TextField(
+            controller: _panelTokenController,
+            obscureText: true,
+            style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12),
+            decoration: InputDecoration(
+              prefixIcon: const Icon(Icons.key_rounded, color: VelocityColors.neonYellow, size: 18),
+              filled: true,
+              fillColor: VelocityColors.pureBlack,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: VelocityColors.borderDark)),
+              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: VelocityColors.neonYellow)),
+            ),
+          ),
+
+          if (_syncSuccessMessage != null) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: VelocityColors.neonGreen.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: VelocityColors.neonGreen.withOpacity(0.6)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.check_circle, color: VelocityColors.neonGreen, size: 16),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _syncSuccessMessage!,
+                      style: const TextStyle(color: VelocityColors.neonGreen, fontSize: 11, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
+          const SizedBox(height: 16),
+
+          // Trigger Sync Button
+          SizedBox(
+            width: double.infinity,
+            height: 46,
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: VelocityColors.electricCyan,
+                foregroundColor: VelocityColors.pureBlack,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              icon: _isSyncing
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: VelocityColors.pureBlack),
+                    )
+                  : const Icon(Icons.sync_rounded, size: 18),
+              label: Text(
+                _isSyncing ? I18n.t('syncing_nodes') : I18n.t('btn_sync_now'),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              ),
+              onPressed: _isSyncing ? null : _performBackendSync,
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Synced Inbound Nodes Preview List
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                I18n.t('synced_nodes_title'),
+                style: const TextStyle(color: VelocityColors.electricCyan, fontSize: 13, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                '${_syncedNodes.length} Inbounds',
+                style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+
+          ..._syncedNodes.map((node) {
+            return Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0F1422),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: VelocityColors.borderDark),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: VelocityColors.neonGreen.withOpacity(0.12),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.circle, color: VelocityColors.neonGreen, size: 8),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          node['name'] as String,
+                          style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          '${node['proto']} • ${node['users']} Connected Clients',
+                          style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 10.5),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: VelocityColors.surfaceElevated,
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: VelocityColors.neonGreen.withOpacity(0.4)),
+                    ),
+                    child: Text(
+                      node['status'] as String,
+                      style: const TextStyle(color: VelocityColors.neonGreen, fontSize: 9, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ],
+      ),
+    );
+  }
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
@@ -5025,6 +5718,748 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Velocity Power-User Settings Screen
+// (Routing / Bypass Rules, Advanced TUN/Core Engine, Split Tunneling, Neon Visual Theme)
+// ---------------------------------------------------------------------------
+class VelocityPowerUserSettingsScreen extends StatefulWidget {
+  final bool isFa;
+  final RoutingMode currentRoutingMode;
+  final Function(RoutingMode) onRoutingModeChanged;
+  final VoidCallback onAccentChanged;
+
+  const VelocityPowerUserSettingsScreen({
+    super.key,
+    required this.isFa,
+    required this.currentRoutingMode,
+    required this.onRoutingModeChanged,
+    required this.onAccentChanged,
+  });
+
+  @override
+  State<VelocityPowerUserSettingsScreen> createState() => _VelocityPowerUserSettingsScreenState();
+}
+
+class _VelocityPowerUserSettingsScreenState extends State<VelocityPowerUserSettingsScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  // Routing & Bypass Rules State
+  late RoutingMode _routingMode;
+  bool _bypassDomesticIran = true;
+  bool _bypassBankingApps = true;
+  bool _blockAdsMalware = true;
+  bool _blockUdpQuic = false;
+
+  // TUN & Core Engine Settings State
+  String _tunImplementation = 'gVisor (User-space)';
+  int _mtu = 1400;
+  String _remoteDns = 'https://1.1.1.1/dns-query';
+  String _directDns = '10.202.10.202';
+  bool _enableFragmentMode = true;
+  int _fragmentPackets = 50;
+  bool _enableMux = true;
+  bool _sniffingDomain = true;
+
+  // Split Tunneling State
+  bool _splitTunnelEnabled = true;
+  String _splitMode = 'Bypass selected apps'; // 'Bypass selected apps' or 'Proxy only selected apps'
+  final List<Map<String, dynamic>> _installedApps = [
+    {'name': 'Mobile Bank Mellat', 'package': 'ir.mellat.mobile', 'bypass': true, 'icon': Icons.account_balance},
+    {'name': 'Snapp! Ride & Food', 'package': 'cab.snapp.passenger', 'bypass': true, 'icon': Icons.local_taxi},
+    {'name': 'Digikala Shopping', 'package': 'com.digikala.mobile', 'bypass': true, 'icon': Icons.shopping_bag_outlined},
+    {'name': 'Bale Messenger', 'package': 'ir.ble.messenger', 'bypass': true, 'icon': Icons.chat_bubble_outline},
+    {'name': 'Telegram Messenger', 'package': 'org.telegram.messenger', 'bypass': false, 'icon': Icons.send_rounded},
+    {'name': 'Instagram & Threads', 'package': 'com.instagram.android', 'bypass': false, 'icon': Icons.camera_alt_outlined},
+    {'name': 'YouTube & Music', 'package': 'com.google.android.youtube', 'bypass': false, 'icon': Icons.play_circle_outline},
+    {'name': 'Google Chrome Browser', 'package': 'com.android.chrome', 'bypass': false, 'icon': Icons.public},
+  ];
+
+  // Visual Customizer Presets
+  final List<Map<String, dynamic>> _colorThemes = [
+    {
+      'name': 'Electric Cyan (Default)',
+      'primary': const Color(0xFF00E5FF),
+      'secondary': const Color(0xFF00B0FF),
+      'tag': 'CYAN',
+    },
+    {
+      'name': 'Cyber Neon Emerald',
+      'primary': const Color(0xFF00FF88),
+      'secondary': const Color(0xFF00C853),
+      'tag': 'EMERALD',
+    },
+    {
+      'name': 'Acid Neon Amber',
+      'primary': const Color(0xFFFFD600),
+      'secondary': const Color(0xFFFF9100),
+      'tag': 'AMBER',
+    },
+    {
+      'name': 'Synthwave Neon Pink',
+      'primary': const Color(0xFFFF1744),
+      'secondary': const Color(0xFFD500F9),
+      'tag': 'PINK',
+    },
+    {
+      'name': 'Ultra Violet Horizon',
+      'primary': const Color(0xFFD500F9),
+      'secondary': const Color(0xFF651FFF),
+      'tag': 'VIOLET',
+    },
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 4, vsync: this);
+    _routingMode = widget.currentRoutingMode;
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: VelocityColors.pureBlack,
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF0D121F),
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: VelocityColors.electricCyan, size: 18),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              I18n.t('settings_title'),
+              style: const TextStyle(
+                fontSize: 13.5,
+                fontWeight: FontWeight.w900,
+                color: VelocityColors.textPrimary,
+                letterSpacing: 1.0,
+              ),
+            ),
+            Text(
+              I18n.t('settings_subtitle'),
+              style: const TextStyle(fontSize: 9.5, color: VelocityColors.textSecondary, letterSpacing: 0.5),
+            ),
+          ],
+        ),
+        bottom: TabBar(
+          controller: _tabController,
+          isScrollable: true,
+          indicatorColor: VelocityColors.electricCyan,
+          indicatorWeight: 2.5,
+          labelColor: VelocityColors.electricCyan,
+          unselectedLabelColor: VelocityColors.textMuted,
+          labelStyle: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold),
+          tabs: [
+            Tab(
+              icon: const Icon(Icons.alt_route, size: 16),
+              text: I18n.t('tab_routing_bypass'),
+            ),
+            Tab(
+              icon: const Icon(Icons.memory_rounded, size: 16),
+              text: I18n.t('tab_tun_core'),
+            ),
+            Tab(
+              icon: const Icon(Icons.call_split_rounded, size: 16),
+              text: I18n.t('tab_split_tunnel'),
+            ),
+            Tab(
+              icon: const Icon(Icons.palette_outlined, size: 16),
+              text: I18n.t('tab_visual_theme'),
+            ),
+          ],
+        ),
+      ),
+      body: SafeArea(
+        child: TabBarView(
+          controller: _tabController,
+          children: [
+            // TAB 1: Routing & Bypass Rules
+            _buildRoutingRulesTab(),
+            // TAB 2: TUN & Core Engine Settings
+            _buildTunCoreTab(),
+            // TAB 3: Split Tunneling
+            _buildSplitTunnelTab(),
+            // TAB 4: Visual Neon Customizer
+            _buildVisualCustomizerTab(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // -------------------------------------------------------------------------
+  // TAB 1: Routing & Bypass Rules
+  // -------------------------------------------------------------------------
+  Widget _buildRoutingRulesTab() {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        _buildSectionHeader('GLOBAL ROUTING STRATEGY'),
+        const SizedBox(height: 8),
+        _buildRadioTile(
+          RoutingMode.rule,
+          'Rule-Based (Smart Traffic Routing)',
+          'Automatically routes blocked traffic through proxy while keeping local Iranian services direct.',
+        ),
+        _buildRadioTile(
+          RoutingMode.bypassLan,
+          'Bypass LAN & Private Addresses',
+          'Only routes public internet traffic through proxy; local 192.168.x / 10.x stay untouched.',
+        ),
+        _buildRadioTile(
+          RoutingMode.global,
+          'Global Tunnel (All Traffic Proxy)',
+          'Force all device IP packets including local connections through encrypted VPN tunnel.',
+        ),
+        _buildRadioTile(
+          RoutingMode.direct,
+          'Direct Mode (Bypass VPN)',
+          'No encryption applied. Packets connect directly without tunnel proxying.',
+        ),
+
+        const SizedBox(height: 20),
+        _buildSectionHeader('SPECIALIZED IRAN BYPASS & FILTERS'),
+        const SizedBox(height: 8),
+        _buildSwitchCard(
+          title: 'Bypass Domestic Iran Sites (.ir & CIDRs)',
+          subtitle: 'Keep Bank, Governmental, and internal ISP sites at local un-throttled speeds',
+          value: _bypassDomesticIran,
+          onChanged: (val) => setState(() => _bypassDomesticIran = val),
+        ),
+        const SizedBox(height: 8),
+        _buildSwitchCard(
+          title: 'Bypass Iranian Banking & Fintech Apps',
+          subtitle: 'Prevent account security lockouts by routing mobile banks directly via domestic IP',
+          value: _bypassBankingApps,
+          onChanged: (val) => setState(() => _bypassBankingApps = val),
+        ),
+        const SizedBox(height: 8),
+        _buildSwitchCard(
+          title: 'Adblocking & Malicious DNS Shield',
+          subtitle: 'Drop tracking telemetry, annoying ads, and known botnet domains at core DNS layer',
+          value: _blockAdsMalware,
+          onChanged: (val) => setState(() => _blockAdsMalware = val),
+        ),
+        const SizedBox(height: 8),
+        _buildSwitchCard(
+          title: 'Block UDP / QUIC (Force TCP/TLS Fallback)',
+          subtitle: 'Useful on ISPs where UDP traffic is heavily choked or throttled by deep packet inspection',
+          value: _blockUdpQuic,
+          onChanged: (val) => setState(() => _blockUdpQuic = val),
+        ),
+      ],
+    );
+  }
+
+  // -------------------------------------------------------------------------
+  // TAB 2: TUN & Core Engine Settings
+  // -------------------------------------------------------------------------
+  Widget _buildTunCoreTab() {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        _buildSectionHeader('TUN INTERFACE STACK'),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0F1422),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: VelocityColors.borderDark),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('TUN Virtual Stack Driver', style: TextStyle(color: VelocityColors.textPrimary, fontSize: 12, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                value: _tunImplementation,
+                dropdownColor: const Color(0xFF0D121F),
+                style: const TextStyle(color: VelocityColors.electricCyan, fontSize: 13),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: VelocityColors.pureBlack,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: VelocityColors.borderDark)),
+                ),
+                items: ['gVisor (User-space)', 'System (Kernel TUN)', 'Mixed LWIP'].map((v) {
+                  return DropdownMenuItem(value: v, child: Text(v));
+                }).toList(),
+                onChanged: (val) {
+                  if (val != null) setState(() => _tunImplementation = val);
+                },
+              ),
+              const SizedBox(height: 14),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('MTU (Maximum Transmission Unit)', style: TextStyle(color: VelocityColors.textPrimary, fontSize: 12)),
+                  Text('$_mtu bytes', style: const TextStyle(color: VelocityColors.electricCyan, fontWeight: FontWeight.bold, fontSize: 12)),
+                ],
+              ),
+              Slider(
+                value: _mtu.toDouble(),
+                min: 1280,
+                max: 1500,
+                divisions: 22,
+                activeColor: VelocityColors.electricCyan,
+                inactiveColor: VelocityColors.borderDark,
+                onChanged: (v) => setState(() => _mtu = v.toInt()),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 20),
+        _buildSectionHeader('DNS RESOLUTION ENGINE'),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0F1422),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: VelocityColors.borderDark),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Remote Secure DoH / DoT DNS', style: TextStyle(color: VelocityColors.textPrimary, fontSize: 12, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 6),
+              TextField(
+                controller: TextEditingController(text: _remoteDns),
+                style: const TextStyle(color: VelocityColors.electricCyan, fontSize: 12),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: VelocityColors.pureBlack,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: VelocityColors.borderDark)),
+                ),
+                onChanged: (val) => _remoteDns = val,
+              ),
+              const SizedBox(height: 12),
+              const Text('Direct Domestic DNS (Iran)', style: TextStyle(color: VelocityColors.textPrimary, fontSize: 12, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 6),
+              TextField(
+                controller: TextEditingController(text: _directDns),
+                style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 12),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: VelocityColors.pureBlack,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: VelocityColors.borderDark)),
+                ),
+                onChanged: (val) => _directDns = val,
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 20),
+        _buildSectionHeader('ANTI-CENSORSHIP PACKET EVASION'),
+        const SizedBox(height: 8),
+        _buildSwitchCard(
+          title: 'TLS Fragment Mode (Deep Packet Inspection Evasion)',
+          subtitle: 'Splits TLS Client Hello packets into multiple fragments to bypass Iran GFW SNI inspection',
+          value: _enableFragmentMode,
+          onChanged: (val) => setState(() => _enableFragmentMode = val),
+        ),
+        if (_enableFragmentMode) ...[
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Fragment Chunk Size', style: TextStyle(color: VelocityColors.textSecondary, fontSize: 11)),
+                Text('$_fragmentPackets-100 bytes', style: const TextStyle(color: VelocityColors.neonYellow, fontWeight: FontWeight.bold, fontSize: 11)),
+              ],
+            ),
+          ),
+          Slider(
+            value: _fragmentPackets.toDouble(),
+            min: 10,
+            max: 100,
+            divisions: 9,
+            activeColor: VelocityColors.neonYellow,
+            inactiveColor: VelocityColors.borderDark,
+            onChanged: (v) => setState(() => _fragmentPackets = v.toInt()),
+          ),
+        ],
+        const SizedBox(height: 8),
+        _buildSwitchCard(
+          title: 'Multiplexing (TCP Mux)',
+          subtitle: 'Consolidates multiple TCP connections into single streams to reduce handshake overhead',
+          value: _enableMux,
+          onChanged: (val) => setState(() => _enableMux = val),
+        ),
+        const SizedBox(height: 8),
+        _buildSwitchCard(
+          title: 'Core Domain Sniffing (HTTP & TLS)',
+          subtitle: 'Extracts target domains from packet headers for accurate domain-based routing',
+          value: _sniffingDomain,
+          onChanged: (val) => setState(() => _sniffingDomain = val),
+        ),
+      ],
+    );
+  }
+
+  // -------------------------------------------------------------------------
+  // TAB 3: Split Tunneling
+  // -------------------------------------------------------------------------
+  Widget _buildSplitTunnelTab() {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: const Color(0xFF101626),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: VelocityColors.electricCyan.withOpacity(0.4)),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.call_split_rounded, color: VelocityColors.electricCyan, size: 26),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'App Split Tunneling Controller',
+                      style: TextStyle(color: VelocityColors.electricCyan, fontWeight: FontWeight.bold, fontSize: 13),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      widget.isFa
+                          ? 'مشخص کنید کدام اپلیکیشن‌ها از تونل وی‌پی‌ان عبور کنند یا از آن خارج شوند.'
+                          : 'Select which installed apps bypass the encrypted VPN tunnel or route through it.',
+                      style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11),
+                    ),
+                  ],
+                ),
+              ),
+              Switch(
+                value: _splitTunnelEnabled,
+                activeColor: VelocityColors.electricCyan,
+                onChanged: (val) => setState(() => _splitTunnelEnabled = val),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 16),
+
+        if (_splitTunnelEnabled) ...[
+          _buildSectionHeader('SPLIT TUNNELING MODE'),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: InkWell(
+                  onTap: () => setState(() => _splitMode = 'Bypass selected apps'),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                    decoration: BoxDecoration(
+                      color: _splitMode == 'Bypass selected apps' ? VelocityColors.electricCyan.withOpacity(0.16) : VelocityColors.surfaceDark,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: _splitMode == 'Bypass selected apps' ? VelocityColors.electricCyan : VelocityColors.borderDark),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Bypass Selected',
+                      style: TextStyle(
+                        color: _splitMode == 'Bypass selected apps' ? VelocityColors.electricCyan : VelocityColors.textSecondary,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: InkWell(
+                  onTap: () => setState(() => _splitMode = 'Proxy only selected apps'),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                    decoration: BoxDecoration(
+                      color: _splitMode == 'Proxy only selected apps' ? VelocityColors.electricCyan.withOpacity(0.16) : VelocityColors.surfaceDark,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: _splitMode == 'Proxy only selected apps' ? VelocityColors.electricCyan : VelocityColors.borderDark),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Proxy Only Selected',
+                      style: TextStyle(
+                        color: _splitMode == 'Proxy only selected apps' ? VelocityColors.electricCyan : VelocityColors.textSecondary,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 18),
+          _buildSectionHeader('DEVICE APPLICATIONS'),
+          const SizedBox(height: 8),
+
+          ..._installedApps.map((app) {
+            final isBypassed = app['bypass'] as bool;
+            return Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0F1422),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: VelocityColors.borderDark),
+              ),
+              child: Row(
+                children: [
+                  Icon(app['icon'] as IconData, color: isBypassed ? VelocityColors.neonYellow : VelocityColors.electricCyan, size: 20),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(app['name'] as String, style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12, fontWeight: FontWeight.bold)),
+                        Text(app['package'] as String, style: const TextStyle(color: VelocityColors.textMuted, fontSize: 10)),
+                      ],
+                    ),
+                  ),
+                  Checkbox(
+                    value: isBypassed,
+                    activeColor: VelocityColors.electricCyan,
+                    checkColor: VelocityColors.pureBlack,
+                    onChanged: (val) {
+                      setState(() {
+                        app['bypass'] = val ?? false;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ],
+      ],
+    );
+  }
+
+  // -------------------------------------------------------------------------
+  // TAB 4: Visual Neon Customizer
+  // -------------------------------------------------------------------------
+  Widget _buildVisualCustomizerTab() {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0F1422),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: VelocityColors.electricCyan.withOpacity(0.5)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const VelocityEmblemWidget(size: 32, glowIntensity: 1.2),
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        I18n.t('tab_visual_theme'),
+                        style: const TextStyle(color: VelocityColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 13),
+                      ),
+                      const SizedBox(height: 2),
+                      const Text(
+                        'Cyberpunk Neon Accent Palette',
+                        style: TextStyle(color: VelocityColors.textSecondary, fontSize: 10.5),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Text(
+                widget.isFa
+                    ? 'رنگ نئون اصلی رابط کاربری ولوسیتی را با یک لمس شخصی‌سازی نمایید.'
+                    : 'Personalize Velocity with high-voltage cyberpunk neon accents.',
+                style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11.5, height: 1.4),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 20),
+        _buildSectionHeader('SELECT NEON GLOW ACCENT'),
+        const SizedBox(height: 10),
+
+        ..._colorThemes.map((theme) {
+          final primary = theme['primary'] as Color;
+          final secondary = theme['secondary'] as Color;
+          final isCurrent = VelocityColors.electricCyan.value == primary.value;
+
+          return Container(
+            margin: const EdgeInsets.only(bottom: 10),
+            decoration: BoxDecoration(
+              color: isCurrent ? primary.withOpacity(0.12) : const Color(0xFF0D121F),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isCurrent ? primary : VelocityColors.borderDark,
+                width: isCurrent ? 1.5 : 1,
+              ),
+            ),
+            child: ListTile(
+              onTap: () {
+                VelocityColors.setNeonAccent(primary, secondary);
+                widget.onAccentChanged();
+                setState(() {});
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    backgroundColor: VelocityColors.surfaceElevated,
+                    duration: const Duration(seconds: 1),
+                    content: Text(
+                      'Theme accent applied: ${theme['name']}',
+                      style: TextStyle(color: primary, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                );
+              },
+              leading: Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [primary, secondary]),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(color: primary.withOpacity(0.6), blurRadius: 8, spreadRadius: 1),
+                  ],
+                ),
+              ),
+              title: Text(
+                theme['name'] as String,
+                style: TextStyle(
+                  color: isCurrent ? primary : VelocityColors.textPrimary,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                ),
+              ),
+              subtitle: Text(
+                'RGB: ${primary.value.toRadixString(16).toUpperCase().substring(2)}',
+                style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 10, fontFamily: 'monospace'),
+              ),
+              trailing: isCurrent
+                  ? Icon(Icons.check_circle_rounded, color: primary, size: 20)
+                  : const Icon(Icons.circle_outlined, color: VelocityColors.textMuted, size: 18),
+            ),
+          );
+        }).toList(),
+      ],
+    );
+  }
+
+  // -------------------------------------------------------------------------
+  // Helper UI Builders
+  // -------------------------------------------------------------------------
+  Widget _buildSectionHeader(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        color: VelocityColors.electricCyan,
+        fontSize: 10.5,
+        fontWeight: FontWeight.w900,
+        letterSpacing: 1.2,
+      ),
+    );
+  }
+
+  Widget _buildRadioTile(RoutingMode mode, String title, String subtitle) {
+    final isSelected = _routingMode == mode;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: isSelected ? VelocityColors.electricCyan.withOpacity(0.08) : const Color(0xFF0F1422),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: isSelected ? VelocityColors.electricCyan : VelocityColors.borderDark),
+      ),
+      child: ListTile(
+        onTap: () {
+          setState(() => _routingMode = mode);
+          widget.onRoutingModeChanged(mode);
+        },
+        leading: Icon(
+          isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
+          color: isSelected ? VelocityColors.electricCyan : VelocityColors.textSecondary,
+          size: 18,
+        ),
+        title: Text(
+          title,
+          style: TextStyle(
+            color: isSelected ? VelocityColors.electricCyan : VelocityColors.textPrimary,
+            fontWeight: FontWeight.bold,
+            fontSize: 12.5,
+          ),
+        ),
+        subtitle: Text(subtitle, style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 10.5)),
+      ),
+    );
+  }
+
+  Widget _buildSwitchCard({
+    required String title,
+    required String subtitle,
+    required bool value,
+    required Function(bool) onChanged,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F1422),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: VelocityColors.borderDark),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 2),
+                Text(subtitle, style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 10.5, height: 1.25)),
+              ],
+            ),
+          ),
+          Switch(
+            value: value,
+            activeColor: VelocityColors.electricCyan,
+            onChanged: onChanged,
+          ),
+        ],
       ),
     );
   }

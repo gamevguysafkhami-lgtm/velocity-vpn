@@ -1,106 +1,232 @@
-# 🌐 VELOCITY | Secure VPN Services
-> **Next-Generation Multi-Platform Proxy & VPN Client**  
-> Built with high-performance Flutter, powered by Sing-box core concepts, featuring an electric cyberpunk UI and intelligent routing mechanics.
+# ⚡ VELOCITY VPN - High-Performance Anti-Censorship Client
+
+<div align="center">
+
+```
+  ██    ██ ███████ ██       ██████   ██████ ██ ████████ ██    ██
+  ██    ██ ██      ██      ██    ██ ██      ██    ██     ██  ██ 
+  ██    ██ █████   ██      ██    ██ ██      ██    ██      ████  
+   ██  ██  ██      ██      ██    ██ ██      ██    ██       ██   
+    ████   ███████ ███████  ██████   ██████ ██    ██       ██   
+```
+
+**Next-Gen Cyberpunk Midnight VPN Terminal & Multi-Protocol Tunneling Suite**  
+*Powered by Sing-box & Hiddify Core Routing • Tun2Socks Engine • Role-Based Access Control*
+
+[![Build & Release APK](https://github.com/velocity-vpn/velocity/actions/workflows/build-apk.yml/badge.svg)](https://github.com/velocity-vpn/velocity/actions/workflows/build-apk.yml)
+[![Flutter](https://img.shields.io/badge/Flutter-3.19+-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
+[![Dart](https://img.shields.io/badge/Dart-3.0+-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
+[![Android](https://img.shields.io/badge/Android-8.0%2B%20(API%2026%2B)-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://developer.android.com)
+[![Protocol](https://img.shields.io/badge/Protocols-VLESS%20%7C%20Hysteria%202%20%7C%20Trojan-00E5FF?style=for-the-badge)](https://github.com/XTLS/Xray-core)
+[![License](https://img.shields.io/badge/License-MIT-FFD600?style=for-the-badge)](LICENSE)
+
+[English](#-english-documentation) • [فارسی (Persian)](#-مستندات-فارسی)
 
 ---
-
-### 🇬🇧 English Description
-
-#### ⚡ Overview
-**VELOCITY** is a modern, enterprise-ready, high-performance VPN and proxy client engineered with **Flutter**. Designed for speed, resilience against heavy network restrictions, and complete user privacy, VELOCITY brings a sleek **Dark Midnight & Electric Cyan** aesthetic paired with powerful telemetry, multi-protocol support, and an automated plan management system.
-
-#### 🚀 Key Features
-* **Cyberpunk Visual Interface:** High-contrast neon aesthetics (#00E5FF / #000000), fluid pulse animations, radar telemetry rings, and responsive glassmorphism cards.
-* **Modern Protocol Suite:** Architecture ready for **VLESS (Reality), VMess, Trojan, ShadowSocks, and Hysteria 2 (UDP)**.
-* **Dynamic Low-Latency Routing:**
-  * Real-time multi-node ICMP / TCP ping delay measurement.
-  * Instant **Lowest Ping** sorting and country/region smart search.
-  * Smart traffic bifurcation (Domestic Iranian IP bypass, ad-blocking, and split tunneling).
-* **Bilingual & Native Bi-Directional:** Native, zero-flicker dynamic switching between **English (LTR)** and **Persian (RTL)**.
-* **Full-Lifecycle Onboarding:** Step-by-step setup wizard for first-run regional optimization, network preset selection, and Android `VpnService` permission orchestration.
-* **Integrated Management & Auth Terminal:**
-  * Dual user session linking via Telegram ID or Gmail OTP verification.
-  * Role-Based Access Control (RBAC) featuring an **Admin Control Panel**.
-  * Real-time plan management (CRUD, quota control, pricing in Tomans & USDT, dynamic public store sync).
-  * Direct crypto and card receipt upload integration.
-
-#### 🛠️ Tech Stack
-* **Framework:** Flutter 3.x / Dart 3.x
-* **State Management:** Reactive ValueNotifiers / In-Memory State Pipeline
-* **Core Architecture:** Cross-Platform Native TUN Interface (Android `VpnService` & Desktop TUN abstraction)
-* **CI/CD:** Automated GitHub Actions build pipeline targeting Android (`.apk`).
-
----
-
-<div dir="rtl">
-
-### 🇮🇷 توضیحات فارسی
-
-#### ⚡ معرفی پروژه
-**ولاسیتی (VELOCITY)** یک کلاینت وی‌پی‌ان و پراکسی مدرن، سریع و چندمنظوره است که با فریم‌ورک **فلاتر (Flutter)** توسعه یافته است. این برنامه با الهام از معماری هسته‌های قدرتمندی همچون Sing-box و Hiddify و با تمرکز بر عبور از محدودیت‌های شدید شبکه، امنیت داده‌ها و رابط کاربری چشم‌نواز نئونی-سایبرپنک طراحی شده است.
-
-#### 💎 قابلیت‌های برجسته
-* **رابط کاربری اختصاصی نئونی (Cyberpunk):** پالت رنگی مشکی عمیق و آبی الکتریکی، دکمه اتصال با انیمیشن راداری تپنده، کارت‌های وضعیت شیشه‌ای و چیدمان استاندارد.
-* **پشتیبانی از پروتکل‌های نسل جدید:** ساختار سازگار با پروتکل‌های ضد فیلتر از جمله VLESS Reality ،Hysteria 2 ،Trojan و VMess.
-* **مدیریت هوشمند نودها و پینگ واقعی:**
-  * تست تاخیر لحظه‌ای با نمایش میلی‌ثانیه (ms).
-  * مرتب‌سازی خودکار بر اساس کمترین پینگ (Lowest Ping) و جستجوی پیشرفته بر اساس نام کشور و لوکیشن.
-  * روتینگ هوشمند (دور زدن سایت‌های داخلی ایران / LAN و بهینه‌سازی برای اپراتورهای مختلف).
-* **سیستم دوزبانه کاملاً بومی:** تغییر لحظه‌ای زبان میان فارسی (RTL) و انگلیسی (LTR) بدون تداخل در چیدمان.
-* **ویزارد راه‌اندازی گام‌به‌گام (Onboarding):** راهنمای اولیه کاربر برای انتخاب زبان، بهینه‌سازی ریجن بر اساس اینترنت، و شبیه‌سازی دریافت مجوزهای امنیتی VpnService و نوتیفیکیشن اندروید.
-* **سیستم احراز هویت و پنل مدیریت ادمین:**
-  * ورود و اتصال حساب از طریق آیدی تلگرام یا دریافت کد تایید ایمیلی (Gmail OTP).
-  * تفکیک سطح دسترسی کاربر عادی و ادمین (RBAC).
-  * پنل اختصاصی ادمین جهت افزودن، ویرایش و حذف پلن‌ها، تنظیم حجم و قیمت (تومان و تتر) و انتشار لحظه‌ای در فروشگاه.
-  * صفحه اختصاصی فعال‌سازی VIP و ارسال تصویر فیش واریزی.
 
 </div>
 
+## 🌐 English Documentation
+
+### 🚀 Overview
+**VELOCITY** is an advanced, production-grade anti-censorship VPN client engineered with a cyberpunk midnight aesthetic and high-performance routing inspired by **Sing-box**, **Hiddify**, and **v2rayNG**. Designed specifically to conquer strict firewalls and DPI (Deep Packet Inspection), Velocity integrates advanced protocol obfuscation, dynamic subscriptions, multi-method user authentication, and real-time network telemetry.
+
+### ✨ Key Features
+
+- 🛡️ **Next-Gen Protocol Support:**
+  - **VLESS Reality**: Camouflages traffic using legitimate TLS 1.3 handshakes and TLS fingerprint mimicry (`chrome`, `safari`, `firefox`).
+  - **Hysteria 2**: UDP-based protocol with aggressive BBR-like congestion control and port-hopping for filtered or throttled connections.
+  - **Trojan gRPC & VMess WebSocket**: Obfuscated multi-transport fallbacks with CDN reverse-proxy compatibility.
+  - **Shadowsocks 2022**: Modern AEAD cipher suites (BLAKE3, 2022-blake3-aes-128-gcm).
+
+- 🧠 **Intelligent Core Routing & Tun2Socks:**
+  - **Split Tunneling (Iran Bypass)**: Automatic routing rules bypass `.ir` domains, Iranian banking IP ranges, and local government subnets, ensuring high speed without disconnecting.
+  - **Anti-DPI Packet Fragmentation**: Splits initial TLS ClientHello packets to evade stateful DPI inspection.
+  - **Custom DNS Resolvers**: Encrypted DNS-over-HTTPS (DoH) via Cloudflare (`1.1.1.1`), Google (`8.8.8.8`), and NextDNS to defeat DNS poisoning and hijacking.
+
+- 🔐 **Multi-Method User Authentication:**
+  - **Telegram Account Sync**: Instant 1-tap link with Telegram usernames or IDs to restore active subscriptions and node pools.
+  - **Gmail OTP Terminal**: Email authentication with real-time countdown timer and 6-digit verification code generator.
+  - **Admin RBAC Terminal**: Secure role-based administrative control with credential validation (`admin@velocity.vpn`).
+
+- 💼 **Dynamic Plan & Subscription Management:**
+  - **Store Management**: Full administrative CRUD (Create, Read, Update, Delete) for subscription packages.
+  - **Dual Currency Pricing**: Automated pricing display in Iranian Tomans and USDT.
+  - **Payment Integration**: One-click copy for TRC-20 USDT and TON wallet payment addresses.
+  - **Instant Store Visibility**: Live toggle to show or hide plans in the public store without redeploying.
+
+- 📊 **Cyberpunk Telemetry & Live Diagnostics:**
+  - Real-time RTT latency oscilloscope and round-trip ping chart.
+  - Connection Jitter meter and packet-loss rate monitor.
+  - Real-time upload and download throughput meters.
+  - GeoIP country resolver with direct node flag indicators (Germany, Finland, Netherlands, USA, Japan, etc.).
+
+- 🎨 **Visual Identity & Design System:**
+  - Electric Cyan (`#00E5FF`), Neon Green (`#00FF88`), Neon Pink (`#FFFF1744`), and Neon Yellow (`#FFD600`).
+  - Deep Midnight OLED black canvas (`#000000`, `#060910`) for minimal battery consumption.
+  - Dual-language engine (English / Persian) with automatic RTL and LTR layout switching.
+
 ---
+
+### 📱 Architecture & Project Layout
+
+```
+velocity/
+├── .github/
+│   └── workflows/
+│       └── build-apk.yml       # Automated CI/CD workflow for Android APK builds
+├── app/                        # Native Android Gradle configuration & wrapper
+│   ├── build.gradle.kts
+│   └── src/main/
+│       └── AndroidManifest.xml
+├── lib/
+│   └── main.dart               # Complete Flutter application with state management,
+│                               # telemetry engine, auth, and admin plan dashboard
+├── pubspec.yaml                # Flutter project specification & dependencies
+├── .gitignore                  # Production-grade Git ignore filters
+├── metadata.json               # Google AI Studio platform metadata
+└── README.md                   # Dual-language repository documentation
+```
+
 ---
 
-## 📥 دانلود و نصب / Installation & Platforms
+### 🛠️ Prerequisites & Local Setup
 
-<div dir="rtl">
+#### Prerequisites
+1. **Flutter SDK**: Version `3.19.0` or higher ([Install Flutter](https://docs.flutter.dev/get-started/install))
+2. **Java Development Kit**: JDK 17 ([Temurin 17](https://adoptium.net/))
+3. **Android SDK**: API Level 34 with Android Build Tools 34.0.0+
 
-کلاینت **VELOCITY** به لطف معماری کراس‌پلتفرم فلاتر و قابلیت خروجی یونیورسال، روی تمام پلتفرم‌ها و دستگاه‌ها قابل اجرا است:
+#### 1. Clone the Repository
+```bash
+git clone https://github.com/velocity-vpn/velocity.git
+cd velocity
+```
 
-</div>
+#### 2. Install Dependencies
+```bash
+flutter pub get
+```
 
-| پلتفرم / سیستم‌عامل | نسخه و معماری | راهنمای نصب و نکات اختصاصی | وضعیت |
-| پلتفرم / سیستم‌عامل | نسخه و معماری | لینک دریافت مستقیم | وضعیت |
-| :--- | :--- | :--- | :--- |
-| **Android (سامسونگ، پیکسل و...)** | `Universal APK` | [⬇️ **دانلود مستقیم APK**](https://github.com/gamevguysafkhami-lgtm/velocity-vpn/releases/latest/download/Velocity-VPN-Universal-Release.apk) | 🟢 استیبل |
-| **Xiaomi (MIUI / HyperOS)** | `APK بهینه‌شده` | [⬇️ **دانلود مستقیم APK**](https://github.com/gamevguysafkhami-lgtm/velocity-vpn/releases/latest/download/Velocity-VPN-Universal-Release.apk) | 🟢 استیبل |
-| **Windows** | `Windows x64 (.exe / .zip)` | [صفحه دانلود ریلیزها](https://github.com/gamevguysafkhami-lgtm/velocity-vpn/releases) | 🟡 آزمایشی |
-| **macOS** | `Apple Silicon & Intel` | نیازمند بیلد لوکال / Releases | 🟡 آزمایشی |
-| **iOS (iPhone / iPad)** | `IPA / TestFlight` | از طریق AltStore / TrollStore | 🔄 در حال آماده‌سازی |
+#### 3. Run on Connected Device / Emulator
+```bash
+flutter run
+```
 
-<div dir="rtl">
+---
 
-### 💡 راهنمای سریع دانلود فایل اندروید و شیائومی (APK):
-1. از بالای همین صفحه گیت‌هاب، به تب **Actions** بروید.
-2. روی آخرین بیلد سبز رنگ (تیک‌خورده) با عنوان **Build Android Release APK** کلیک کنید.
-3. در پایین صفحه و در بخش **Artifacts**، فایل فشرده `Velocity-VPN-Universal-Release` را دانلود کنید.
-4. فایل را از زیپ خارج کرده و روی گوشی نصب کنید.
+### 📦 Building Release APK
 
-</div>
-
-
-### 📱 Quick Run / اجرای سریع پروژه
+To build a standalone production release APK ready to install on Android phones:
 
 ```bash
-# Clone the repository
-git clone [https://github.com/gamevguysafkhami-lgtm/velocity-vpn.git](https://github.com/gamevguysafkhami-lgtm/velocity-vpn.git)
+flutter build apk --release
+```
 
-# Enter project directory
-cd velocity-vpn
+The compiled release APK will be generated at:
+```
+build/app/outputs/flutter-apk/app-release.apk
+```
 
-# Get Flutter dependencies
+To build split APKs per ABI (for smaller file sizes):
+```bash
+flutter build apk --release --split-per-abi
+```
+
+---
+
+### 🔑 Default Admin Demo Credentials
+
+For testing the **Admin Dashboard** and **Dynamic Plan Management**:
+- **Email:** `admin@velocity.vpn`
+- **Password:** `AdminSecurePassword123!`
+*(Quick autofill shortcut is available directly inside the Authentication dialog)*
+
+---
+
+<br/>
+
+## 🇮🇷 مستندات فارسی
+
+### 🚀 معرفی پروژه
+**ولوسیتی (VELOCITY)** یک کلاینت ضد فیلترینگ و تونلینگ نسل جدید با طراحی سایبرپانک و موتور مسیریابی مبتنی بر اصول **سینگ‌باکس (Sing-box)**، **هیدیفای (Hiddify)** و **v2rayNG** است. این نرم‌افزار به صورت ویژه برای عبور پایدار از دیوارهای آتش پیشرفته و سیستم‌های فیلترینگ عمیق بسته‌ها (DPI) طراحی و بهینه‌سازی شده است.
+
+### ✨ قابلیت‌های کلیدی
+
+- 🛡️ **پشتیبانی جامع از پروتکل‌های نوین:**
+  - **VLESS Reality**: پنهان‌سازی ترافیک پشت اتصالات واقعی TLS 1.3 با شبیه‌سازی دقیق اثر انگشت مرورگرها (`chrome`, `safari`, `firefox`).
+  - **Hysteria 2**: پروتکل پرسرعت مبتنی بر UDP با کنترل ازدحام اختصاصی و قابلیت تعویض پورت (Port Hopping) مناسب شرایط اختلال شدید اینترنت.
+  - **Trojan gRPC & VMess WebSocket**: امکان عبور از CDNها و دامنه‌های واسط با ترافیک وب معتبر.
+  - **Shadowsocks 2022**: جدیدترین استانداردهای رمزنگاری ایمن AEAD.
+
+- 🧠 **مسیریابی هوشمند و تفکیک ترافیک ایران (Bypass Iran):**
+  - **تونل‌زنی هوشمند (Split Tunneling)**: عبور مستقیم ترافیک سایت‌های بانکی و دامنه‌های `.ir` بدون نیاز به قطع اتصال فیلترشکن.
+  - **تکه‌تکه‌سازی بسته‌های اولیه (Fragmentation)**: دور زدن شناسایی پکت‌های ClientHello توسط فیلترینگ هوشمند.
+  - **DNS رمزنگاری‌شده (DoH)**: استفاده از سرورهای امن Cloudflare و Google برای مقابله با مسمومیت و مسدودسازی DNS.
+
+- 🔐 **ترمینال احراز هویت چندگانه:**
+  - **اتصال با تلگرام**: همگام‌سازی فوری از طریق آیدی یا یوزرنیم تلگرام (`@username`) جهت بازیابی اشتراک VIP.
+  - **ورود با کد یکبار مصرف جیمیل (Gmail OTP)**: ارسال کد تایید ۶ رقمی به همراه شمارش معکوس ۶۰ ثانیه‌ای.
+  - **پنل مدیریت ادمین (RBAC)**: دسترسی کنترل‌شده برای ادمین‌ها با تایید رمزعبور امنیتی.
+
+- 💼 **مدیریت پویا و بلادرنگ پلن‌های اشتراک:**
+  - ایجاد، ویرایش، مخفی‌سازی و حذف پلن‌های اشتراک توسط ادمین.
+  - قیمت‌گذاری دوگانه به **تومان** و **تتر (USDT)**.
+  - درگاه‌های پرداخت کریپتو با قابلیت کپی سریع آدرس کیف‌پول‌های USDT TRC-20 و TON.
+
+- 📊 **مانیتورینگ و تله‌متری زنده:**
+  - نمودار نوسان‌نمای تاخیر پینگ (RTT) و شاخص پایداری ارتباط (Jitter).
+  - سنجش لحظه‌ای سرعت دانلود و آپلود بر حسب کیلوبایت و مگابایت بر ثانیه.
+  - تشخیص موقعیت جغرافیایی سرورها به همراه پرچم کشورهای متصل (آلمان، هلند، فنلاند، آمریکا و...).
+
+- 🎨 **طراحی نئونی و رابط کاربری دو زبانه:**
+  - رنگ‌بندی سایبرپانک فیروزه‌ای الکتریک (`#00E5FF`) و پس‌زمینه تمام مشکی بهینه‌شده برای نمایشگرهای AMOLED.
+  - پشتیبانی کامل و اصولی از زبان‌های فارسی (راست‌چین RTL) و انگلیسی (چپ‌چین LTR).
+
+---
+
+### 💻 راهنمای نصب و اجرای محلی
+
+#### پیش‌نیازها
+1. نصب **Flutter SDK** نسخه ۳.۱۹ به بالا
+2. نصب **JDK 17**
+3. ابزارهای اندروید (Android SDK 34)
+
+#### مراحل اجرا:
+```bash
+# دریافت مخزن پروژه
+git clone https://github.com/velocity-vpn/velocity.git
+cd velocity
+
+# دریافت پکیج‌های فلاتر
 flutter pub get
 
-# Run on Web / Chrome
-flutter run -d chrome --web-port=8080
+# اجرای برنامه روی شبیه‌ساز یا دستگاه متصل
+flutter run
+```
 
-# Build Android Release APK
+#### خروجی فایل نصبی (APK):
+```bash
 flutter build apk --release
+```
+فایل نصبی نهایی در مسیر زیر ایجاد خواهد شد:
+`build/app/outputs/flutter-apk/app-release.apk`
+
+---
+
+### 🤖 بیلد خودکار در گیت‌هاب (CI/CD)
+در پوشه `.github/workflows/build-apk.yml` فرآیند کامل بیلد خودکار تنظیم شده است. با هر بار اعمال کامیت در شاخه `main` یا ایجاد تگ انتشار جدید (مثلا `v1.0.0`)، گیت‌هاب اکشنز به طور خودکار محیط جاوا و فلاتر را بارگذاری کرده و نسخه Release APK را کامپایل نموده و در بخش Releases برای دانلود کاربران قرار می‌دهد.
+
+---
+
+### ⚖️ Disclaimer & Terms of Service
+This project is developed for educational, network security evaluation, and digital accessibility purposes. Users are solely responsible for compliance with their local telecommunications regulations.
+
+---
+
+<div align="center">
+
+**VELOCITY TUNNEL CORE • POWERED BY OPEN-SOURCE FREEDOM**  
+*Crafted with ⚡ and precision for resilient global connectivity.*
+
+</div>

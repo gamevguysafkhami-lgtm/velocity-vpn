@@ -2,7 +2,7 @@
   "name": "Velocity",
   "description": "Velocity - Secure VPN Services. Cyberpunk midnight VPN client with multi-method authentication (Telegram, Gmail OTP, Admin RBAC), dynamic plan management, and real-time telemetry.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }
-
-
