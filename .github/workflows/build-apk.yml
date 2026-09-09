@@ -1,9 +1,12 @@
-name: Build Android Release APK
+name: Build and Release Velocity VPN
 
 on:
+  workflow_dispatch:
   push:
     branches: [ main ]
-  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -37,9 +40,14 @@ jobs:
       - name: Build Android APK
         run: flutter build apk --release
 
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
+      - name: Create Release and Upload APK
+        uses: softprops/action-gh-release@v2
         with:
-          name: Velocity-VPN-Universal-Release
-          path: build/app/outputs/flutter-apk/app-release.apk
-          retention-days: 30
+          tag_name: v1.0.0
+          name: "Velocity VPN v1.0.0"
+          body: "Official Release of Velocity VPN Android Client"
+          draft: false
+          prerelease: false
+          files: build/app/outputs/flutter-apk/app-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
