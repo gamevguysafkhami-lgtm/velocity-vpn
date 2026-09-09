@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    <!-- Outer Cyan Glow Halo -->
+    <path
+        android:pathData="M30,32 L46,32 C48,37 50,42 54,49 L60,62 L74,32 L88,32 L64,88 C62,92 58,92 56,88 L30,32 Z"
+        android:strokeColor="#3300E5FF"
+        android:strokeWidth="10"
+        android:strokeLineJoin="round"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+    <!-- Secondary Glow Path -->
+    <path
+        android:pathData="M31,32 L47,32 C50,40 53,46 56,53 L60,62 L73,32 L87,32 L63,87 C61,90 59,90 57,87 L31,32 Z"
+        android:strokeColor="#6600B0FF"
+        android:strokeWidth="5"
+        android:strokeLineJoin="round"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+    <!-- Right Wing of V (Solid Neon Cyan Line) -->
+    <path
+        android:pathData="M60,86 L85,34 C85.5,33 86.5,32 88,32 L78,32 C76.5,32 75.5,33 75,34 L58,74 Z"
+        android:fillColor="#00E5FF" />
+    <!-- Left Wing of V with Stylized Aerodynamic Cuts -->
+    <path
+        android:pathData="M32,32 L48,32 C49,35 50,38 52,43 L45,43 C44,40 43,38 41,36 L34,36 Z"
+        android:fillColor="#00E5FF" />
+    <path
+        android:pathData="M36,41 L47,41 C50,47 52,53 54,58 L48,58 C46,53 44,48 42,45 Z"
+        android:fillColor="#00B0FF" />
+    <!-- Core V Stroke with Radiant Center -->
+    <path
+        android:pathData="M52,60 L58,74 L54,84 C53,82 52,80 50,76 Z"
+        android:fillColor="#E0F7FA" />
+    <!-- Sharp Neon Center V Outline -->
+    <path
+        android:pathData="M32,32 L48,32 L58,76 C59,78 61,78 62,76 L86,32"
+        android:strokeColor="#00E5FF"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000" />
+    <path
+        android:pathData="M35,39 L47,45"
+        android:strokeColor="#00E5FF"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round" />
+</vector>

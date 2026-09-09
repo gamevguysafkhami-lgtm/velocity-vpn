@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Outer Cyan Glow Halo -->
+    <path
+        android:pathData="M28,30 L44,30 C46,35 48,40 52,47 L58,60 L72,30 L86,30 L62,86 C60,90 56,90 54,86 L28,30 Z"
+        android:strokeColor="#4400E5FF"
+        android:strokeWidth="8"
+        android:strokeLineJoin="round"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+    <!-- Secondary Glow Path -->
+    <path
+        android:pathData="M29,30 L45,30 C48,38 51,44 54,51 L58,60 L71,30 L85,30 L61,85 C59,88 57,88 55,85 L29,30 Z"
+        android:strokeColor="#8800B0FF"
+        android:strokeWidth="4"
+        android:strokeLineJoin="round"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+    <!-- Sharp Neon Cyan 'V' with wing cuts -->
+    <path
+        android:pathData="M30,30 L46,30 L56,76 C57,78 59,78 60,76 L84,30"
+        android:strokeColor="#00E5FF"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000" />
+    <path
+        android:pathData="M33,37 L45,43"
+        android:strokeColor="#00E5FF"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round" />
+</vector>
