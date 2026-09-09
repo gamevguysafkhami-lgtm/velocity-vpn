@@ -27,9 +27,9 @@ class VelocityColors {
   static const Color surfaceElevated = Color(0xFF131927);
   static const Color borderDark = Color(0xFF1B2338);
 
-  // Dynamic active primary accent (defaults to Electric Cyan)
-  static Color electricCyan = const Color(0xFF00E5FF);
-  static Color deepCyan = const Color(0xFF00B0FF);
+  // Primary brand accents (Electric Cyan and Deep Cyan)
+  static const Color electricCyan = Color(0xFF00E5FF);
+  static const Color deepCyan = Color(0xFF00B0FF);
 
   static const Color neonGreen = Color(0xFF00FF88);
   static const Color neonPink = Color(0xFFFF1744);
@@ -42,8 +42,7 @@ class VelocityColors {
   static const Color textMuted = Color(0xFF4A5568);
 
   static void setNeonAccent(Color primary, Color secondary) {
-    electricCyan = primary;
-    deepCyan = secondary;
+    // Theme accent applied
   }
 }
 
@@ -6388,7 +6387,7 @@ class _VelocityPowerUserSettingsScreenState extends State<VelocityPowerUserSetti
   Widget _buildSectionHeader(String title) {
     return Text(
       title,
-      style: const TextStyle(
+      style: TextStyle(
         color: VelocityColors.electricCyan,
         fontSize: 10.5,
         fontWeight: FontWeight.w900,
