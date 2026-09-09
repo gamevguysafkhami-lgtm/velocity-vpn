@@ -372,6 +372,9 @@ class ServerProfile {
   bool isTesting;
   String trafficUsage;
 
+  String get address => host;
+  String get server => host;
+
   ServerProfile({
     required this.id,
     required this.name,
@@ -2122,7 +2125,7 @@ class _HomeScreenState extends State<HomeScreen>
             }).toList();
 
             if (sortByLowestPing) {
-              displayServers.sort((a, b) => a.pingMs.compareTo(b.pingMs));
+              displayServers.sort((a, b) => (a.pingMs ?? 9999).compareTo(b.pingMs ?? 9999));
             }
 
             return Container(
@@ -2265,7 +2268,7 @@ class _HomeScreenState extends State<HomeScreen>
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                     child: Row(
-                      children: ['ALL', 'VLESS', 'HYSTERIA2', 'TROJAN', 'VMESS'].map((proto) {
+                      children: ['ALL', 'VLESS', 'HYSTERIA2', 'TROJAN', 'VMESS'].map<Widget>((proto) {
                         final isChipSelected = selectedProtocolFilter == proto;
                         return Padding(
                           padding: const EdgeInsets.only(right: 6),
@@ -2515,6 +2518,11 @@ class _HomeScreenState extends State<HomeScreen>
       case RoutingMode.direct:
         return I18n.t('mode_direct');
     }
+  }
+
+  Future<int> _simulatePing(String host, int port) async {
+    await Future.delayed(const Duration(milliseconds: 150));
+    return 45 + (host.hashCode.abs() % 95);
   }
 
   // -------------------------------------------------------------------------
@@ -3631,7 +3639,7 @@ class _VelocityOnboardingDialogState extends State<VelocityOnboardingDialog> {
         ),
         const SizedBox(height: 14),
 
-        ...protocols.map((proto) {
+        ...protocols.map<Widget>((proto) {
           final isSelected = _selectedProtocols.contains(proto['id'] as String);
           final color = proto['color'] as Color;
 
@@ -3982,7 +3990,7 @@ class _VelocityOnboardingDialogState extends State<VelocityOnboardingDialog> {
               Wrap(
                 spacing: 6,
                 runSpacing: 4,
-                children: tags.map((t) {
+                children: tags.map<Widget>((t) {
                   return Container(
                     padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                     decoration: BoxDecoration(
@@ -5468,7 +5476,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> with Single
           ),
           const SizedBox(height: 8),
           Row(
-            children: ['Marzban', '3X-UI', 'Hiddify'].map((backend) {
+            children: ['Marzban', '3X-UI', 'Hiddify'].map<Widget>((backend) {
               final isSel = _selectedBackendType == backend;
               return Expanded(
                 child: Padding(
@@ -5612,7 +5620,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> with Single
           ),
           const SizedBox(height: 8),
 
-          ..._syncedNodes.map((node) {
+          ..._syncedNodes.map<Widget>((node) {
             return Container(
               margin: const EdgeInsets.only(bottom: 8),
               padding: const EdgeInsets.all(12),
@@ -5667,6 +5675,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> with Single
       ),
     );
   }
+
+  Widget _buildKpiCard(String label, String value, Color color, IconData icon) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
@@ -5996,8 +6006,8 @@ class _VelocityPowerUserSettingsScreenState extends State<VelocityPowerUserSetti
                   contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: VelocityColors.borderDark)),
                 ),
-                items: ['gVisor (User-space)', 'System (Kernel TUN)', 'Mixed LWIP'].map((v) {
-                  return DropdownMenuItem(value: v, child: Text(v));
+                items: ['gVisor (User-space)', 'System (Kernel TUN)', 'Mixed LWIP'].map<DropdownMenuItem<String>>((v) {
+                  return DropdownMenuItem<String>(value: v, child: Text(v));
                 }).toList(),
                 onChanged: (val) {
                   if (val != null) setState(() => _tunImplementation = val);
@@ -6223,7 +6233,7 @@ class _VelocityPowerUserSettingsScreenState extends State<VelocityPowerUserSetti
           _buildSectionHeader('DEVICE APPLICATIONS'),
           const SizedBox(height: 8),
 
-          ..._installedApps.map((app) {
+          ..._installedApps.map<Widget>((app) {
             final isBypassed = app['bypass'] as bool;
             return Container(
               margin: const EdgeInsets.only(bottom: 8),
@@ -6317,7 +6327,7 @@ class _VelocityPowerUserSettingsScreenState extends State<VelocityPowerUserSetti
         _buildSectionHeader('SELECT NEON GLOW ACCENT'),
         const SizedBox(height: 10),
 
-        ..._colorThemes.map((theme) {
+        ..._colorThemes.map<Widget>((theme) {
           final primary = theme['primary'] as Color;
           final secondary = theme['secondary'] as Color;
           final isCurrent = VelocityColors.electricCyan.value == primary.value;
