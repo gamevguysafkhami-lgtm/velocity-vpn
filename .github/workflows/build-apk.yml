@@ -26,6 +26,11 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Configure Flutter Android
+        run: |
+          flutter config --enable-android
+          flutter create . --platforms=android --org=com.velocity.vpn
+
       - name: Install dependencies
         run: flutter pub get
 
