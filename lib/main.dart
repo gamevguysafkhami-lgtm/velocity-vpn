@@ -384,6 +384,30 @@ class SubscriptionInfo {
 
   bool get hasQuota => totalBytes > 0;
   
+  int get trafficUsed => uploadBytes + downloadBytes;
+  int get trafficTotal => totalBytes;
+  DateTime? get expiryDate => expireTimestamp > 0 ? DateTime.fromMillisecondsSinceEpoch(expireTimestamp * 1000) : null;
+
+  String? get planName => null;
+
+  double get quotaProgress {
+    if (trafficTotal <= 0) return 0.0;
+    return (trafficUsed / trafficTotal).clamp(0.0, 1.0);
+  }
+
+  String get trafficUsageFormatted {
+    return '${(trafficUsed / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
+  }
+
+  String get trafficTotalFormatted {
+    return '${(trafficTotal / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
+  }
+
+  String get expiryDateFormatted {
+    if (expiryDate == null) return 'نامحدود';
+    return '${expiryDate!.year}/${expiryDate!.month}/${expiryDate!.day}';
+  }
+
   double get usedGb => (uploadBytes + downloadBytes) / (1024 * 1024 * 1024);
   double get totalGb => totalBytes / (1024 * 1024 * 1024);
   double get remainingGb => totalGb > usedGb ? (totalGb - usedGb) : 0.0;
