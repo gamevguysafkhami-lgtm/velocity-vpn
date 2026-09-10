@@ -29,22 +29,28 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Enable Android Desugaring
+      - name: Recreate Android Harness
         run: |
-          BUILD_GRADLE="android/app/build.gradle"
-          if [ -f "$BUILD_GRADLE" ]; then
-            # اضافه کردن coreLibraryDesugaringEnabled اگر نباشد
-            if ! grep -q "coreLibraryDesugaringEnabled" "$BUILD_GRADLE"; then
-              sed -i '/compileOptions {/a \        coreLibraryDesugaringEnabled true' "$BUILD_GRADLE"
-            fi
-            # اضافه کردن پکیج دسیوگر به dependencies
-            if ! grep -q "desugar_jdk_libs" "$BUILD_GRADLE"; then
-              sed -i '/dependencies {/a \    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.0.4"' "$BUILD_GRADLE"
-            fi
+          flutter create . --platforms=android --org=com.velocity.vpn
+
+      - name: Enable Core Library Desugaring
+        run: |
+          TARGET_GRADLE="android/app/build.gradle"
+          if [ -f "$TARGET_GRADLE" ]; then
+            # فعال‌سازی desugaring در compileOptions
+            sed -i '/compileOptions {/a \        coreLibraryDesugaringEnabled true' "$TARGET_GRADLE"
+            # افزودن کتابخانه desugar به dependencies
+            sed -i '/dependencies {/a \    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.0.4"' "$TARGET_GRADLE"
           fi
 
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Generate App Icons
+        run: |
+          if grep -q "flutter_launcher_icons" pubspec.yaml; then
+            dart run flutter_launcher_icons || true
+          fi
 
       - name: Build Android APK
         run: flutter build apk --release
@@ -52,9 +58,9 @@ jobs:
       - name: Create Release and Upload APK
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.1
-          name: "Velocity VPN v1.0.1"
-          body: "Official Release of Velocity VPN Android Client"
+          tag_name: v1.0.2
+          name: "Velocity VPN v1.0.2"
+          body: "Official Release with Desugaring and Custom Icon"
           draft: false
           prerelease: false
           files: build/app/outputs/flutter-apk/app-release.apk
