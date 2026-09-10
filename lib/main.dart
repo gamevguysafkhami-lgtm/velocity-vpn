@@ -9,16 +9,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-      systemNavigationBarColor: Color(0xFF000000),
-      systemNavigationBarIconBrightness: Brightness.light,
-    ),
-  );
+  try {
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        systemNavigationBarColor: Color(0xFF000000),
+        systemNavigationBarIconBrightness: Brightness.light,
+      ),
+    );
+  } catch (_) {}
   runApp(const VelocityApp());
 }
 
@@ -1133,23 +1135,31 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
-    VelocityNotificationService.init();
-    _loadPersistedData();
+    try {
+      VelocityNotificationService.init();
+    } catch (_) {}
+    try {
+      _loadPersistedData();
+    } catch (_) {}
 
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1800),
-    )..repeat(reverse: true);
+    try {
+      _pulseController = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 1800),
+      )..repeat(reverse: true);
 
-    _pulseAnimation = Tween<double>(begin: 0.96, end: 1.06).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
-    );
+      _pulseAnimation = Tween<double>(begin: 0.96, end: 1.06).animate(
+        CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+      );
+    } catch (_) {}
 
     // Present First-Launch Onboarding Wizard on initial startup
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!_hasCompletedOnboarding && mounted) {
-        _showOnboardingWizard();
-      }
+      try {
+        if (!_hasCompletedOnboarding && mounted) {
+          _showOnboardingWizard();
+        }
+      } catch (_) {}
     });
   }
 
