@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace "com.velocity.vpn"
-    compileSdk 34
+    compileSdk 36
 
     compileOptions {
         coreLibraryDesugaringEnabled true
@@ -21,7 +21,7 @@ android {
     defaultConfig {
         applicationId "com.velocity.vpn"
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion 36
         versionCode 1
         versionName "1.0"
         multiDexEnabled true

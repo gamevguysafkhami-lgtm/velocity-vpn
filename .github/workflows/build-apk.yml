@@ -33,6 +33,7 @@ jobs:
         run: |
           flutter config --enable-android
           flutter create . --platforms=android --org=com.velocity.vpn
+          rm -f android/app/build.gradle.kts
 
       - name: Install dependencies
         run: flutter pub get
