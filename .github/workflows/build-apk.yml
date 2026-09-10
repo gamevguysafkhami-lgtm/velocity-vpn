@@ -1,3 +1,62 @@
-- name: Configure Flutter Android
+name: Build and Release Velocity VPN
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Enable Android Desugaring
         run: |
-          flutter config --enable-android
+          BUILD_GRADLE="android/app/build.gradle"
+          if [ -f "$BUILD_GRADLE" ]; then
+            # اضافه کردن coreLibraryDesugaringEnabled اگر نباشد
+            if ! grep -q "coreLibraryDesugaringEnabled" "$BUILD_GRADLE"; then
+              sed -i '/compileOptions {/a \        coreLibraryDesugaringEnabled true' "$BUILD_GRADLE"
+            fi
+            # اضافه کردن پکیج دسیوگر به dependencies
+            if ! grep -q "desugar_jdk_libs" "$BUILD_GRADLE"; then
+              sed -i '/dependencies {/a \    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.0.4"' "$BUILD_GRADLE"
+            fi
+          fi
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Android APK
+        run: flutter build apk --release
+
+      - name: Create Release and Upload APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.1
+          name: "Velocity VPN v1.0.1"
+          body: "Official Release of Velocity VPN Android Client"
+          draft: false
+          prerelease: false
+          files: build/app/outputs/flutter-apk/app-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
