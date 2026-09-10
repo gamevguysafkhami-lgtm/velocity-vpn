@@ -47,14 +47,19 @@ import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.material.icons.filled.CurrencyExchange
 import androidx.compose.material.icons.filled.Headphones
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.PowerSettingsNew
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.ReceiptLong
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.SignalCellularAlt
+import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.SyncDisabled
 import androidx.compose.material.icons.filled.UploadFile
@@ -65,6 +70,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
@@ -75,6 +82,8 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -306,6 +315,26 @@ fun VelocityVpnMainScreen() {
 
     val coroutineScope = rememberCoroutineScope()
 
+    // Live latency & testing state
+    var isLivePingEnabled by remember { mutableStateOf(false) }
+    var isPingAllRunning by remember { mutableStateOf(false) }
+
+    // Live ping background periodic loop
+    LaunchedEffect(isLivePingEnabled) {
+        if (isLivePingEnabled) {
+            while (true) {
+                delay(12000)
+                val targetServer = selectedServer
+                val updated = LatencyChecker.testSingleServer(targetServer)
+                val idx = servers.indexOfFirst { it.id == updated.id }
+                if (idx != -1) {
+                    servers[idx] = updated
+                    selectedServer = updated
+                }
+            }
+        }
+    }
+
     // Telemetry ticker loop
     LaunchedEffect(vpnState) {
         if (vpnState == VpnState.CONNECTED) {
@@ -340,24 +369,49 @@ fun VelocityVpnMainScreen() {
         }
     }
 
-    fun pingAllServers() {
+    fun pingSingleServer(target: ServerProfile) {
         coroutineScope.launch {
-            servers.forEach { it.isTesting = true }
-            for (i in servers.indices) {
-                delay(220)
-                val base = when (servers[i].protocol) {
-                    VpnProtocol.HYSTERIA2 -> 70
-                    VpnProtocol.VLESS -> 78
-                    else -> 118
-                }
-                servers[i] = servers[i].copy(
-                    pingMs = base + Random.nextInt(-15, 35),
-                    isTesting = false
-                )
-                if (selectedServer.id == servers[i].id) {
-                    selectedServer = servers[i]
+            val idx = servers.indexOfFirst { it.id == target.id }
+            if (idx != -1) {
+                servers[idx] = servers[idx].copy(isTesting = true)
+                val tested = LatencyChecker.testSingleServer(servers[idx])
+                servers[idx] = tested
+                if (selectedServer.id == tested.id) {
+                    selectedServer = tested
                 }
             }
+        }
+    }
+
+    fun pingAllServers() {
+        if (isPingAllRunning) return
+        isPingAllRunning = true
+        coroutineScope.launch {
+            for (i in servers.indices) {
+                servers[i] = servers[i].copy(isTesting = true)
+            }
+            LatencyChecker.testAllServersConcurrent(servers) { tested ->
+                val idx = servers.indexOfFirst { it.id == tested.id }
+                if (idx != -1) {
+                    servers[idx] = tested
+                    if (selectedServer.id == tested.id) {
+                        selectedServer = tested
+                    }
+                }
+            }
+            isPingAllRunning = false
+        }
+    }
+
+    fun autoSelectFastestServer() {
+        val best = LatencyChecker.findBestServer(servers)
+        if (best != null) {
+            selectedServer = best
+            Toast.makeText(
+                context,
+                "${I18n.t("best_selected_toast")}: ${best.name} (${best.pingDisplay})",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
@@ -583,11 +637,19 @@ fun VelocityVpnMainScreen() {
                     VelocityServerBottomSheetContent(
                         servers = servers,
                         selectedServer = selectedServer,
+                        isPingAllRunning = isPingAllRunning,
+                        isLivePingEnabled = isLivePingEnabled,
+                        onToggleLivePing = { isLivePingEnabled = it },
                         onSelectServer = { server ->
                             selectedServer = server
                             showServerSheet = false
                         },
+                        onAutoSelectBest = {
+                            autoSelectFastestServer()
+                            showServerSheet = false
+                        },
                         onPingAll = { pingAllServers() },
+                        onPingSingle = { server -> pingSingleServer(server) },
                         onOpenImport = {
                             showServerSheet = false
                             showSubscriptionScreen = true
@@ -732,6 +794,7 @@ fun VelocityVpnMainScreen() {
                     }
                 )
             }
+
         }
     }
 }
@@ -804,7 +867,7 @@ fun VelocityHeaderBar(
                         imageVector = Icons.Default.Send,
                         contentDescription = "Telegram Support",
                         tint = ElectricCyan,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(19.dp)
                     )
                 }
 
@@ -817,7 +880,7 @@ fun VelocityHeaderBar(
                         imageVector = Icons.Default.ReceiptLong,
                         contentDescription = "VIP Activation",
                         tint = NeonYellow,
-                        modifier = Modifier.size(22.dp)
+                        modifier = Modifier.size(21.dp)
                     )
                 }
 
@@ -1092,6 +1155,34 @@ fun VelocityTelemetryCard(
 }
 
 // ---------------------------------------------------------------------------
+// Latency Signal Bars & Indicators
+// ---------------------------------------------------------------------------
+@Composable
+fun LatencySignalBars(
+    signalBars: Int,
+    color: Color,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(2.dp),
+        verticalAlignment = Alignment.Bottom
+    ) {
+        val heights = listOf(4.dp, 7.dp, 10.dp, 13.dp)
+        heights.forEachIndexed { index, height ->
+            val isActive = index < signalBars
+            Box(
+                modifier = Modifier
+                    .width(3.dp)
+                    .height(height)
+                    .clip(RoundedCornerShape(1.dp))
+                    .background(if (isActive) color else TextMuted.copy(alpha = 0.25f))
+            )
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Active Node Card
 // ---------------------------------------------------------------------------
 @Composable
@@ -1158,20 +1249,34 @@ fun VelocityActiveNodeCard(
                     overflow = TextOverflow.Ellipsis
                 )
             }
-            // Ping latency chip
+            // Ping latency chip with signal bars
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
                     .background(server.pingColor.copy(alpha = 0.12f))
-                    .border(1.dp, server.pingColor, RoundedCornerShape(8.dp))
+                    .border(1.dp, server.pingColor.copy(alpha = 0.7f), RoundedCornerShape(8.dp))
                     .padding(horizontal = 8.dp, vertical = 5.dp)
             ) {
-                Text(
-                    text = server.pingDisplay,
-                    color = server.pingColor,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(5.dp)
+                ) {
+                    if (server.isTesting) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(10.dp),
+                            color = ElectricCyan,
+                            strokeWidth = 1.5.dp
+                        )
+                    } else {
+                        LatencySignalBars(signalBars = server.signalBars, color = server.pingColor)
+                    }
+                    Text(
+                        text = server.pingDisplay,
+                        color = server.pingColor,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
             Spacer(modifier = Modifier.width(8.dp))
             Icon(
@@ -1185,20 +1290,47 @@ fun VelocityActiveNodeCard(
 }
 
 // ---------------------------------------------------------------------------
-// Server Selection Bottom Sheet Content
+// Server Selection Bottom Sheet Content (Real-time Latency Engine)
 // ---------------------------------------------------------------------------
 @Composable
 fun VelocityServerBottomSheetContent(
     servers: List<ServerProfile>,
     selectedServer: ServerProfile,
+    isPingAllRunning: Boolean,
+    isLivePingEnabled: Boolean,
+    onToggleLivePing: (Boolean) -> Unit,
     onSelectServer: (ServerProfile) -> Unit,
+    onAutoSelectBest: () -> Unit,
     onPingAll: () -> Unit,
+    onPingSingle: (ServerProfile) -> Unit,
     onOpenImport: () -> Unit
 ) {
+    var searchQuery by remember { mutableStateOf("") }
+    var sortOption by remember { mutableStateOf(LatencySortOption.FASTEST_FIRST) }
+    var filterOption by remember { mutableStateOf(LatencyFilterOption.ALL) }
+
+    val filteredServers = remember(servers, sortOption, filterOption, searchQuery) {
+        LatencyChecker.filterAndSort(servers, sortOption, filterOption, searchQuery)
+    }
+
+    val bestServer = remember(servers) {
+        LatencyChecker.findBestServer(servers)
+    }
+
+    val validPings = remember(servers) {
+        servers.mapNotNull { it.pingMs }.filter { it > 0 }
+    }
+    val avgPing = remember(validPings) {
+        if (validPings.isNotEmpty()) validPings.average().toInt() else null
+    }
+    val onlineCount = remember(servers) {
+        servers.count { (it.pingMs ?: -1) > 0 }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(540.dp)
+            .height(620.dp)
             .background(SurfaceDark)
             .padding(top = 10.dp)
     ) {
@@ -1217,62 +1349,328 @@ fun VelocityServerBottomSheetContent(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 8.dp),
+                .padding(horizontal = 16.dp, vertical = 4.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
                 Text(
                     text = I18n.t("select_server"),
-                    fontSize = 18.sp,
+                    fontSize = 17.sp,
                     fontWeight = FontWeight.Bold,
                     color = ElectricCyan
                 )
                 Text(
-                    text = "${servers.size} ${I18n.t("servers_count")}",
-                    fontSize = 12.sp,
+                    text = "$onlineCount/${servers.size} ${I18n.t("servers_count")}",
+                    fontSize = 11.5.sp,
                     color = TextSecondary
                 )
             }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = onOpenImport) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                // Auto Select Fastest button
+                OutlinedButton(
+                    onClick = onAutoSelectBest,
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = PureBlack,
+                        contentColor = NeonGreen
+                    ),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, NeonGreen.copy(alpha = 0.8f)),
+                    shape = RoundedCornerShape(8.dp),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Bolt,
+                        contentDescription = null,
+                        modifier = Modifier.size(15.dp),
+                        tint = NeonGreen
+                    )
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Text(text = I18n.t("auto_select_fastest"), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                }
+
+                // Ping All button
+                Button(
+                    onClick = onPingAll,
+                    enabled = !isPingAllRunning,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ElectricCyan,
+                        contentColor = PureBlack
+                    ),
+                    shape = RoundedCornerShape(8.dp),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 10.dp, vertical = 4.dp)
+                ) {
+                    if (isPingAllRunning) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(14.dp),
+                            color = PureBlack,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Icon(imageVector = Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(15.dp))
+                    }
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = if (isPingAllRunning) I18n.t("ping_testing") else I18n.t("ping_all"),
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                IconButton(
+                    onClick = onOpenImport,
+                    modifier = Modifier.size(36.dp)
+                ) {
                     Icon(
                         imageVector = Icons.Default.AddLink,
                         contentDescription = "Import",
-                        tint = ElectricCyan
+                        tint = ElectricCyan,
+                        modifier = Modifier.size(20.dp)
                     )
                 }
-                OutlinedButton(
-                    onClick = onPingAll,
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = SurfaceElevated,
-                        contentColor = ElectricCyan
-                    ),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, ElectricCyan),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Icon(imageVector = Icons.Default.Bolt, contentDescription = null, modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = I18n.t("ping_all"), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+
+        // Live Monitoring & Summary Strip
+        Surface(
+            color = SurfaceElevated,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 6.dp),
+            shape = RoundedCornerShape(10.dp),
+            border = androidx.compose.foundation.BorderStroke(1.dp, BorderDark)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                // Live Monitor Switch
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(if (isLivePingEnabled) NeonGreen else TextMuted)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = I18n.t("live_ping_monitor"),
+                        fontSize = 11.sp,
+                        color = if (isLivePingEnabled) NeonGreen else TextSecondary,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Switch(
+                        checked = isLivePingEnabled,
+                        onCheckedChange = onToggleLivePing,
+                        modifier = Modifier.height(24.dp),
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = PureBlack,
+                            checkedTrackColor = NeonGreen,
+                            uncheckedThumbColor = TextMuted,
+                            uncheckedTrackColor = PureBlack
+                        )
+                    )
+                }
+
+                // Average & Fastest Summary
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (avgPing != null) {
+                        Text(
+                            text = "${I18n.t("stat_avg_latency")}: ",
+                            fontSize = 10.5.sp,
+                            color = TextMuted
+                        )
+                        Text(
+                            text = "${avgPing}ms",
+                            fontSize = 11.sp,
+                            color = ElectricCyan,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    if (bestServer != null) {
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Surface(
+                            color = NeonGreen.copy(alpha = 0.12f),
+                            shape = RoundedCornerShape(4.dp),
+                            modifier = Modifier.clickable { onSelectServer(bestServer) }
+                        ) {
+                            Text(
+                                text = "⚡ ${bestServer.countryCode} ${bestServer.pingDisplay}",
+                                color = NeonGreen,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp)
+                            )
+                        }
+                    }
                 }
             }
+        }
+
+        // Search Bar
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 4.dp),
+            placeholder = { Text(I18n.t("search_server_hint"), fontSize = 12.sp, color = TextMuted) },
+            leadingIcon = {
+                Icon(Icons.Default.Search, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(16.dp))
+            },
+            trailingIcon = {
+                if (searchQuery.isNotEmpty()) {
+                    IconButton(onClick = { searchQuery = "" }, modifier = Modifier.size(24.dp)) {
+                        Icon(Icons.Default.Close, contentDescription = "Clear", tint = TextSecondary, modifier = Modifier.size(14.dp))
+                    }
+                }
+            },
+            singleLine = true,
+            shape = RoundedCornerShape(10.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = PureBlack,
+                unfocusedContainerColor = PureBlack,
+                focusedBorderColor = ElectricCyan,
+                unfocusedBorderColor = BorderDark,
+                focusedTextColor = TextPrimary,
+                unfocusedTextColor = TextPrimary
+            )
+        )
+
+        // Filter and Sort Chips Scroll Row
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(androidx.compose.foundation.rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 2.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Sort: Fastest First
+            FilterChip(
+                selected = sortOption == LatencySortOption.FASTEST_FIRST,
+                onClick = { sortOption = LatencySortOption.FASTEST_FIRST },
+                label = { Text("⚡ ${I18n.t("sort_latency")}", fontSize = 11.sp) },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = ElectricCyan.copy(alpha = 0.2f),
+                    selectedLabelColor = ElectricCyan,
+                    containerColor = SurfaceElevated,
+                    labelColor = TextSecondary
+                ),
+                border = FilterChipDefaults.filterChipBorder(
+                    enabled = true,
+                    selected = sortOption == LatencySortOption.FASTEST_FIRST,
+                    borderColor = BorderDark,
+                    selectedBorderColor = ElectricCyan
+                )
+            )
+
+            // Sort: Country
+            FilterChip(
+                selected = sortOption == LatencySortOption.COUNTRY_NAME,
+                onClick = { sortOption = LatencySortOption.COUNTRY_NAME },
+                label = { Text("🌐 ${I18n.t("sort_country")}", fontSize = 11.sp) },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = ElectricCyan.copy(alpha = 0.2f),
+                    selectedLabelColor = ElectricCyan,
+                    containerColor = SurfaceElevated,
+                    labelColor = TextSecondary
+                ),
+                border = FilterChipDefaults.filterChipBorder(
+                    enabled = true,
+                    selected = sortOption == LatencySortOption.COUNTRY_NAME,
+                    borderColor = BorderDark,
+                    selectedBorderColor = ElectricCyan
+                )
+            )
+
+            // Sort: Protocol
+            FilterChip(
+                selected = sortOption == LatencySortOption.PROTOCOL,
+                onClick = { sortOption = LatencySortOption.PROTOCOL },
+                label = { Text("⚙️ ${I18n.t("sort_protocol")}", fontSize = 11.sp) },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = ElectricCyan.copy(alpha = 0.2f),
+                    selectedLabelColor = ElectricCyan,
+                    containerColor = SurfaceElevated,
+                    labelColor = TextSecondary
+                ),
+                border = FilterChipDefaults.filterChipBorder(
+                    enabled = true,
+                    selected = sortOption == LatencySortOption.PROTOCOL,
+                    borderColor = BorderDark,
+                    selectedBorderColor = ElectricCyan
+                )
+            )
+
+            // Filter: Online Only
+            FilterChip(
+                selected = filterOption == LatencyFilterOption.ONLINE_ONLY,
+                onClick = {
+                    filterOption = if (filterOption == LatencyFilterOption.ONLINE_ONLY) LatencyFilterOption.ALL else LatencyFilterOption.ONLINE_ONLY
+                },
+                label = { Text(I18n.t("filter_online"), fontSize = 11.sp) },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = NeonGreen.copy(alpha = 0.2f),
+                    selectedLabelColor = NeonGreen,
+                    containerColor = SurfaceElevated,
+                    labelColor = TextSecondary
+                ),
+                border = FilterChipDefaults.filterChipBorder(
+                    enabled = true,
+                    selected = filterOption == LatencyFilterOption.ONLINE_ONLY,
+                    borderColor = BorderDark,
+                    selectedBorderColor = NeonGreen
+                )
+            )
+
+            // Filter: Ultra Fast (<150ms)
+            FilterChip(
+                selected = filterOption == LatencyFilterOption.ULTRA_FAST,
+                onClick = {
+                    filterOption = if (filterOption == LatencyFilterOption.ULTRA_FAST) LatencyFilterOption.ALL else LatencyFilterOption.ULTRA_FAST
+                },
+                label = { Text(I18n.t("filter_ultra_fast"), fontSize = 11.sp) },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = NeonGreen.copy(alpha = 0.2f),
+                    selectedLabelColor = NeonGreen,
+                    containerColor = SurfaceElevated,
+                    labelColor = TextSecondary
+                ),
+                border = FilterChipDefaults.filterChipBorder(
+                    enabled = true,
+                    selected = filterOption == LatencyFilterOption.ULTRA_FAST,
+                    borderColor = BorderDark,
+                    selectedBorderColor = NeonGreen
+                )
+            )
         }
 
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(top = 4.dp)
                 .height(1.dp)
                 .background(BorderDark)
         )
 
+        // Server List
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .padding(horizontal = 16.dp, vertical = 6.dp)
         ) {
-            items(servers) { server ->
+            items(filteredServers, key = { it.id }) { server ->
                 val isSelected = server.id == selectedServer.id
+                val isFastestInList = bestServer?.id == server.id && (server.pingMs ?: -1) > 0
+
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -1283,8 +1681,8 @@ fun VelocityServerBottomSheetContent(
                         containerColor = if (isSelected) ElectricCyan.copy(alpha = 0.08f) else SurfaceElevated
                     ),
                     border = androidx.compose.foundation.BorderStroke(
-                        if (isSelected) 1.5.dp else 1.dp,
-                        if (isSelected) ElectricCyan else BorderDark
+                        if (isSelected) 1.5.dp else if (isFastestInList) 1.dp else 1.dp,
+                        if (isSelected) ElectricCyan else if (isFastestInList) NeonGreen.copy(alpha = 0.5f) else BorderDark
                     )
                 ) {
                     Row(
@@ -1293,6 +1691,7 @@ fun VelocityServerBottomSheetContent(
                             .padding(horizontal = 12.dp, vertical = 10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        // Country Flag
                         Box(
                             modifier = Modifier
                                 .size(40.dp)
@@ -1303,14 +1702,39 @@ fun VelocityServerBottomSheetContent(
                         ) {
                             Text(text = server.countryCode, fontSize = 20.sp)
                         }
+
                         Spacer(modifier = Modifier.width(12.dp))
+
+                        // Info Column
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = server.name,
-                                fontSize = 14.sp,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                color = if (isSelected) ElectricCyan else TextPrimary
-                            )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = server.name,
+                                    fontSize = 13.5.sp,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                    color = if (isSelected) ElectricCyan else TextPrimary,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                if (isFastestInList) {
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Surface(
+                                        color = NeonGreen.copy(alpha = 0.15f),
+                                        shape = RoundedCornerShape(4.dp)
+                                    ) {
+                                        Text(
+                                            text = "FASTEST",
+                                            color = NeonGreen,
+                                            fontSize = 8.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                                        )
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(3.dp))
+
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Box(
                                     modifier = Modifier
@@ -1328,25 +1752,48 @@ fun VelocityServerBottomSheetContent(
                                 }
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(
-                                    text = server.trafficUsage,
-                                    fontSize = 10.sp,
-                                    color = TextMuted
+                                    text = "${server.host}:${server.port}",
+                                    fontSize = 9.5.sp,
+                                    color = TextSecondary,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                             }
                         }
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(server.pingColor.copy(alpha = 0.12f))
-                                .border(1.dp, server.pingColor, RoundedCornerShape(8.dp))
-                                .padding(horizontal = 10.dp, vertical = 6.dp)
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        // Interactive Latency Badge (Tap to re-test individual server)
+                        Surface(
+                            onClick = { onPingSingle(server) },
+                            color = server.pingColor.copy(alpha = 0.12f),
+                            shape = RoundedCornerShape(8.dp),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, server.pingColor.copy(alpha = 0.7f))
                         ) {
-                            Text(
-                                text = server.pingDisplay,
-                                color = server.pingColor,
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold
-                            )
+                            Row(
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(5.dp)
+                            ) {
+                                if (server.isTesting) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(11.dp),
+                                        color = server.pingColor,
+                                        strokeWidth = 1.5.dp
+                                    )
+                                } else {
+                                    LatencySignalBars(
+                                        signalBars = server.signalBars,
+                                        color = server.pingColor
+                                    )
+                                }
+                                Text(
+                                    text = server.pingDisplay,
+                                    color = server.pingColor,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                         }
                     }
                 }

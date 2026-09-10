@@ -1,15 +1,15 @@
 name: velocity_vpn
-description: "Velocity VPN Client"
-publish_to: 'none'
-version: 1.0.2+3
+description: "Velocity Cyberpunk VPN & Proxy Client"
+publish_to: "none"
+version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.6
+  cupertino_icons: ^1.0.8
   http: ^1.2.1
   shared_preferences: ^2.2.3
   flutter_local_notifications: ^17.2.1
@@ -19,12 +19,6 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
-  flutter_launcher_icons: ^0.13.1
 
 flutter:
   uses-material-design: true
-
-flutter_launcher_icons:
-  android: true
-  ios: false
-  image_path: "assets/icon/icon.png"

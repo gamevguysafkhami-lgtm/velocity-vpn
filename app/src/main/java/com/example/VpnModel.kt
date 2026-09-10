@@ -63,6 +63,30 @@ data class ServerProfile(
             val ping = pingMs ?: return "N/A"
             return if (ping < 0) "Timeout" else "${ping}ms"
         }
+
+    val signalBars: Int
+        get() {
+            val ping = pingMs ?: return 0
+            return when {
+                ping < 0 -> 0
+                ping < 100 -> 4
+                ping < 200 -> 3
+                ping < 350 -> 2
+                else -> 1
+            }
+        }
+
+    val qualityKey: String
+        get() {
+            val ping = pingMs ?: return "ping_unknown"
+            return when {
+                ping < 0 -> "ping_timeout"
+                ping < 100 -> "ping_ultra"
+                ping < 200 -> "ping_fast"
+                ping < 350 -> "ping_medium"
+                else -> "ping_slow"
+            }
+        }
 }
 
 object ConfigLinkParser {
