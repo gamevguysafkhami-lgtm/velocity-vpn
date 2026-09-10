@@ -34,33 +34,11 @@ jobs:
           flutter config --enable-android
           flutter create . --platforms=android --org=com.velocity.vpn
 
-      - name: Enable Core Library Desugaring
-        run: |
-          python3 -c "
-          import os
-          path = 'android/app/build.gradle'
-          if os.path.exists(path):
-              content = open(path, 'r').read()
-              if 'coreLibraryDesugaringEnabled' not in content:
-                  content = content.replace('compileOptions {', 'compileOptions {\n        coreLibraryDesugaringEnabled true')
-              if 'coreLibraryDesugaring' not in content:
-                  content = content.replace('dependencies {', 'dependencies {\n    coreLibraryDesugaring \"com.android.tools:desugar_jdk_libs:2.0.4\"')
-              open(path, 'w').write(content)
-          kts_path = 'android/app/build.gradle.kts'
-          if os.path.exists(kts_path):
-              content = open(kts_path, 'r').read()
-              if 'isCoreLibraryDesugaringEnabled' not in content:
-                  content = content.replace('compileOptions {', 'compileOptions {\n        isCoreLibraryDesugaringEnabled = true')
-              if 'coreLibraryDesugaring' not in content:
-                  content = content.replace('dependencies {', 'dependencies {\n    coreLibraryDesugaring(\"com.android.tools:desugar_jdk_libs:2.0.4\")')
-              open(kts_path, 'w').write(content)
-          "
-
       - name: Install dependencies
         run: flutter pub get
 
       - name: Build Android APK
-        run: flutter build apk --release
+        run: flutter build apk --release --no-tree-shake-icons
 
       - name: Create Release and Upload APK
         uses: softprops/action-gh-release@v2

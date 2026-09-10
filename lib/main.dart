@@ -19,7 +19,7 @@ void main() {
       systemNavigationBarIconBrightness: Brightness.light,
     ),
   );
-  runApp(const VelocityVpnApp());
+  runApp(const VelocityApp());
 }
 
 // ---------------------------------------------------------------------------
@@ -92,8 +92,8 @@ class I18n {
     'import_btn': {'en': 'Import & Test', 'fa': 'وارد کردن و تست'},
     'cancel': {'en': 'Cancel', 'fa': 'انصراف'},
     'no_nodes_available': {
-      'en': 'No servers found. Please add a subscription link via Import.',
-      'fa': 'هیچ سروری یافت نشد. لطفاً از طریق دکمه Import لینک سابسکریپشن اضافه کنید.',
+      'en': 'No servers found. Please enter your subscription link via Subscription Manager.',
+      'fa': 'هیچ سروری یافت نشد. لطفاً از طریق Subscription Manager لینک سابسکریپشن خود را وارد کنید.',
     },
     'no_active_subscription': {
       'en': 'No Active Subscription',
@@ -804,16 +804,16 @@ class VelocityPlan {
 }
 
 // ---------------------------------------------------------------------------
-// Root App
+// Root VelocityApp
 // ---------------------------------------------------------------------------
-class VelocityVpnApp extends StatefulWidget {
-  const VelocityVpnApp({super.key});
+class VelocityApp extends StatefulWidget {
+  const VelocityApp({super.key});
 
   @override
-  State<VelocityVpnApp> createState() => _VelocityVpnAppState();
+  State<VelocityApp> createState() => _VelocityAppState();
 }
 
-class _VelocityVpnAppState extends State<VelocityVpnApp> {
+class _VelocityAppState extends State<VelocityApp> {
   AppLanguage _currentLang = AppLanguage.en;
 
   void _toggleLanguage() {
@@ -854,6 +854,8 @@ class _VelocityVpnAppState extends State<VelocityVpnApp> {
     );
   }
 }
+
+typedef VelocityVpnApp = VelocityApp;
 
 // ---------------------------------------------------------------------------
 // Velocity Foreground Local Notifications Service
@@ -1153,7 +1155,10 @@ class _HomeScreenState extends State<HomeScreen>
 
       if (serversJson != null && serversJson.isNotEmpty) {
         final List<dynamic> decodedList = jsonDecode(serversJson);
-        final loadedServers = decodedList.map((item) => ServerProfile.fromJson(item as Map<String, dynamic>)).toList();
+        final loadedServers = decodedList
+            .map((item) => ServerProfile.fromJson(item as Map<String, dynamic>))
+            .where((s) => !s.id.startsWith('node-'))
+            .toList();
         if (loadedServers.isNotEmpty) {
           setState(() {
             _servers.clear();
@@ -1165,61 +1170,6 @@ class _HomeScreenState extends State<HomeScreen>
             }
           });
         }
-      }
-
-      // Seed initial high-speed nodes if empty so users can immediately test latency
-      if (_servers.isEmpty) {
-        final defaultNodes = [
-          ServerProfile(
-            id: 'node-de-1',
-            name: 'Germany (Frankfurt Ultra)',
-            countryCode: '🇩🇪',
-            protocol: VpnProtocol.vless,
-            host: '1.1.1.1',
-            port: 443,
-            sni: 'de.velocity.network',
-          ),
-          ServerProfile(
-            id: 'node-fi-1',
-            name: 'Finland (Helsinki Turbo UDP)',
-            countryCode: '🇫🇮',
-            protocol: VpnProtocol.hysteria2,
-            host: '1.0.0.1',
-            port: 443,
-            sni: 'fi.velocity.network',
-          ),
-          ServerProfile(
-            id: 'node-nl-1',
-            name: 'Netherlands (Amsterdam Direct)',
-            countryCode: '🇳🇱',
-            protocol: VpnProtocol.trojan,
-            host: '8.8.8.8',
-            port: 443,
-            sni: 'nl.velocity.network',
-          ),
-          ServerProfile(
-            id: 'node-sg-1',
-            name: 'Singapore (Gaming Low-Ping)',
-            countryCode: '🇸🇬',
-            protocol: VpnProtocol.vmess,
-            host: '8.8.4.4',
-            port: 443,
-            sni: 'sg.velocity.network',
-          ),
-          ServerProfile(
-            id: 'node-tr-1',
-            name: 'Turkey (Istanbul VIP)',
-            countryCode: '🇹🇷',
-            protocol: VpnProtocol.shadowsocks,
-            host: '9.9.9.9',
-            port: 443,
-            sni: 'tr.velocity.network',
-          ),
-        ];
-        setState(() {
-          _servers.addAll(defaultNodes);
-          _selectedServer = defaultNodes.first;
-        });
       }
 
       if (subJson != null && subJson.isNotEmpty) {
@@ -2571,41 +2521,57 @@ class _HomeScreenState extends State<HomeScreen>
           child: displayServers.isEmpty
               ? Center(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 32),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          _servers.isEmpty ? Icons.cloud_off_rounded : Icons.search_off_rounded,
-                          size: 56,
-                          color: VelocityColors.textMuted,
-                        ),
-                        const SizedBox(height: 14),
-                        Text(
-                          _servers.isEmpty ? I18n.t('no_nodes_available') : I18n.t('no_nodes_found'),
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: VelocityColors.textSecondary,
-                            fontSize: 13,
-                            height: 1.5,
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                      decoration: BoxDecoration(
+                        color: VelocityColors.surfaceDark,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: VelocityColors.borderDark),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: VelocityColors.electricCyan.withOpacity(0.12),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              _servers.isEmpty ? Icons.cloud_off_rounded : Icons.search_off_rounded,
+                              size: 46,
+                              color: VelocityColors.electricCyan,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 18),
-                        ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: VelocityColors.electricCyan,
-                            foregroundColor: VelocityColors.pureBlack,
-                            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          const SizedBox(height: 16),
+                          Text(
+                            _servers.isEmpty ? I18n.t('no_nodes_available') : I18n.t('no_nodes_found'),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: VelocityColors.textPrimary,
+                              fontSize: 13,
+                              height: 1.6,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                          onPressed: _showImportDialog,
-                          icon: const Icon(Icons.add_link, size: 18),
-                          label: Text(
-                            I18n.t('import_config'),
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          const SizedBox(height: 18),
+                          ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: VelocityColors.electricCyan,
+                              foregroundColor: VelocityColors.pureBlack,
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
+                            onPressed: _showImportDialog,
+                            icon: const Icon(Icons.add_link, size: 18),
+                            label: Text(
+                              I18n.t('import_config'),
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 )
@@ -3626,129 +3592,160 @@ class _HomeScreenState extends State<HomeScreen>
   // Central Glowing Power Button with Neon BoxShadow
   // -------------------------------------------------------------------------
   Widget _buildGlowingPowerButton() {
+    final hasServers = _servers.isNotEmpty && _selectedServer != null;
     final isConnected = _vpnState == VpnState.connected;
     final isConnecting =
         _vpnState == VpnState.connecting || _vpnState == VpnState.disconnecting;
 
-    final glowColor = isConnected
-        ? VelocityColors.neonGreen
-        : VelocityColors.electricCyan;
+    final glowColor = !hasServers
+        ? VelocityColors.textMuted
+        : isConnected
+            ? VelocityColors.neonGreen
+            : VelocityColors.electricCyan;
 
     return AnimatedBuilder(
       animation: _pulseAnimation,
       builder: (context, child) {
-        final scale = (isConnected || isConnecting) ? _pulseAnimation.value : 1.0;
+        final scale = (hasServers && (isConnected || isConnecting)) ? _pulseAnimation.value : 1.0;
 
         return Transform.scale(
           scale: scale,
           child: GestureDetector(
-            onTap: isConnecting ? null : _toggleVpn,
-            child: Container(
-              width: 230,
-              height: 230,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                // BoxShadow neon glow effects behind connect button
-                boxShadow: [
-                  BoxShadow(
-                    color: glowColor.withOpacity(isConnected ? 0.40 : 0.22),
-                    blurRadius: 40,
-                    spreadRadius: 8,
-                  ),
-                  BoxShadow(
-                    color: VelocityColors.deepCyan.withOpacity(0.20),
-                    blurRadius: 60,
-                    spreadRadius: 15,
-                  ),
-                ],
-              ),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  // Outer decorative neon circle
-                  Container(
-                    width: 215,
-                    height: 215,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: glowColor.withOpacity(0.25),
-                        width: 2,
-                      ),
-                    ),
-                  ),
-
-                  // Middle Ring
-                  Container(
-                    width: 175,
-                    height: 175,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [
-                          glowColor.withOpacity(isConnected ? 0.32 : 0.12),
-                          Colors.transparent,
-                        ],
-                      ),
-                      border: Border.all(
-                        color: glowColor,
-                        width: 2.5,
-                      ),
-                    ),
-                  ),
-
-                  // Inner Core Button
-                  Container(
-                    width: 136,
-                    height: 136,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: const RadialGradient(
-                        colors: [
-                          VelocityColors.surfaceElevated,
-                          VelocityColors.pureBlack,
-                        ],
-                      ),
-                      border: Border.all(
-                        color: isConnected ? glowColor : VelocityColors.borderDark,
-                        width: 1.8,
-                      ),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (isConnecting)
-                          SizedBox(
-                            width: 42,
-                            height: 42,
-                            child: CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(glowColor),
-                              strokeWidth: 3.5,
-                            ),
-                          )
-                        else
-                          Icon(
-                            Icons.power_settings_new_rounded,
-                            size: 48,
-                            color: glowColor,
-                          ),
-                        const SizedBox(height: 6),
-                        Text(
-                          isConnected
-                              ? I18n.t('tap_to_disconnect')
-                              : I18n.t('tap_to_connect'),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: glowColor,
-                            fontSize: 9,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.5,
-                          ),
+            onTap: !hasServers
+                ? () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: VelocityColors.surfaceElevated,
+                        content: Text(
+                          I18n.t('no_nodes_available'),
+                          style: const TextStyle(color: VelocityColors.neonYellow, fontWeight: FontWeight.bold),
                         ),
-                      ],
+                        action: SnackBarAction(
+                          label: I18n.t('import_config'),
+                          textColor: VelocityColors.electricCyan,
+                          onPressed: _showImportDialog,
+                        ),
+                      ),
+                    );
+                  }
+                : isConnecting
+                    ? null
+                    : _toggleVpn,
+            child: Opacity(
+              opacity: hasServers ? 1.0 : 0.45,
+              child: Container(
+                width: 230,
+                height: 230,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  // BoxShadow neon glow effects behind connect button
+                  boxShadow: hasServers
+                      ? [
+                          BoxShadow(
+                            color: glowColor.withOpacity(isConnected ? 0.40 : 0.22),
+                            blurRadius: 40,
+                            spreadRadius: 8,
+                          ),
+                          BoxShadow(
+                            color: VelocityColors.deepCyan.withOpacity(0.20),
+                            blurRadius: 60,
+                            spreadRadius: 15,
+                          ),
+                        ]
+                      : [],
+                ),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Outer decorative neon circle
+                    Container(
+                      width: 215,
+                      height: 215,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: glowColor.withOpacity(hasServers ? 0.25 : 0.15),
+                          width: 2,
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+
+                    // Middle Ring
+                    Container(
+                      width: 175,
+                      height: 175,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          colors: [
+                            glowColor.withOpacity(hasServers ? (isConnected ? 0.32 : 0.12) : 0.04),
+                            Colors.transparent,
+                          ],
+                        ),
+                        border: Border.all(
+                          color: glowColor,
+                          width: 2.5,
+                        ),
+                      ),
+                    ),
+
+                    // Inner Core Button
+                    Container(
+                      width: 136,
+                      height: 136,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: const RadialGradient(
+                          colors: [
+                            VelocityColors.surfaceElevated,
+                            VelocityColors.pureBlack,
+                          ],
+                        ),
+                        border: Border.all(
+                          color: hasServers
+                              ? (isConnected ? glowColor : VelocityColors.borderDark)
+                              : VelocityColors.borderDark,
+                          width: 1.8,
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (isConnecting)
+                            SizedBox(
+                              width: 42,
+                              height: 42,
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(glowColor),
+                                strokeWidth: 3.5,
+                              ),
+                            )
+                          else
+                            Icon(
+                              Icons.power_settings_new_rounded,
+                              size: 48,
+                              color: glowColor,
+                            ),
+                          const SizedBox(height: 6),
+                          Text(
+                            !hasServers
+                                ? (I18n.currentLang == AppLanguage.fa ? 'بدون سرور' : 'NO SERVER')
+                                : isConnected
+                                    ? I18n.t('tap_to_disconnect')
+                                    : I18n.t('tap_to_connect'),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: glowColor,
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -4267,46 +4264,55 @@ class _HomeScreenState extends State<HomeScreen>
                         ? Center(
                             child: Padding(
                               padding: const EdgeInsets.all(24),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(16),
-                                    decoration: BoxDecoration(
-                                      color: VelocityColors.electricCyan.withOpacity(0.1),
-                                      shape: BoxShape.circle,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                                decoration: BoxDecoration(
+                                  color: VelocityColors.surfaceElevated,
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: VelocityColors.borderDark),
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(14),
+                                      decoration: BoxDecoration(
+                                        color: VelocityColors.electricCyan.withOpacity(0.12),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(Icons.cloud_off_rounded, size: 42, color: VelocityColors.electricCyan),
                                     ),
-                                    child: const Icon(Icons.cloud_off_rounded, size: 42, color: VelocityColors.electricCyan),
-                                  ),
-                                  const SizedBox(height: 14),
-                                  Text(
-                                    I18n.t('no_nodes_available'),
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                      color: VelocityColors.textPrimary,
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      _servers.isEmpty ? I18n.t('no_nodes_available') : I18n.t('no_nodes_found'),
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        color: VelocityColors.textPrimary,
+                                        fontSize: 13,
+                                        height: 1.6,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(height: 16),
-                                  ElevatedButton.icon(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: VelocityColors.electricCyan,
-                                      foregroundColor: VelocityColors.pureBlack,
-                                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                    const SizedBox(height: 18),
+                                    ElevatedButton.icon(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: VelocityColors.electricCyan,
+                                        foregroundColor: VelocityColors.pureBlack,
+                                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                        _showImportDialog();
+                                      },
+                                      icon: const Icon(Icons.add_link, size: 18),
+                                      label: Text(
+                                        I18n.t('import_config'),
+                                        style: const TextStyle(fontWeight: FontWeight.bold),
+                                      ),
                                     ),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                      _showImportDialog();
-                                    },
-                                    icon: const Icon(Icons.add_link, size: 18),
-                                    label: Text(
-                                      I18n.t('import_config'),
-                                      style: const TextStyle(fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           )
