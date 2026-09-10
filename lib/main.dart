@@ -181,7 +181,6 @@ class I18n {
     'auth_subtitle': {'en': 'AUTHENTICATE USER SESSION', 'fa': 'احراز هویت و مدیریت دسترسی'},
     'tab_telegram': {'en': 'Telegram', 'fa': 'تلگرام'},
     'tab_gmail': {'en': 'Gmail OTP', 'fa': 'کد ایمیل'},
-    'tab_admin': {'en': 'Admin Key', 'fa': 'پنل ادمین'},
     'telegram_hint': {'en': '@username or Telegram ID', 'fa': '@نام_کاربری یا شناسه تلگرام'},
     'btn_connect_telegram': {'en': 'LINK TELEGRAM ACCOUNT', 'fa': 'اتصال به حساب تلگرام'},
     'gmail_hint': {'en': 'username@gmail.com', 'fa': 'آدرس ایمیل شما'},
@@ -189,44 +188,12 @@ class I18n {
     'btn_resend_otp': {'en': 'Resend in', 'fa': 'ارسال مجدد تا'},
     'otp_hint': {'en': '6-Digit OTP Code', 'fa': 'کد تایید ۶ رقمی'},
     'btn_verify_otp': {'en': 'VERIFY & SIGN IN', 'fa': 'تایید کد و ورود'},
-    'admin_email_hint': {'en': 'admin@velocity.vpn', 'fa': 'ایمیل ادمین'},
-    'admin_password_hint': {'en': 'Admin Security Key', 'fa': 'رمز عبور امنیتی'},
-    'btn_admin_login': {'en': 'AUTHORIZE ADMIN ACCESS', 'fa': 'ورود به پنل مدیریت'},
-    'quick_admin_fill': {'en': 'Autofill Admin Demo Credentials', 'fa': 'پر کردن سریع اطلاعات آزمایشی ادمین'},
-    'admin_error': {'en': 'Invalid Admin Credentials! Check email or password.', 'fa': 'اطلاعات ادمین اشتباه است! ایمیل یا رمز را بررسی کنید.'},
-    'admin_success': {'en': 'Admin access authorized! Control panel unlocked.', 'fa': 'دسترسی ادمین با موفقیت تایید شد! پنل کنترل فعال گردید.'},
     'sub_active': {'en': 'ACTIVE VIP', 'fa': 'اشتراک فعال'},
     'sub_free': {'en': 'FREE TIER', 'fa': 'نسخه رایگان'},
     'sub_expiry': {'en': 'Expires on', 'fa': 'تاریخ انقضا:'},
     'sub_quota': {'en': 'Bandwidth Usage', 'fa': 'میزان مصرف ترافیک'},
     'btn_upgrade': {'en': 'BROWSE PLANS & UPGRADE', 'fa': 'مشاهده و ارتقای پلن اشتراک'},
-    'btn_open_admin': {'en': 'OPEN ADMIN CONTROL PANEL', 'fa': 'ورود به پنل مدیریت سرورها و پلن‌ها'},
     'btn_logout': {'en': 'LOG OUT', 'fa': 'خروج از حساب'},
-    // Admin Dashboard & Plan Management Strings
-    'admin_title': {'en': 'VELOCITY CORE • ADMIN PANEL', 'fa': 'ولوسیتی • پنل مدیریت ادمین'},
-    'admin_sub': {'en': 'ROLE-BASED ACCESS CONTROL (RBAC)', 'fa': 'مدیریت پویا و سطح دسترسی سیستم'},
-    'stat_total_plans': {'en': 'Total Plans', 'fa': 'کل پلن‌ها'},
-    'stat_active_plans': {'en': 'Active in Store', 'fa': 'فعال در فروشگاه'},
-    'stat_hidden_plans': {'en': 'Hidden / Draft', 'fa': 'مخفی / پیش‌نویس'},
-    'stat_security': {'en': 'RBAC Status', 'fa': 'امنیت سیستم'},
-    'filter_all': {'en': 'All Plans', 'fa': 'همه پلن‌ها'},
-    'filter_active': {'en': 'Active Only', 'fa': 'فقط فعال'},
-    'filter_hidden': {'en': 'Hidden Only', 'fa': 'فقط مخفی'},
-    'btn_new_plan': {'en': 'CREATE NEW PLAN', 'fa': 'افزودن پلن جدید'},
-    'edit_plan': {'en': 'Edit Plan', 'fa': 'ویرایش پلن'},
-    'delete_plan': {'en': 'Delete Plan', 'fa': 'حذف پلن'},
-    'delete_confirm': {'en': 'Are you sure you want to delete this subscription plan?', 'fa': 'آیا از حذف این پلن اشتراک اطمینان دارید؟'},
-    'plan_name_field': {'en': 'Plan Title', 'fa': 'نام پلن'},
-    'data_quota_field': {'en': 'Data Quota (e.g. 80 GB)', 'fa': 'حجم ترافیک (مثال: ۸۰ گیگابایت)'},
-    'duration_days_field': {'en': 'Duration in Days', 'fa': 'مدت زمان (به روز)'},
-    'price_tomans_field': {'en': 'Price in Tomans', 'fa': 'قیمت به تومان'},
-    'price_usdt_field': {'en': 'Price in USDT', 'fa': 'قیمت به تتر (USDT)'},
-    'protocol_type_field': {'en': 'Protocol Type', 'fa': 'نوع پروتکل'},
-    'badge_field': {'en': 'Badge (Optional, e.g. POPULAR)', 'fa': 'برچسب (اختیاری، مثلا ویژه)'},
-    'active_in_store': {'en': 'Active in Public Store', 'fa': 'نمایش در فروشگاه عمومی'},
-    'save_plan_btn': {'en': 'SAVE PLAN', 'fa': 'ذخیره تغییرات'},
-    'plan_saved': {'en': 'Plan successfully updated!', 'fa': 'پلن اشتراک با موفقیت ذخیره شد!'},
-    'plan_deleted': {'en': 'Plan deleted from system.', 'fa': 'پلن از سیستم حذف شد.'},
     // Power-User, Node Management & Settings Strings
     'search_nodes_hint': {'en': 'Search by country, city, protocol...', 'fa': 'جستجو بر اساس کشور، شهر یا پروتکل...'},
     'sort_lowest_ping': {'en': 'Sort by Lowest Ping', 'fa': 'مرتب‌سازی بر اساس کمترین پینگ'},
@@ -239,13 +206,6 @@ class I18n {
     'tab_tun_core': {'en': 'TUN & Core Engine', 'fa': 'تنظیمات هسته TUN'},
     'tab_split_tunnel': {'en': 'Split Tunneling', 'fa': 'تفکیک ترافیک برنامه‌ها'},
     'tab_visual_theme': {'en': 'Visual Neon Customizer', 'fa': 'شخصی‌سازی رنگ نئون'},
-    'admin_tab_plans': {'en': 'Plans Management', 'fa': 'مدیریت پلن‌ها'},
-    'admin_tab_api': {'en': 'API & Panel Sync', 'fa': 'همگام‌سازی پنل و API'},
-    'api_backend_provider': {'en': 'VPN Panel Type', 'fa': 'نوع پنل وی‌پی‌ان'},
-    'api_server_url': {'en': 'Panel Base URL', 'fa': 'آدرس سرور پنل'},
-    'api_token_label': {'en': 'API Access Token / Secret', 'fa': 'توکن دسترسی API'},
-    'btn_sync_now': {'en': 'SYNC WITH EXTERNAL PANEL', 'fa': 'همگام‌سازی و دریافت سرورها'},
-    'sync_success': {'en': 'External Panel synchronized! Nodes updated.', 'fa': 'همگام‌سازی با موفقیت انجام شد! لیست سرورها بروزرسانی گردید.'},
     'mock_grant_vpn': {'en': 'Mock Grant VpnService', 'fa': 'تایید دسترسی VpnService'},
     'mock_grant_notif': {'en': 'Mock Grant Notifications', 'fa': 'تایید دسترسی اعلان‌ها'},
     'finish_setup_enter': {'en': 'FINISH SETUP & ENTER VELOCITY', 'fa': 'پایان راه‌اندازی و ورود به ولوسیتی'},
@@ -253,14 +213,6 @@ class I18n {
     'search_nodes': {'en': 'Search servers or protocols...', 'fa': 'جستجوی سرور یا پروتکل...'},
     'no_nodes_found': {'en': 'No servers match your filter.', 'fa': 'هیچ سروری با فیلتر شما یافت نشد.'},
     'import_success': {'en': 'Server verified & imported', 'fa': 'سرور بررسی و اضافه شد'},
-    'admin_tab_panels': {'en': 'API & Panel Sync', 'fa': 'همگام‌سازی پنل و API'},
-    'panel_sync_title': {'en': 'AUTOMATED INBOUND SYNC ENGINE', 'fa': 'موتور همگام‌سازی خودکار سرورها'},
-    'panel_sync_desc': {'en': 'Connect directly to Marzban, 3X-UI, or Hiddify panels to pull active inbounds in real-time.', 'fa': 'اتصال مستقیم به پنل‌های مرزبان، ۳X-UI یا هیدیفای برای دریافت آنی سرورها.'},
-    'select_backend_type': {'en': 'External Backend Provider', 'fa': 'ارائه‌دهنده پنل خارجی'},
-    'panel_api_url': {'en': 'Panel Base URL (HTTPS)', 'fa': 'آدرس کامل پنل (HTTPS)'},
-    'panel_api_token': {'en': 'Admin API Token / Secret', 'fa': 'توکن امنیتی دسترسی ادمین'},
-    'syncing_nodes': {'en': 'Connecting to Panel & Fetching Inbounds...', 'fa': 'در حال اتصال به پنل و دریافت سرورها...'},
-    'synced_nodes_title': {'en': 'Active Synced Inbounds', 'fa': 'سرورهای فعال دریافت شده'},
   };
 
   static String t(String key) {
@@ -710,14 +662,11 @@ class ConfigLinkParser {
 }
 
 // ---------------------------------------------------------------------------
-// User Authentication, RBAC & Subscription Plan Models
+// User Authentication & Subscription Plan Models
 // ---------------------------------------------------------------------------
-const String kAdminEmail = 'admin@velocity.vpn';
-const String kAdminPassword = 'AdminSecurePassword123!';
+enum UserRole { guest, user }
 
-enum UserRole { guest, user, admin }
-
-enum AuthMethod { guest, telegram, gmailOtp, adminPassword }
+enum AuthMethod { guest, telegram, gmailOtp }
 
 class UserSession {
   final String id;
@@ -1077,34 +1026,17 @@ class _HomeScreenState extends State<HomeScreen>
         currentLang: widget.currentLang,
         onLoginSuccess: (session) {
           setState(() => _currentUser = session);
-          if (session.role == UserRole.admin) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                backgroundColor: VelocityColors.surfaceElevated,
-                content: Text(
-                  I18n.t('admin_success'),
-                  style: const TextStyle(color: VelocityColors.neonGreen, fontWeight: FontWeight.bold),
-                ),
-                action: SnackBarAction(
-                  label: I18n.t('btn_open_admin'),
-                  textColor: VelocityColors.electricCyan,
-                  onPressed: _openAdminDashboard,
-                ),
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: VelocityColors.surfaceElevated,
+              content: Text(
+                widget.currentLang == AppLanguage.fa
+                    ? 'خوش آمدید ${session.displayName}! ورود با موفقیت انجام شد.'
+                    : 'Welcome ${session.displayName}! Account linked successfully.',
+                style: const TextStyle(color: VelocityColors.electricCyan),
               ),
-            );
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                backgroundColor: VelocityColors.surfaceElevated,
-                content: Text(
-                  widget.currentLang == AppLanguage.fa
-                      ? 'خوش آمدید ${session.displayName}! ورود با موفقیت انجام شد.'
-                      : 'Welcome ${session.displayName}! Account linked successfully.',
-                  style: const TextStyle(color: VelocityColors.electricCyan),
-                ),
-              ),
-            );
-          }
+            ),
+          );
         },
       ),
     );
@@ -1118,10 +1050,6 @@ class _HomeScreenState extends State<HomeScreen>
       builder: (ctx) => UserProfileSheet(
         session: _currentUser,
         currentLang: widget.currentLang,
-        onOpenAdmin: () {
-          Navigator.pop(ctx);
-          _openAdminDashboard();
-        },
         onOpenPlans: () {
           Navigator.pop(ctx);
           _openReceiptUploadScreen();
@@ -1143,52 +1071,6 @@ class _HomeScreenState extends State<HomeScreen>
           Navigator.pop(ctx);
           _showAuthDialog();
         },
-      ),
-    );
-  }
-
-  void _openAdminDashboard() {
-    if (_currentUser.role != UserRole.admin) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: VelocityColors.neonPink,
-          content: Text('Access Denied: Administrator role required.'),
-        ),
-      );
-      return;
-    }
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (ctx) => AdminDashboardScreen(
-          plans: _plans,
-          currentUser: _currentUser,
-          currentLang: widget.currentLang,
-          onAddPlan: (newPlan) {
-            setState(() => _plans.insert(0, newPlan));
-          },
-          onEditPlan: (updatedPlan) {
-            setState(() {
-              final idx = _plans.indexWhere((p) => p.id == updatedPlan.id);
-              if (idx != -1) {
-                _plans[idx] = updatedPlan;
-              }
-            });
-          },
-          onDeletePlan: (planId) {
-            setState(() {
-              _plans.removeWhere((p) => p.id == planId);
-            });
-          },
-          onToggleActive: (planId, isActive) {
-            setState(() {
-              final idx = _plans.indexWhere((p) => p.id == planId);
-              if (idx != -1) {
-                _plans[idx].isActive = isActive;
-              }
-            });
-          },
-        ),
       ),
     );
   }
@@ -1747,47 +1629,18 @@ class _HomeScreenState extends State<HomeScreen>
                   const Spacer(),
                   // User Profile & Authentication Terminal
                   IconButton(
-                    icon: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Icon(
-                          _currentUser.role == UserRole.admin
-                              ? Icons.admin_panel_settings_rounded
-                              : (_currentUser.role == UserRole.user
-                                  ? Icons.account_circle_rounded
-                                  : Icons.no_accounts_outlined),
-                          color: _currentUser.role == UserRole.admin
-                              ? VelocityColors.neonYellow
-                              : (_currentUser.role == UserRole.user
-                                  ? VelocityColors.neonGreen
-                                  : VelocityColors.electricCyan),
-                          size: 22,
-                        ),
-                        if (_currentUser.role == UserRole.admin)
-                          Positioned(
-                            right: -1,
-                            top: -1,
-                            child: Container(
-                              width: 7,
-                              height: 7,
-                              decoration: const BoxDecoration(
-                                color: VelocityColors.neonYellow,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                          ),
-                      ],
+                    icon: Icon(
+                      _currentUser.role == UserRole.user
+                          ? Icons.account_circle_rounded
+                          : Icons.no_accounts_outlined,
+                      color: _currentUser.role == UserRole.user
+                          ? VelocityColors.neonGreen
+                          : VelocityColors.electricCyan,
+                      size: 22,
                     ),
                     tooltip: I18n.t('profile'),
                     onPressed: _openAuthOrProfile,
                   ),
-                  // If Admin, show Quick Admin Control Panel Launcher
-                  if (_currentUser.role == UserRole.admin)
-                    IconButton(
-                      icon: const Icon(Icons.dashboard_customize_rounded, color: VelocityColors.neonYellow, size: 20),
-                      tooltip: I18n.t('admin_panel'),
-                      onPressed: _openAdminDashboard,
-                    ),
                   // Setup Wizard button
                   IconButton(
                     icon: const Icon(Icons.auto_awesome, color: VelocityColors.electricCyan, size: 20),
@@ -4310,7 +4163,7 @@ class _VelocityOnboardingDialogState extends State<VelocityOnboardingDialog> {
 }
 
 // ---------------------------------------------------------------------------
-// Velocity User Authentication Terminal (Telegram, Gmail OTP, Admin Access)
+// Velocity User Authentication Terminal (Telegram, Gmail OTP)
 // ---------------------------------------------------------------------------
 class VelocityAuthDialog extends StatefulWidget {
   final AppLanguage currentLang;
@@ -4327,16 +4180,11 @@ class VelocityAuthDialog extends StatefulWidget {
 }
 
 class _VelocityAuthDialogState extends State<VelocityAuthDialog> {
-  int _activeTab = 0; // 0: Telegram, 1: Gmail OTP, 2: Admin Key
+  int _activeTab = 0; // 0: Telegram, 1: Gmail OTP
 
   final _telegramController = TextEditingController(text: '@velocity_user');
   final _gmailController = TextEditingController(text: 'user@gmail.com');
   final _otpController = TextEditingController();
-
-  final _adminEmailController = TextEditingController(text: kAdminEmail);
-  final _adminPasswordController = TextEditingController(text: kAdminPassword);
-  bool _obscureAdminPass = true;
-  String? _adminError;
 
   int _otpCountdown = 0;
   Timer? _otpTimer;
@@ -4348,8 +4196,6 @@ class _VelocityAuthDialogState extends State<VelocityAuthDialog> {
     _telegramController.dispose();
     _gmailController.dispose();
     _otpController.dispose();
-    _adminEmailController.dispose();
-    _adminPasswordController.dispose();
     super.dispose();
   }
 
@@ -4473,41 +4319,6 @@ class _VelocityAuthDialogState extends State<VelocityAuthDialog> {
     Navigator.pop(context);
   }
 
-  void _submitAdmin() {
-    final email = _adminEmailController.text.trim().toLowerCase();
-    final pass = _adminPasswordController.text.trim();
-
-    if (email == kAdminEmail.toLowerCase() && pass == kAdminPassword) {
-      setState(() => _adminError = null);
-      final adminSession = const UserSession(
-        id: 'admin_root',
-        displayName: 'Root Administrator',
-        identity: kAdminEmail,
-        role: UserRole.admin,
-        method: AuthMethod.adminPassword,
-        planName: 'Enterprise Unlimited VIP (Root)',
-        planExpiry: 'Permanent RBAC Root Privileges',
-        dataUsed: '0.0 GB',
-        dataTotal: 'Unlimited',
-        isVipActive: true,
-      );
-      widget.onLoginSuccess(adminSession);
-      Navigator.pop(context);
-    } else {
-      setState(() {
-        _adminError = I18n.t('admin_error');
-      });
-    }
-  }
-
-  void _quickFillAdmin() {
-    setState(() {
-      _adminEmailController.text = kAdminEmail;
-      _adminPasswordController.text = kAdminPassword;
-      _adminError = null;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final isFa = widget.currentLang == AppLanguage.fa;
@@ -4587,7 +4398,6 @@ class _VelocityAuthDialogState extends State<VelocityAuthDialog> {
                     children: [
                       _buildAuthTab(0, I18n.t('tab_telegram'), Icons.send_rounded),
                       _buildAuthTab(1, I18n.t('tab_gmail'), Icons.mail_outline_rounded),
-                      _buildAuthTab(2, I18n.t('tab_admin'), Icons.admin_panel_settings_rounded, isHighlighted: true),
                     ],
                   ),
                 ),
@@ -4597,7 +4407,6 @@ class _VelocityAuthDialogState extends State<VelocityAuthDialog> {
                 // Tab Contents
                 if (_activeTab == 0) _buildTelegramTab(),
                 if (_activeTab == 1) _buildGmailTab(),
-                if (_activeTab == 2) _buildAdminTab(),
               ],
             ),
           ),
@@ -4606,11 +4415,9 @@ class _VelocityAuthDialogState extends State<VelocityAuthDialog> {
     );
   }
 
-  Widget _buildAuthTab(int index, String title, IconData icon, {bool isHighlighted = false}) {
+  Widget _buildAuthTab(int index, String title, IconData icon) {
     final isSelected = _activeTab == index;
-    final color = isHighlighted
-        ? VelocityColors.neonYellow
-        : VelocityColors.electricCyan;
+    const color = VelocityColors.electricCyan;
 
     return Expanded(
       child: InkWell(
@@ -4794,107 +4601,6 @@ class _VelocityAuthDialogState extends State<VelocityAuthDialog> {
       ],
     );
   }
-
-  Widget _buildAdminTab() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: VelocityColors.neonYellow.withOpacity(0.12),
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: VelocityColors.neonYellow.withOpacity(0.5)),
-          ),
-          child: const Row(
-            children: [
-              Icon(Icons.shield_outlined, color: VelocityColors.neonYellow, size: 18),
-              SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'SYSTEM ADMINISTRATOR PRIVILEGES (RBAC)\nUnlocks Dynamic Plan Management and Core Telemetry.',
-                  style: TextStyle(color: VelocityColors.neonYellow, fontSize: 10.5, height: 1.35, fontWeight: FontWeight.w600),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          I18n.t('admin_email_hint'),
-          style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 6),
-        TextField(
-          controller: _adminEmailController,
-          style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 13),
-          decoration: InputDecoration(
-            prefixIcon: const Icon(Icons.account_box_outlined, color: VelocityColors.neonYellow, size: 18),
-            hintText: 'admin@velocity.vpn',
-            hintStyle: const TextStyle(color: VelocityColors.textMuted, fontSize: 12),
-            filled: true,
-            fillColor: VelocityColors.pureBlack,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: VelocityColors.borderDark)),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: VelocityColors.neonYellow)),
-          ),
-        ),
-        const SizedBox(height: 10),
-        Text(
-          I18n.t('admin_password_hint'),
-          style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 6),
-        TextField(
-          controller: _adminPasswordController,
-          obscureText: _obscureAdminPass,
-          style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 13),
-          decoration: InputDecoration(
-            prefixIcon: const Icon(Icons.key_rounded, color: VelocityColors.neonYellow, size: 18),
-            suffixIcon: IconButton(
-              icon: Icon(_obscureAdminPass ? Icons.visibility_off : Icons.visibility, color: VelocityColors.textSecondary, size: 18),
-              onPressed: () => setState(() => _obscureAdminPass = !_obscureAdminPass),
-            ),
-            hintText: 'Admin password',
-            hintStyle: const TextStyle(color: VelocityColors.textMuted, fontSize: 12),
-            filled: true,
-            fillColor: VelocityColors.pureBlack,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: VelocityColors.borderDark)),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: VelocityColors.neonYellow)),
-          ),
-        ),
-        if (_adminError != null) ...[
-          const SizedBox(height: 8),
-          Text(
-            _adminError!,
-            style: const TextStyle(color: VelocityColors.neonPink, fontSize: 11, fontWeight: FontWeight.bold),
-          ),
-        ],
-        const SizedBox(height: 8),
-        InkWell(
-          onTap: _quickFillAdmin,
-          child: Text(
-            I18n.t('quick_admin_fill'),
-            style: const TextStyle(color: VelocityColors.electricCyan, fontSize: 11, decoration: TextDecoration.underline),
-          ),
-        ),
-        const SizedBox(height: 14),
-        SizedBox(
-          width: double.infinity,
-          height: 48,
-          child: ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: VelocityColors.neonYellow,
-              foregroundColor: VelocityColors.pureBlack,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-            icon: const Icon(Icons.admin_panel_settings_rounded, size: 18),
-            label: Text(I18n.t('btn_admin_login'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-            onPressed: _submitAdmin,
-          ),
-        ),
-      ],
-    );
-  }
 }
 
 // ---------------------------------------------------------------------------
@@ -4903,7 +4609,6 @@ class _VelocityAuthDialogState extends State<VelocityAuthDialog> {
 class UserProfileSheet extends StatelessWidget {
   final UserSession session;
   final AppLanguage currentLang;
-  final VoidCallback onOpenAdmin;
   final VoidCallback onOpenPlans;
   final VoidCallback onLogout;
   final VoidCallback onSwitchAccount;
@@ -4912,7 +4617,6 @@ class UserProfileSheet extends StatelessWidget {
     super.key,
     required this.session,
     required this.currentLang,
-    required this.onOpenAdmin,
     required this.onOpenPlans,
     required this.onLogout,
     required this.onSwitchAccount,
@@ -4921,12 +4625,8 @@ class UserProfileSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isFa = currentLang == AppLanguage.fa;
-    final isAdmin = session.role == UserRole.admin;
     final isUser = session.role == UserRole.user;
-
-    final themeColor = isAdmin
-        ? VelocityColors.neonYellow
-        : (isUser ? VelocityColors.neonGreen : VelocityColors.electricCyan);
+    final themeColor = isUser ? VelocityColors.neonGreen : VelocityColors.electricCyan;
 
     return Directionality(
       textDirection: isFa ? TextDirection.rtl : TextDirection.ltr,
@@ -4976,9 +4676,7 @@ class UserProfileSheet extends StatelessWidget {
                     ],
                   ),
                   child: Icon(
-                    isAdmin
-                        ? Icons.admin_panel_settings_rounded
-                        : (isUser ? Icons.person_rounded : Icons.terminal_rounded),
+                    isUser ? Icons.person_rounded : Icons.terminal_rounded,
                     color: themeColor,
                     size: 28,
                   ),
@@ -5010,9 +4708,7 @@ class UserProfileSheet extends StatelessWidget {
                               border: Border.all(color: themeColor, width: 0.8),
                             ),
                             child: Text(
-                              isAdmin
-                                  ? 'ADMINISTRATOR'
-                                  : (isUser ? 'VIP SUBSCRIBER' : 'GUEST TERMINAL'),
+                              isUser ? 'VIP SUBSCRIBER' : 'GUEST TERMINAL',
                               style: TextStyle(
                                 color: themeColor,
                                 fontSize: 9.5,
@@ -5096,7 +4792,7 @@ class UserProfileSheet extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
-                      value: isAdmin ? 0.05 : 0.35,
+                      value: 0.35,
                       minHeight: 5,
                       backgroundColor: VelocityColors.pureBlack,
                       valueColor: AlwaysStoppedAnimation<Color>(themeColor),
@@ -5108,47 +4804,25 @@ class UserProfileSheet extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            // If Admin: Quick Admin Launch Button
-            if (isAdmin) ...[
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: VelocityColors.neonYellow,
-                    foregroundColor: VelocityColors.pureBlack,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    elevation: 4,
-                  ),
-                  icon: const Icon(Icons.dashboard_customize_rounded, size: 18),
-                  label: Text(
-                    I18n.t('btn_open_admin'),
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                  ),
-                  onPressed: onOpenAdmin,
+            // Upgrade Button
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: VelocityColors.electricCyan,
+                  foregroundColor: VelocityColors.pureBlack,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-              ),
-              const SizedBox(height: 10),
-            ] else ...[
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: VelocityColors.electricCyan,
-                    foregroundColor: VelocityColors.pureBlack,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  icon: const Icon(Icons.upgrade_rounded, size: 18),
-                  label: Text(
-                    I18n.t('btn_upgrade'),
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                  ),
-                  onPressed: onOpenPlans,
+                icon: const Icon(Icons.upgrade_rounded, size: 18),
+                label: Text(
+                  I18n.t('btn_upgrade'),
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                 ),
+                onPressed: onOpenPlans,
               ),
-              const SizedBox(height: 10),
-            ],
+            ),
+            const SizedBox(height: 10),
 
             // Secondary Actions (Switch / Logout)
             Row(
@@ -5189,844 +4863,9 @@ class UserProfileSheet extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Velocity Admin Dashboard Screen (CRUD Dynamic Plan Management)
-// ---------------------------------------------------------------------------
-class AdminDashboardScreen extends StatefulWidget {
-  final List<VelocityPlan> plans;
-  final UserSession currentUser;
-  final AppLanguage currentLang;
-  final Function(VelocityPlan) onAddPlan;
-  final Function(VelocityPlan) onEditPlan;
-  final Function(String planId) onDeletePlan;
-  final Function(String planId, bool isActive) onToggleActive;
 
-  const AdminDashboardScreen({
-    super.key,
-    required this.plans,
-    required this.currentUser,
-    required this.currentLang,
-    required this.onAddPlan,
-    required this.onEditPlan,
-    required this.onDeletePlan,
-    required this.onToggleActive,
-  });
 
-  @override
-  State<AdminDashboardScreen> createState() => _AdminDashboardScreenState();
-}
 
-class _AdminDashboardScreenState extends State<AdminDashboardScreen> with SingleTickerProviderStateMixin {
-  late TabController _adminTabController;
-  String _filter = 'all'; // 'all', 'active', 'hidden'
-
-  // External VPN Backend Sync State
-  String _selectedBackendType = 'Marzban'; // Marzban, 3X-UI, Hiddify
-  final TextEditingController _panelUrlController = TextEditingController(text: 'https://vpn.velocity-node.net:8443');
-  final TextEditingController _panelTokenController = TextEditingController(text: 'v_adm_tok_84920491823901');
-  bool _isSyncing = false;
-  String? _syncSuccessMessage;
-  List<Map<String, dynamic>> _syncedNodes = [
-    {'name': 'DE-Frankfurt-01 (Marzban Core)', 'proto': 'VLESS Reality', 'users': 142, 'status': 'ONLINE'},
-    {'name': 'NL-Amsterdam-03 (3X-UI Fallback)', 'proto': 'Hysteria 2', 'users': 98, 'status': 'ONLINE'},
-    {'name': 'TR-Istanbul-02 (Hiddify Stealth)', 'proto': 'Trojan gRPC', 'users': 215, 'status': 'ONLINE'},
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _adminTabController = TabController(length: 2, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _adminTabController.dispose();
-    _panelUrlController.dispose();
-    _panelTokenController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _performBackendSync() async {
-    setState(() {
-      _isSyncing = true;
-      _syncSuccessMessage = null;
-    });
-
-    await Future.delayed(const Duration(milliseconds: 1400));
-
-    setState(() {
-      _isSyncing = false;
-      _syncSuccessMessage = 'Synced successfully with $_selectedBackendType at ${DateTime.now().hour}:${DateTime.now().minute.toString().padLeft(2, '0')}. 4 Active Inbounds fetched.';
-      _syncedNodes.insert(0, {
-        'name': 'FI-Helsinki-01 ($_selectedBackendType Auto)',
-        'proto': 'VLESS Reality',
-        'users': 34,
-        'status': 'ONLINE',
-      });
-    });
-  }
-
-  void _showPlanFormDialog({VelocityPlan? existing}) {
-    final isEditing = existing != null;
-    final nameCtrl = TextEditingController(text: existing?.name ?? 'Velocity VIP Turbo');
-    final quotaCtrl = TextEditingController(text: existing?.dataQuota ?? '80 GB');
-    final durationCtrl = TextEditingController(text: (existing?.durationDays ?? 30).toString());
-    final priceTomansCtrl = TextEditingController(text: existing?.priceTomans ?? '390,000 Toman');
-    final priceUsdtCtrl = TextEditingController(text: existing?.priceUsdt ?? '\$5.99 USDT');
-    final protocolCtrl = TextEditingController(text: existing?.protocolType ?? 'VLESS Reality');
-    final badgeCtrl = TextEditingController(text: existing?.badge ?? 'HOT');
-    bool isActive = existing?.isActive ?? true;
-
-    showDialog(
-      context: context,
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-            return AlertDialog(
-              backgroundColor: const Color(0xFF101524),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-                side: const BorderSide(color: VelocityColors.electricCyan, width: 1.2),
-              ),
-              title: Row(
-                children: [
-                  const Icon(Icons.layers_rounded, color: VelocityColors.electricCyan),
-                  const SizedBox(width: 8),
-                  Text(
-                    isEditing ? I18n.t('edit_plan') : I18n.t('btn_new_plan'),
-                    style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _buildFormField(nameCtrl, I18n.t('plan_name_field'), Icons.title),
-                    const SizedBox(height: 8),
-                    _buildFormField(quotaCtrl, I18n.t('data_quota_field'), Icons.data_usage),
-                    const SizedBox(height: 8),
-                    _buildFormField(durationCtrl, I18n.t('duration_days_field'), Icons.calendar_today, isNumeric: true),
-                    const SizedBox(height: 8),
-                    _buildFormField(priceTomansCtrl, I18n.t('price_tomans_field'), Icons.currency_exchange),
-                    const SizedBox(height: 8),
-                    _buildFormField(priceUsdtCtrl, I18n.t('price_usdt_field'), Icons.attach_money),
-                    const SizedBox(height: 8),
-                    _buildFormField(protocolCtrl, I18n.t('protocol_type_field'), Icons.security),
-                    const SizedBox(height: 8),
-                    _buildFormField(badgeCtrl, I18n.t('badge_field'), Icons.star_border),
-                    const SizedBox(height: 10),
-                    SwitchListTile(
-                      value: isActive,
-                      activeColor: VelocityColors.electricCyan,
-                      contentPadding: EdgeInsets.zero,
-                      title: Text(
-                        I18n.t('active_in_store'),
-                        style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12),
-                      ),
-                      onChanged: (v) => setDialogState(() => isActive = v),
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  child: Text(I18n.t('btn_cancel'), style: const TextStyle(color: VelocityColors.textSecondary)),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: VelocityColors.electricCyan,
-                    foregroundColor: VelocityColors.pureBlack,
-                  ),
-                  onPressed: () {
-                    final dur = int.tryParse(durationCtrl.text.trim()) ?? 30;
-                    if (isEditing) {
-                      final updated = existing.copyWith(
-                        name: nameCtrl.text.trim(),
-                        dataQuota: quotaCtrl.text.trim(),
-                        durationDays: dur,
-                        priceTomans: priceTomansCtrl.text.trim(),
-                        priceUsdt: priceUsdtCtrl.text.trim(),
-                        protocolType: protocolCtrl.text.trim(),
-                        badge: badgeCtrl.text.trim(),
-                        isActive: isActive,
-                      );
-                      widget.onEditPlan(updated);
-                    } else {
-                      final newPlan = VelocityPlan(
-                        id: 'plan_${DateTime.now().millisecondsSinceEpoch}',
-                        name: nameCtrl.text.trim(),
-                        dataQuota: quotaCtrl.text.trim(),
-                        durationDays: dur,
-                        priceTomans: priceTomansCtrl.text.trim(),
-                        priceUsdt: priceUsdtCtrl.text.trim(),
-                        protocolType: protocolCtrl.text.trim(),
-                        badge: badgeCtrl.text.trim(),
-                        isActive: isActive,
-                      );
-                      widget.onAddPlan(newPlan);
-                    }
-                    setState(() {});
-                    Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        backgroundColor: VelocityColors.surfaceElevated,
-                        content: Text(I18n.t('plan_saved'), style: const TextStyle(color: VelocityColors.neonGreen)),
-                      ),
-                    );
-                  },
-                  child: Text(I18n.t('save_plan_btn'), style: const TextStyle(fontWeight: FontWeight.bold)),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildFormField(TextEditingController ctrl, String label, IconData icon, {bool isNumeric = false}) {
-    return TextField(
-      controller: ctrl,
-      keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
-      style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12.5),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11),
-        prefixIcon: Icon(icon, color: VelocityColors.electricCyan, size: 16),
-        filled: true,
-        fillColor: VelocityColors.pureBlack,
-        isDense: true,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: VelocityColors.borderDark)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: VelocityColors.electricCyan)),
-      ),
-    );
-  }
-
-  void _confirmDelete(VelocityPlan plan) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: VelocityColors.surfaceDark,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: const BorderSide(color: VelocityColors.neonPink)),
-        title: Text(I18n.t('delete_plan'), style: const TextStyle(color: VelocityColors.neonPink)),
-        content: Text('${I18n.t('delete_confirm')}\n\n"${plan.name}"', style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 13)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(I18n.t('btn_cancel'), style: const TextStyle(color: VelocityColors.textSecondary)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: VelocityColors.neonPink, foregroundColor: VelocityColors.pureBlack),
-            onPressed: () {
-              widget.onDeletePlan(plan.id);
-              setState(() {});
-              Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  backgroundColor: VelocityColors.surfaceElevated,
-                  content: Text(I18n.t('plan_deleted'), style: const TextStyle(color: VelocityColors.neonPink)),
-                ),
-              );
-            },
-            child: Text(I18n.t('delete_plan'), style: const TextStyle(fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isFa = widget.currentLang == AppLanguage.fa;
-
-    List<VelocityPlan> displayedPlans = widget.plans;
-    if (_filter == 'active') {
-      displayedPlans = widget.plans.where((p) => p.isActive).toList();
-    } else if (_filter == 'hidden') {
-      displayedPlans = widget.plans.where((p) => !p.isActive).toList();
-    }
-
-    final totalCount = widget.plans.length;
-    final activeCount = widget.plans.where((p) => p.isActive).length;
-    final hiddenCount = widget.plans.where((p) => !p.isActive).length;
-
-    return Directionality(
-      textDirection: isFa ? TextDirection.rtl : TextDirection.ltr,
-      child: Scaffold(
-        backgroundColor: VelocityColors.pureBlack,
-        appBar: AppBar(
-          backgroundColor: const Color(0xFF0D121F),
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: VelocityColors.neonYellow, size: 18),
-            onPressed: () => Navigator.pop(context),
-          ),
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                I18n.t('admin_title'),
-                style: const TextStyle(
-                  fontSize: 14.5,
-                  fontWeight: FontWeight.w900,
-                  color: VelocityColors.neonYellow,
-                  letterSpacing: 1.0,
-                ),
-              ),
-              Text(
-                I18n.t('admin_sub'),
-                style: const TextStyle(fontSize: 9.5, color: VelocityColors.textSecondary, letterSpacing: 0.5),
-              ),
-            ],
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.add_circle_outline, color: VelocityColors.electricCyan, size: 22),
-              tooltip: I18n.t('btn_new_plan'),
-              onPressed: () => _showPlanFormDialog(),
-            ),
-          ],
-          bottom: TabBar(
-            controller: _adminTabController,
-            indicatorColor: VelocityColors.electricCyan,
-            indicatorWeight: 2.5,
-            labelColor: VelocityColors.electricCyan,
-            unselectedLabelColor: VelocityColors.textMuted,
-            labelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-            tabs: [
-              Tab(
-                icon: const Icon(Icons.layers_rounded, size: 16),
-                text: I18n.t('admin_tab_plans'),
-              ),
-              Tab(
-                icon: const Icon(Icons.cloud_sync_rounded, size: 16),
-                text: I18n.t('admin_tab_panels'),
-              ),
-            ],
-          ),
-        ),
-        body: SafeArea(
-          child: TabBarView(
-            controller: _adminTabController,
-            children: [
-              // TAB 1: Plan Management
-              _buildPlansTab(totalCount, activeCount, hiddenCount, displayedPlans),
-              // TAB 2: External VPN Backend & Panel Sync
-              _buildPanelSyncTab(),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPlansTab(int totalCount, int activeCount, int hiddenCount, List<VelocityPlan> displayedPlans) {
-    return Column(
-      children: [
-        // System Overview KPI Cards
-        Padding(
-          padding: const EdgeInsets.fromLTRB(14, 14, 14, 8),
-          child: Row(
-            children: [
-              _buildKpiCard(I18n.t('stat_total_plans'), '$totalCount', VelocityColors.electricCyan, Icons.folder_copy_outlined),
-              const SizedBox(width: 8),
-              _buildKpiCard(I18n.t('stat_active_plans'), '$activeCount', VelocityColors.neonGreen, Icons.visibility_outlined),
-              const SizedBox(width: 8),
-              _buildKpiCard(I18n.t('stat_hidden_plans'), '$hiddenCount', VelocityColors.neonYellow, Icons.visibility_off_outlined),
-              const SizedBox(width: 8),
-              _buildKpiCard(I18n.t('stat_security'), 'SECURE', VelocityColors.electricCyan, Icons.lock_outline),
-            ],
-          ),
-        ),
-
-        // Filter Tabs & Create Button Row
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-          child: Row(
-            children: [
-              _buildFilterChip('all', '${I18n.t('filter_all')} ($totalCount)'),
-              const SizedBox(width: 6),
-              _buildFilterChip('active', '${I18n.t('filter_active')} ($activeCount)'),
-              const SizedBox(width: 6),
-              _buildFilterChip('hidden', '${I18n.t('filter_hidden')} ($hiddenCount)'),
-              const Spacer(),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: VelocityColors.electricCyan,
-                  foregroundColor: VelocityColors.pureBlack,
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                icon: const Icon(Icons.add, size: 14),
-                label: const Text('NEW PLAN', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-                onPressed: () => _showPlanFormDialog(),
-              ),
-            ],
-          ),
-        ),
-
-        const Divider(color: VelocityColors.borderDark, height: 16),
-
-        // Dynamic Plan List
-        Expanded(
-          child: displayedPlans.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.inventory_2_outlined, color: VelocityColors.textMuted, size: 48),
-                      const SizedBox(height: 12),
-                      const Text('No plans match current filter.', style: TextStyle(color: VelocityColors.textSecondary, fontSize: 13)),
-                      const SizedBox(height: 10),
-                      TextButton.icon(
-                        icon: const Icon(Icons.add, color: VelocityColors.electricCyan),
-                        label: const Text('Add Plan', style: TextStyle(color: VelocityColors.electricCyan)),
-                        onPressed: () => _showPlanFormDialog(),
-                      ),
-                    ],
-                  ),
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.fromLTRB(14, 4, 14, 20),
-                  itemCount: displayedPlans.length,
-                  itemBuilder: (context, index) {
-                    final plan = displayedPlans[index];
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 10),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF0F1422),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: plan.isActive ? VelocityColors.borderDark : VelocityColors.neonYellow.withOpacity(0.3),
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: (plan.isActive ? VelocityColors.electricCyan : VelocityColors.textMuted).withOpacity(0.12),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Icon(
-                                  Icons.bolt,
-                                  color: plan.isActive ? VelocityColors.electricCyan : VelocityColors.textMuted,
-                                  size: 18,
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Flexible(
-                                          child: Text(
-                                            plan.name,
-                                            style: TextStyle(
-                                              color: plan.isActive ? VelocityColors.textPrimary : VelocityColors.textMuted,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                        if (plan.badge.isNotEmpty) ...[
-                                          const SizedBox(width: 6),
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-                                            decoration: BoxDecoration(
-                                              color: VelocityColors.neonYellow.withOpacity(0.2),
-                                              borderRadius: BorderRadius.circular(4),
-                                            ),
-                                            child: Text(
-                                              plan.badge,
-                                              style: const TextStyle(color: VelocityColors.neonYellow, fontSize: 8.5, fontWeight: FontWeight.bold),
-                                            ),
-                                          ),
-                                        ],
-                                      ],
-                                    ),
-                                    Text(
-                                      '${plan.dataQuota} • ${plan.durationDays} Days • ${plan.protocolType}',
-                                      style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    plan.priceUsdt,
-                                    style: const TextStyle(color: VelocityColors.neonGreen, fontSize: 12, fontWeight: FontWeight.bold),
-                                  ),
-                                  Text(
-                                    plan.priceTomans,
-                                    style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 10),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          const Divider(color: VelocityColors.borderDark, height: 1),
-                          const SizedBox(height: 6),
-                          Row(
-                            children: [
-                              Text(
-                                plan.isActive ? 'Active in Public Store' : 'Hidden from Public Store',
-                                style: TextStyle(
-                                  color: plan.isActive ? VelocityColors.neonGreen : VelocityColors.neonYellow,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const Spacer(),
-                              Switch(
-                                value: plan.isActive,
-                                activeColor: VelocityColors.electricCyan,
-                                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                onChanged: (val) {
-                                  widget.onToggleActive(plan.id, val);
-                                  setState(() {});
-                                },
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.edit_outlined, color: VelocityColors.electricCyan, size: 18),
-                                tooltip: I18n.t('edit_plan'),
-                                onPressed: () => _showPlanFormDialog(existing: plan),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.delete_outline_rounded, color: VelocityColors.neonPink, size: 18),
-                                tooltip: I18n.t('delete_plan'),
-                                onPressed: () => _confirmDelete(plan),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-        ),
-      ],
-    );
-  }
-
-  // TAB 2: External VPN Backend & Panel Sync
-  Widget _buildPanelSyncTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Banner Info
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: const Color(0xFF101626),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: VelocityColors.electricCyan.withOpacity(0.5)),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.cloud_sync, color: VelocityColors.electricCyan, size: 24),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        I18n.t('panel_sync_title'),
-                        style: const TextStyle(
-                          color: VelocityColors.electricCyan,
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        I18n.t('panel_sync_desc'),
-                        style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11, height: 1.3),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 18),
-
-          // Backend Selector
-          Text(
-            I18n.t('select_backend_type'),
-            style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: ['Marzban', '3X-UI', 'Hiddify'].map<Widget>((backend) {
-              final isSel = _selectedBackendType == backend;
-              return Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 6),
-                  child: InkWell(
-                    onTap: () => setState(() => _selectedBackendType = backend),
-                    borderRadius: BorderRadius.circular(10),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      decoration: BoxDecoration(
-                        color: isSel ? VelocityColors.electricCyan.withOpacity(0.18) : VelocityColors.surfaceDark,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: isSel ? VelocityColors.electricCyan : VelocityColors.borderDark,
-                          width: isSel ? 1.5 : 1,
-                        ),
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        backend,
-                        style: TextStyle(
-                          color: isSel ? VelocityColors.electricCyan : VelocityColors.textSecondary,
-                          fontWeight: isSel ? FontWeight.bold : FontWeight.normal,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-
-          const SizedBox(height: 16),
-
-          // API Endpoint URL
-          Text(
-            I18n.t('panel_api_url'),
-            style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 6),
-          TextField(
-            controller: _panelUrlController,
-            style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12),
-            decoration: InputDecoration(
-              prefixIcon: const Icon(Icons.link_rounded, color: VelocityColors.electricCyan, size: 18),
-              filled: true,
-              fillColor: VelocityColors.pureBlack,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: VelocityColors.borderDark)),
-              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: VelocityColors.electricCyan)),
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          // API Secret / Bearer Token
-          Text(
-            I18n.t('panel_api_token'),
-            style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 6),
-          TextField(
-            controller: _panelTokenController,
-            obscureText: true,
-            style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12),
-            decoration: InputDecoration(
-              prefixIcon: const Icon(Icons.key_rounded, color: VelocityColors.neonYellow, size: 18),
-              filled: true,
-              fillColor: VelocityColors.pureBlack,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: VelocityColors.borderDark)),
-              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: VelocityColors.neonYellow)),
-            ),
-          ),
-
-          if (_syncSuccessMessage != null) ...[
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: VelocityColors.neonGreen.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: VelocityColors.neonGreen.withOpacity(0.6)),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.check_circle, color: VelocityColors.neonGreen, size: 16),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      _syncSuccessMessage!,
-                      style: const TextStyle(color: VelocityColors.neonGreen, fontSize: 11, fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-
-          const SizedBox(height: 16),
-
-          // Trigger Sync Button
-          SizedBox(
-            width: double.infinity,
-            height: 46,
-            child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: VelocityColors.electricCyan,
-                foregroundColor: VelocityColors.pureBlack,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              icon: _isSyncing
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: VelocityColors.pureBlack),
-                    )
-                  : const Icon(Icons.sync_rounded, size: 18),
-              label: Text(
-                _isSyncing ? I18n.t('syncing_nodes') : I18n.t('btn_sync_now'),
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-              ),
-              onPressed: _isSyncing ? null : _performBackendSync,
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          // Synced Inbound Nodes Preview List
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                I18n.t('synced_nodes_title'),
-                style: const TextStyle(color: VelocityColors.electricCyan, fontSize: 13, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                '${_syncedNodes.length} Inbounds',
-                style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-
-          ..._syncedNodes.map<Widget>((node) {
-            return Container(
-              margin: const EdgeInsets.only(bottom: 8),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFF0F1422),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: VelocityColors.borderDark),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: VelocityColors.neonGreen.withOpacity(0.12),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.circle, color: VelocityColors.neonGreen, size: 8),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          node['name'] as String,
-                          style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          '${node['proto']} • ${node['users']} Connected Clients',
-                          style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 10.5),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: VelocityColors.surfaceElevated,
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: VelocityColors.neonGreen.withOpacity(0.4)),
-                    ),
-                    child: Text(
-                      node['status'] as String,
-                      style: const TextStyle(color: VelocityColors.neonGreen, fontSize: 9, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }).toList(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildKpiCard(String label, String value, Color color, IconData icon) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-        decoration: BoxDecoration(
-          color: const Color(0xFF0F1420),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: VelocityColors.borderDark),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, color: color, size: 14),
-            const SizedBox(height: 6),
-            Text(
-              value,
-              style: TextStyle(color: color, fontSize: 14, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 9),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFilterChip(String key, String label) {
-    final isSelected = _filter == key;
-    return InkWell(
-      onTap: () => setState(() => _filter = key),
-      borderRadius: BorderRadius.circular(6),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: isSelected ? VelocityColors.electricCyan.withOpacity(0.18) : Colors.transparent,
-          borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: isSelected ? VelocityColors.electricCyan : VelocityColors.borderDark),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? VelocityColors.electricCyan : VelocityColors.textSecondary,
-            fontSize: 10.5,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 // ---------------------------------------------------------------------------
 // Velocity Power-User Settings Screen

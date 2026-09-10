@@ -67,6 +67,9 @@ data class ServerProfile(
 
 object ConfigLinkParser {
     fun parse(rawUrl: String): ServerProfile {
+        val parsed = SubscriptionParser.parseSingleNode(rawUrl)
+        if (parsed != null) return parsed
+
         val trimmed = rawUrl.trim()
         var protocol = VpnProtocol.VLESS
         var name = "Imported Node"
@@ -107,9 +110,11 @@ object ConfigLinkParser {
             name = "Imported Node (${trimmed.split("://").firstOrNull()?.uppercase() ?: "VPN"})"
         }
 
+        val flag = SubscriptionParser.detectCountryFlag(name, host)
+
         return ServerProfile(
             name = name,
-            countryCode = "🌐",
+            countryCode = flag,
             protocol = protocol,
             host = host,
             port = port,

@@ -297,6 +297,7 @@ fun VelocityVpnMainScreen() {
     var connectedSeconds by remember { mutableIntStateOf(0) }
 
     // Dialog & sheet controllers
+    var showSubscriptionScreen by remember { mutableStateOf(false) }
     var showServerSheet by remember { mutableStateOf(false) }
     var showRoutingSheet by remember { mutableStateOf(false) }
     var showImportDialog by remember { mutableStateOf(false) }
@@ -371,102 +372,124 @@ fun VelocityVpnMainScreen() {
     }
 
     CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
-        Scaffold(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(PureBlack)
-                .statusBarsPadding()
-                .navigationBarsPadding(),
-            containerColor = PureBlack,
-            topBar = {
-                VelocityHeaderBar(
-                    onToggleLang = {
-                        currentLang = if (currentLang == AppLanguage.EN) AppLanguage.FA else AppLanguage.EN
-                    },
-                    onOpenReceipt = { showReceiptSheet = true },
-                    onOpenSupport = { showTelegramSupportDialog = true },
-                    currentLang = currentLang
-                )
-            }
-        ) { paddingValues ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // Top Routing Mode & Quick Action Bar
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(SurfaceDark)
-                        .padding(horizontal = 16.dp, vertical = 9.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Routing Mode Pill
-                    Surface(
-                        color = SurfaceElevated,
-                        shape = RoundedCornerShape(8.dp),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, BorderDark),
-                        modifier = Modifier
-                            .testTag("routing_mode_button")
-                            .clickable { showRoutingSheet = true }
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.AltRoute,
-                                contentDescription = null,
-                                tint = ElectricCyan,
-                                modifier = Modifier.size(14.dp)
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(
-                                text = when (routingMode) {
-                                    RoutingMode.RULE -> I18n.t("mode_rule")
-                                    RoutingMode.BYPASS_LAN -> I18n.t("mode_bypass_lan")
-                                    RoutingMode.GLOBAL -> I18n.t("mode_global")
-                                    RoutingMode.DIRECT -> I18n.t("mode_direct")
-                                },
-                                color = TextPrimary,
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
+        if (showSubscriptionScreen) {
+            SubscriptionScreen(
+                onBack = { showSubscriptionScreen = false },
+                onImportServers = { newServers, replaceExisting, autoTestLatency ->
+                    if (replaceExisting) {
+                        servers.clear()
+                        servers.addAll(newServers)
+                    } else {
+                        val existingIds = servers.map { it.id }.toSet()
+                        val toAdd = newServers.filter { !existingIds.contains(it.id) }
+                        servers.addAll(0, toAdd)
                     }
-
-                    // Import Config Button
-                    Surface(
-                        color = SurfaceElevated,
-                        shape = RoundedCornerShape(8.dp),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, ElectricCyan.copy(alpha = 0.5f)),
-                        modifier = Modifier
-                            .testTag("import_config_button")
-                            .clickable { showImportDialog = true }
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = null,
-                                tint = ElectricCyan,
-                                modifier = Modifier.size(14.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = I18n.t("import_config"),
-                                color = ElectricCyan,
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
+                    if (servers.isNotEmpty()) {
+                        selectedServer = servers.first()
+                    }
+                    showSubscriptionScreen = false
+                    if (autoTestLatency) {
+                        pingAllServers()
                     }
                 }
+            )
+        } else {
+            Scaffold(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(PureBlack)
+                    .statusBarsPadding()
+                    .navigationBarsPadding(),
+                containerColor = PureBlack,
+                topBar = {
+                    VelocityHeaderBar(
+                        onToggleLang = {
+                            currentLang = if (currentLang == AppLanguage.EN) AppLanguage.FA else AppLanguage.EN
+                        },
+                        onOpenReceipt = { showReceiptSheet = true },
+                        onOpenSupport = { showTelegramSupportDialog = true },
+                        currentLang = currentLang
+                    )
+                }
+            ) { paddingValues ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // Top Routing Mode & Quick Action Bar
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(SurfaceDark)
+                            .padding(horizontal = 16.dp, vertical = 9.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Routing Mode Pill
+                        Surface(
+                            color = SurfaceElevated,
+                            shape = RoundedCornerShape(8.dp),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, BorderDark),
+                            modifier = Modifier
+                                .testTag("routing_mode_button")
+                                .clickable { showRoutingSheet = true }
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.AltRoute,
+                                    contentDescription = null,
+                                    tint = ElectricCyan,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = when (routingMode) {
+                                        RoutingMode.RULE -> I18n.t("mode_rule")
+                                        RoutingMode.BYPASS_LAN -> I18n.t("mode_bypass_lan")
+                                        RoutingMode.GLOBAL -> I18n.t("mode_global")
+                                        RoutingMode.DIRECT -> I18n.t("mode_direct")
+                                    },
+                                    color = TextPrimary,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                        }
+
+                        // Import Subscription / Config Button
+                        Surface(
+                            color = SurfaceElevated,
+                            shape = RoundedCornerShape(8.dp),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, ElectricCyan.copy(alpha = 0.5f)),
+                            modifier = Modifier
+                                .testTag("import_config_button")
+                                .clickable { showSubscriptionScreen = true }
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = null,
+                                    tint = ElectricCyan,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = I18n.t("sub_screen_title"),
+                                    color = ElectricCyan,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
 
                 Spacer(modifier = Modifier.height(14.dp))
 
@@ -567,7 +590,7 @@ fun VelocityVpnMainScreen() {
                         onPingAll = { pingAllServers() },
                         onOpenImport = {
                             showServerSheet = false
-                            showImportDialog = true
+                            showSubscriptionScreen = true
                         }
                     )
                 }
@@ -711,6 +734,7 @@ fun VelocityVpnMainScreen() {
             }
         }
     }
+}
 }
 
 // ---------------------------------------------------------------------------
