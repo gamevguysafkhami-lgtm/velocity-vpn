@@ -133,14 +133,6 @@ To build split APKs per ABI (for smaller file sizes):
 flutter build apk --release --split-per-abi
 ```
 
----
-
-### 🔑 Default Admin Demo Credentials
-
-For testing the **Admin Dashboard** and **Dynamic Plan Management**:
-- **Email:** `admin@velocity.vpn`
-- **Password:** `AdminSecurePassword123!`
-*(Quick autofill shortcut is available directly inside the Authentication dialog)*
 
 ---
 
@@ -214,10 +206,6 @@ flutter build apk --release
 
 ---
 
-### 🤖 بیلد خودکار در گیت‌هاب (CI/CD)
-در پوشه `.github/workflows/build-apk.yml` فرآیند کامل بیلد خودکار تنظیم شده است. با هر بار اعمال کامیت در شاخه `main` یا ایجاد تگ انتشار جدید (مثلا `v1.0.0`)، گیت‌هاب اکشنز به طور خودکار محیط جاوا و فلاتر را بارگذاری کرده و نسخه Release APK را کامپایل نموده و در بخش Releases برای دانلود کاربران قرار می‌دهد.
-
----
 
 ### ⚖️ Disclaimer & Terms of Service
 This project is developed for educational, network security evaluation, and digital accessibility purposes. Users are solely responsible for compliance with their local telecommunications regulations.
