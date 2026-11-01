@@ -66,3 +66,4 @@ debug.keystore
 # Symbol / Native
 app/intermediates/
 app/outputs/
+.local/
