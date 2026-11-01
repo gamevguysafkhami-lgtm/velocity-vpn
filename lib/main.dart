@@ -142,6 +142,9 @@ class I18n {
     'sub_name_label': {'en': 'Subscription Name', 'fa': 'نام سابسکریپشن'},
     'sub_url_label': {'en': 'Subscription URL', 'fa': 'آدرس سابسکریپشن'},
     'sub_updated': {'en': 'Subscription updated successfully', 'fa': 'سابسکریپشن با موفقیت بروزرسانی شد'},
+    'all_subscriptions': {'en': 'All Subscriptions', 'fa': 'تمام سابسکریپشن‌ها'},
+    'active_sub': {'en': 'Active Subscription', 'fa': 'سابسکریپشن فعال'},
+    'set_active_btn': {'en': 'Set Active', 'fa': 'فعال‌سازی'},
     'telegram_vip_title': {'en': 'VIP Telegram Auth', 'fa': 'احراز هویت VIP تلگرام'},
     'telegram_vip_desc': {'en': 'Link your Telegram ID or Username to verify VIP status and sync dedicated high-speed servers.', 'fa': 'شناسه یا نام‌کاربری تلگرام خود را برای تایید اشتراک VIP و دریافت سرورهای اختصاصی متصل کنید.'},
     'telegram_user_hint': {'en': '@Username or numeric ID', 'fa': 'شناسه عددی یا @نام‌کاربری'},
@@ -334,7 +337,7 @@ class SubscriptionInfo {
 }
 
 // ---------------------------------------------------------------------------
-// Multi-Subscription Item Model
+// Multi-Subscription Item / Model (Explicit Architecture)
 // ---------------------------------------------------------------------------
 class SubscriptionItem {
   final String id;
@@ -392,14 +395,21 @@ class SubscriptionItem {
 
   factory SubscriptionItem.fromJson(Map<String, dynamic> json) {
     List<ServerProfile> parsedServers = [];
+    final subId = json['id'] as String? ?? DateTime.now().millisecondsSinceEpoch.toString();
+
     if (json['servers'] != null) {
       final sList = json['servers'] as List<dynamic>;
       parsedServers = sList
           .map((s) => ServerProfile.fromJson(s as Map<String, dynamic>))
           .toList();
+      for (var s in parsedServers) {
+        if (s.subscriptionId == null || s.subscriptionId!.isEmpty) {
+          s.subscriptionId = subId;
+        }
+      }
     }
     return SubscriptionItem(
-      id: json['id'] as String? ?? DateTime.now().millisecondsSinceEpoch.toString(),
+      id: subId,
       name: json['name'] as String? ?? 'Sub 1',
       url: json['url'] as String? ?? '',
       upload: json['upload'] as int? ?? 0,
@@ -412,8 +422,10 @@ class SubscriptionItem {
   }
 }
 
+typedef SubscriptionModel = SubscriptionItem;
+
 // ---------------------------------------------------------------------------
-// Server Profile Model
+// Server Profile Model with Foreign Key: subscriptionId
 // ---------------------------------------------------------------------------
 class ServerProfile {
   final String id;
@@ -427,6 +439,7 @@ class ServerProfile {
   int? pingMs;
   bool isTesting;
   String trafficUsage;
+  String? subscriptionId;
 
   ServerProfile({
     required this.id,
@@ -440,6 +453,7 @@ class ServerProfile {
     this.pingMs,
     this.isTesting = false,
     this.trafficUsage = '0.0 GB',
+    this.subscriptionId,
   });
 
   Map<String, dynamic> toJson() => {
@@ -453,6 +467,7 @@ class ServerProfile {
     'rawUrl': rawUrl,
     'pingMs': pingMs,
     'trafficUsage': trafficUsage,
+    'subscriptionId': subscriptionId,
   };
 
   factory ServerProfile.fromJson(Map<String, dynamic> json) {
@@ -471,6 +486,7 @@ class ServerProfile {
       rawUrl: json['rawUrl'] as String? ?? '',
       pingMs: json['pingMs'] as int?,
       trafficUsage: json['trafficUsage'] as String? ?? '0.0 GB',
+      subscriptionId: json['subscriptionId'] as String?,
     );
   }
 }
@@ -479,25 +495,24 @@ class ServerProfile {
 // Universal Config & Subscription Parser
 // ---------------------------------------------------------------------------
 class ConfigLinkParser {
-  static ServerProfile? parse(String link) {
+  static ServerProfile? parse(String link, {String? subscriptionId}) {
     final trimmed = link.trim();
     if (trimmed.isEmpty) return null;
 
     try {
-      if (trimmed.startsWith('vless://')) return _parseVless(trimmed);
-      if (trimmed.startsWith('vmess://')) return _parseVmess(trimmed);
-      if (trimmed.startsWith('trojan://')) return _parseTrojan(trimmed);
-      if (trimmed.startsWith('ss://')) return _parseShadowsocks(trimmed);
-      if (trimmed.startsWith('hy2://') || trimmed.startsWith('hysteria2://')) return _parseHysteria2(trimmed);
+      if (trimmed.startsWith('vless://')) return _parseVless(trimmed, subscriptionId: subscriptionId);
+      if (trimmed.startsWith('vmess://')) return _parseVmess(trimmed, subscriptionId: subscriptionId);
+      if (trimmed.startsWith('trojan://')) return _parseTrojan(trimmed, subscriptionId: subscriptionId);
+      if (trimmed.startsWith('ss://')) return _parseShadowsocks(trimmed, subscriptionId: subscriptionId);
+      if (trimmed.startsWith('hy2://') || trimmed.startsWith('hysteria2://')) return _parseHysteria2(trimmed, subscriptionId: subscriptionId);
     } catch (_) {}
     return null;
   }
 
-  static List<ServerProfile> parseMultiple(String content) {
+  static List<ServerProfile> parseMultiple(String content, {String? subscriptionId}) {
     List<ServerProfile> results = [];
     String textToScan = content.trim();
 
-    // Check if base64 encoded subscription
     if (!textToScan.contains('\n') && !textToScan.startsWith('vless://') && !textToScan.startsWith('vmess://')) {
       try {
         final decoded = utf8.decode(base64Decode(base64.normalize(textToScan)));
@@ -507,18 +522,18 @@ class ConfigLinkParser {
 
     final lines = const LineSplitter().convert(textToScan);
     for (var line in lines) {
-      final p = parse(line);
+      final p = parse(line, subscriptionId: subscriptionId);
       if (p != null) results.add(p);
     }
     return results;
   }
 
-  static ServerProfile _parseVless(String url) {
+  static ServerProfile _parseVless(String url, {String? subscriptionId}) {
     final uri = Uri.parse(url);
     final remark = uri.fragment.isNotEmpty ? Uri.decodeComponent(uri.fragment) : 'VLESS-${uri.host}';
     final sni = uri.queryParameters['sni'] ?? uri.queryParameters['host'] ?? '';
     return ServerProfile(
-      id: 'vless_${DateTime.now().microsecondsSinceEpoch}',
+      id: 'vless_${DateTime.now().microsecondsSinceEpoch}_${math.Random().nextInt(9999)}',
       name: remark,
       countryCode: _extractFlag(remark),
       protocol: VpnProtocol.vless,
@@ -526,17 +541,18 @@ class ConfigLinkParser {
       port: uri.port > 0 ? uri.port : 443,
       sni: sni,
       rawUrl: url,
+      subscriptionId: subscriptionId,
     );
   }
 
-  static ServerProfile _parseVmess(String url) {
+  static ServerProfile _parseVmess(String url, {String? subscriptionId}) {
     final b64 = url.substring('vmess://'.length).trim();
     final decoded = utf8.decode(base64Decode(base64.normalize(b64)));
     final Map<String, dynamic> json = jsonDecode(decoded);
 
     final remark = json['ps']?.toString() ?? 'VMESS-${json['add']}';
     return ServerProfile(
-      id: 'vmess_${DateTime.now().microsecondsSinceEpoch}',
+      id: 'vmess_${DateTime.now().microsecondsSinceEpoch}_${math.Random().nextInt(9999)}',
       name: remark,
       countryCode: _extractFlag(remark),
       protocol: VpnProtocol.vmess,
@@ -544,14 +560,15 @@ class ConfigLinkParser {
       port: int.tryParse(json['port']?.toString() ?? '443') ?? 443,
       sni: json['sni']?.toString() ?? json['host']?.toString() ?? '',
       rawUrl: url,
+      subscriptionId: subscriptionId,
     );
   }
 
-  static ServerProfile _parseTrojan(String url) {
+  static ServerProfile _parseTrojan(String url, {String? subscriptionId}) {
     final uri = Uri.parse(url);
     final remark = uri.fragment.isNotEmpty ? Uri.decodeComponent(uri.fragment) : 'Trojan-${uri.host}';
     return ServerProfile(
-      id: 'trojan_${DateTime.now().microsecondsSinceEpoch}',
+      id: 'trojan_${DateTime.now().microsecondsSinceEpoch}_${math.Random().nextInt(9999)}',
       name: remark,
       countryCode: _extractFlag(remark),
       protocol: VpnProtocol.trojan,
@@ -559,14 +576,15 @@ class ConfigLinkParser {
       port: uri.port > 0 ? uri.port : 443,
       sni: uri.queryParameters['sni'] ?? '',
       rawUrl: url,
+      subscriptionId: subscriptionId,
     );
   }
 
-  static ServerProfile _parseHysteria2(String url) {
+  static ServerProfile _parseHysteria2(String url, {String? subscriptionId}) {
     final uri = Uri.parse(url);
     final remark = uri.fragment.isNotEmpty ? Uri.decodeComponent(uri.fragment) : 'HY2-${uri.host}';
     return ServerProfile(
-      id: 'hy2_${DateTime.now().microsecondsSinceEpoch}',
+      id: 'hy2_${DateTime.now().microsecondsSinceEpoch}_${math.Random().nextInt(9999)}',
       name: remark,
       countryCode: _extractFlag(remark),
       protocol: VpnProtocol.hysteria2,
@@ -574,14 +592,15 @@ class ConfigLinkParser {
       port: uri.port > 0 ? uri.port : 443,
       sni: uri.queryParameters['sni'] ?? '',
       rawUrl: url,
+      subscriptionId: subscriptionId,
     );
   }
 
-  static ServerProfile _parseShadowsocks(String url) {
+  static ServerProfile _parseShadowsocks(String url, {String? subscriptionId}) {
     final uri = Uri.parse(url);
     final remark = uri.fragment.isNotEmpty ? Uri.decodeComponent(uri.fragment) : 'SS-${uri.host}';
     return ServerProfile(
-      id: 'ss_${DateTime.now().microsecondsSinceEpoch}',
+      id: 'ss_${DateTime.now().microsecondsSinceEpoch}_${math.Random().nextInt(9999)}',
       name: remark,
       countryCode: _extractFlag(remark),
       protocol: VpnProtocol.shadowsocks,
@@ -589,6 +608,7 @@ class ConfigLinkParser {
       port: uri.port > 0 ? uri.port : 8388,
       sni: '',
       rawUrl: url,
+      subscriptionId: subscriptionId,
     );
   }
 
@@ -670,6 +690,7 @@ class VelocityNotificationService {
   static Future<void> cancelVpnNotification() async {
     try {
       await _notificationsPlugin.cancel(1001);
+      await _notificationsPlugin.cancelAll();
     } catch (_) {}
   }
 }
@@ -775,7 +796,6 @@ class _VelocitySplashScreenState extends State<VelocitySplashScreen> with Ticker
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Official Logo with Breathing Glow
                     Container(
                       width: 140,
                       height: 140,
@@ -805,8 +825,6 @@ class _VelocitySplashScreenState extends State<VelocitySplashScreen> with Ticker
                       ),
                     ),
                     const SizedBox(height: 32),
-
-                    // App Title
                     const Text(
                       'VELOCITY',
                       style: TextStyle(
@@ -817,8 +835,6 @@ class _VelocitySplashScreenState extends State<VelocitySplashScreen> with Ticker
                       ),
                     ),
                     const SizedBox(height: 6),
-
-                    // Subtitle
                     Text(
                       'NEXT-GEN CYBERPUNK TUNNEL',
                       style: TextStyle(
@@ -829,8 +845,6 @@ class _VelocitySplashScreenState extends State<VelocitySplashScreen> with Ticker
                       ),
                     ),
                     const SizedBox(height: 48),
-
-                    // Progress Bar
                     SizedBox(
                       width: 200,
                       child: ClipRRect(
@@ -844,8 +858,6 @@ class _VelocitySplashScreenState extends State<VelocitySplashScreen> with Ticker
                       ),
                     ),
                     const SizedBox(height: 12),
-
-                    // Status Text
                     Text(
                       _loadingStatus,
                       style: const TextStyle(
@@ -866,7 +878,7 @@ class _VelocitySplashScreenState extends State<VelocitySplashScreen> with Ticker
 }
 
 // ---------------------------------------------------------------------------
-// 3-Step Setup Onboarding Wizard Dialog
+// 3-Step Setup Onboarding Wizard Dialog (Step 2 Multi-Select Restored)
 // ---------------------------------------------------------------------------
 class VelocitySetupWizardDialog extends StatefulWidget {
   final VoidCallback onCompleted;
@@ -889,7 +901,15 @@ class _VelocitySetupWizardDialogState extends State<VelocitySetupWizardDialog> {
   late AppLanguage _selectedLang;
   bool _bypassIran = true;
   bool _bypassLan = true;
-  String _selectedProtocolPriority = 'VLESS-REALITY';
+
+  // Step 2: Multi-Select Checkboxes with all 4 enabled by default
+  final Set<String> _selectedProtocols = {
+    'VLESS Reality (XTLS Vision)',
+    'Hysteria 2 (QUIC / UDP)',
+    'Trojan gRPC',
+    'VMess WebSocket + TLS',
+  };
+
   bool _vpnPermGranted = false;
   bool _notifPermGranted = false;
 
@@ -905,7 +925,7 @@ class _VelocitySetupWizardDialogState extends State<VelocitySetupWizardDialog> {
       await prefs.setBool('has_completed_wizard', true);
       await prefs.setBool('bypass_iran_enabled', _bypassIran);
       await prefs.setBool('bypass_lan_enabled', _bypassLan);
-      await prefs.setString('protocol_priority', _selectedProtocolPriority);
+      await prefs.setStringList('protocol_priority', _selectedProtocols.toList());
     } catch (_) {}
     widget.onCompleted();
   }
@@ -936,7 +956,6 @@ class _VelocitySetupWizardDialogState extends State<VelocitySetupWizardDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Header with official emblem
               Row(
                 children: [
                   const VelocityEmblemWidget(size: 38),
@@ -968,7 +987,6 @@ class _VelocitySetupWizardDialogState extends State<VelocitySetupWizardDialog> {
               ),
               const SizedBox(height: 16),
 
-              // Step Indicator
               Row(
                 children: List.generate(3, (index) {
                   final active = index <= _currentStep;
@@ -986,14 +1004,12 @@ class _VelocitySetupWizardDialogState extends State<VelocitySetupWizardDialog> {
               ),
               const SizedBox(height: 20),
 
-              // Step Content
               if (_currentStep == 0) _buildStep1(isFa),
               if (_currentStep == 1) _buildStep2(isFa),
               if (_currentStep == 2) _buildStep3(isFa),
 
               const SizedBox(height: 24),
 
-              // Navigation buttons
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -1047,7 +1063,6 @@ class _VelocitySetupWizardDialogState extends State<VelocitySetupWizardDialog> {
         ),
         const SizedBox(height: 12),
 
-        // Language Select
         Row(
           children: [
             Expanded(
@@ -1101,7 +1116,6 @@ class _VelocitySetupWizardDialogState extends State<VelocitySetupWizardDialog> {
         ),
         const SizedBox(height: 14),
 
-        // Routing Preference
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
           title: Text(I18n.t('bypass_iran_title'), style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12, fontWeight: FontWeight.bold)),
@@ -1115,7 +1129,12 @@ class _VelocitySetupWizardDialogState extends State<VelocitySetupWizardDialog> {
   }
 
   Widget _buildStep2(bool isFa) {
-    final protocols = ['VLESS-REALITY', 'HYSTERIA-2', 'TROJAN-gRPC', 'VMESS-WS'];
+    final protocols = [
+      {'name': 'VLESS Reality (XTLS Vision)', 'desc': isFa ? 'رمزنگاری TLS 1.3 ضد فیلترینگ و رادار' : 'Anti-Censorship TLS 1.3 Steganography'},
+      {'name': 'Hysteria 2 (QUIC / UDP)', 'desc': isFa ? 'تونل فوق سریع UDP با پهنای باند حداکثری' : 'Ultra High-Speed UDP / QUIC Tunnel'},
+      {'name': 'Trojan gRPC', 'desc': isFa ? 'پروتکل امن مبدل با تاخیر پایین' : 'Stealth TLS/gRPC Obfuscation'},
+      {'name': 'VMess WebSocket + TLS', 'desc': isFa ? 'پروتکل سازگار با تمام شبکه‌ها' : 'Universal WebSocket + TLS fallback'},
+    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1124,39 +1143,55 @@ class _VelocitySetupWizardDialogState extends State<VelocitySetupWizardDialog> {
           I18n.t('wizard_step2_title'),
           style: const TextStyle(color: VelocityColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 13),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 4),
         Text(
           isFa
-              ? 'پروتکل اولویت‌دار جهت اتصال سریع و پایداری بر روی هسته Xray v26:'
-              : 'Primary preferred protocol for smart tunneling on Xray core v26:',
+              ? 'پروتکل‌های مجاز جهت مسیریابی هوشمند را انتخاب کنید (به صورت پیش‌فرض همه فعالند):'
+              : 'Select allowed protocols for intelligent routing (all active by default):',
           style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11),
         ),
-        const SizedBox(height: 12),
-        ...protocols.map((proto) {
-          final isSelected = _selectedProtocolPriority == proto;
+        const SizedBox(height: 10),
+        ...protocols.map((item) {
+          final protoName = item['name']!;
+          final isChecked = _selectedProtocols.contains(protoName);
+
           return Container(
-            margin: const EdgeInsets.only(bottom: 8),
+            margin: const EdgeInsets.only(bottom: 6),
             decoration: BoxDecoration(
-              color: isSelected ? VelocityColors.electricCyan.withOpacity(0.12) : VelocityColors.surfaceElevated,
+              color: isChecked ? VelocityColors.electricCyan.withOpacity(0.10) : VelocityColors.surfaceElevated,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: isSelected ? VelocityColors.electricCyan : VelocityColors.borderDark),
-            ),
-            child: RadioListTile<String>(
-              dense: true,
-              value: proto,
-              groupValue: _selectedProtocolPriority,
-              activeColor: VelocityColors.electricCyan,
-              title: Text(proto, style: TextStyle(color: isSelected ? VelocityColors.electricCyan : VelocityColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 12)),
-              subtitle: Text(
-                proto == 'VLESS-REALITY'
-                    ? (isFa ? 'رمزنگاری TLS 1.3 ضد فیلترینگ' : 'TLS 1.3 Anti-Censorship')
-                    : proto == 'HYSTERIA-2'
-                        ? (isFa ? 'تونل پرسرعت UDP با پهنای باند بالا' : 'Ultra High-Speed UDP Tunnel')
-                        : (isFa ? 'تونل استاندارد مبدل' : 'Standard secure tunnel'),
-                style: const TextStyle(color: VelocityColors.textMuted, fontSize: 10),
+              border: Border.all(
+                color: isChecked ? VelocityColors.electricCyan : VelocityColors.borderDark,
+                width: isChecked ? 1.2 : 1.0,
               ),
-              onChanged: (val) {
-                if (val != null) setState(() => _selectedProtocolPriority = val);
+            ),
+            child: CheckboxListTile(
+              dense: true,
+              value: isChecked,
+              activeColor: VelocityColors.electricCyan,
+              checkColor: VelocityColors.pureBlack,
+              title: Text(
+                protoName,
+                style: TextStyle(
+                  color: isChecked ? VelocityColors.electricCyan : VelocityColors.textPrimary,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 11.5,
+                ),
+              ),
+              subtitle: Text(
+                item['desc']!,
+                style: const TextStyle(color: VelocityColors.textMuted, fontSize: 9.5),
+              ),
+              onChanged: (bool? val) {
+                setState(() {
+                  if (val == true) {
+                    _selectedProtocols.add(protoName);
+                  } else {
+                    if (_selectedProtocols.length > 1) {
+                      _selectedProtocols.remove(protoName);
+                    }
+                  }
+                });
               },
             ),
           );
@@ -1175,7 +1210,6 @@ class _VelocitySetupWizardDialogState extends State<VelocitySetupWizardDialog> {
         ),
         const SizedBox(height: 12),
 
-        // VPN Permission Card
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
@@ -1210,7 +1244,6 @@ class _VelocitySetupWizardDialogState extends State<VelocitySetupWizardDialog> {
         ),
         const SizedBox(height: 10),
 
-        // Notification Permission Card
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
@@ -1347,7 +1380,7 @@ class _VelocityAppState extends State<VelocityApp> {
 typedef VelocityVpnApp = VelocityApp;
 
 // ---------------------------------------------------------------------------
-// Home Screen (Full Dashboard, Servers, VIP & Multi-Subscription)
+// Home Screen (Xray Dashboard with Multi-Subscription & Real TCP Ping)
 // ---------------------------------------------------------------------------
 class HomeScreen extends StatefulWidget {
   final VoidCallback onToggleLanguage;
@@ -1368,7 +1401,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
-  // Method Channel for Native Tile Synchronization
   static const MethodChannel _platformControl = MethodChannel('com.velocity.vpn/control');
 
   VpnState _vpnState = VpnState.disconnected;
@@ -1377,7 +1409,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
 
-  // Real Xray Core Controller
   late final V2ray _v2ray;
 
   // Telemetry
@@ -1386,19 +1417,20 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   String _displayDownloadSpeed = '0.0 KB/s';
   String _displayUploadSpeed = '0.0 KB/s';
 
-  // Server Pool & Multi-Subscriptions
+  // Server Pool & Multi-Subscriptions Architecture
   final List<ServerProfile> _servers = [];
   final List<SubscriptionItem> _subscriptions = [];
   final List<String> _connectionLogs = [];
+  String? _activeSubscriptionId; // Specific Sub ID or 'ALL'
   ServerProfile? _selectedServer;
   SubscriptionInfo? _subscriptionInfo;
 
-  // Telegram Authentication State
+  // Telegram Auth
   String? _telegramUsername;
   bool _isTelegramLinked = false;
   String _customBotUrl = 'https://t.me/Velocity_Support';
 
-  // Navigation & Search / Sort Filters
+  // Navigation & Search / Sorting
   int _currentTabIndex = 0;
   String _serverSearchQuery = '';
   ServerSortMode _currentSortMode = ServerSortMode.none;
@@ -1407,7 +1439,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   bool _bypassLan = true;
   bool _notificationsEnabled = true;
 
-  // Subnets to bypass when Bypass Iran or LAN is on
   static const List<String> _bypassSubnets = [
     '0.0.0.0/8',
     '10.0.0.0/8',
@@ -1511,11 +1542,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       final prefs = await SharedPreferences.getInstance();
       final serversJson = prefs.getString('saved_servers');
       final subsJson = prefs.getString('subscription_list');
+      final activeSubId = prefs.getString('active_subscription_id');
       final selectedId = prefs.getString('selected_server_id');
       final subJson = prefs.getString('subscription_info');
       final logs = prefs.getStringList('velocity_connection_logs');
 
-      // Telegram persistence
       _telegramUsername = prefs.getString('telegram_username');
       _isTelegramLinked = prefs.getBool('telegram_linked') ?? false;
       _customBotUrl = prefs.getString('custom_bot_url') ?? 'https://t.me/Velocity_Support';
@@ -1535,7 +1566,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         });
       }
 
-      // Load Subscriptions List
+      // 1. Load Subscriptions
       if (subsJson != null && subsJson.isNotEmpty) {
         final List<dynamic> decodedSubs = jsonDecode(subsJson);
         final loadedSubs = decodedSubs
@@ -1547,7 +1578,16 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         });
       }
 
-      // Load Saved Servers
+      // 2. Set active subscription ID
+      if (activeSubId != null && activeSubId.isNotEmpty) {
+        _activeSubscriptionId = activeSubId;
+      } else if (_subscriptions.isNotEmpty) {
+        _activeSubscriptionId = _subscriptions.first.id;
+      } else {
+        _activeSubscriptionId = 'ALL';
+      }
+
+      // 3. Load Saved Servers
       if (serversJson != null && serversJson.isNotEmpty) {
         final List<dynamic> decodedList = jsonDecode(serversJson);
         final loadedServers = decodedList
@@ -1557,11 +1597,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           setState(() {
             _servers.clear();
             _servers.addAll(loadedServers);
-            if (selectedId != null) {
-              _selectedServer = _servers.firstWhere((s) => s.id == selectedId, orElse: () => _servers.first);
-            } else {
-              _selectedServer = _servers.first;
-            }
           });
         }
       }
@@ -1569,6 +1604,16 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       // Rebuild pool if subscriptions exist
       if (_subscriptions.isNotEmpty) {
         _rebuildServerPool();
+      }
+
+      // Restore selected server
+      final visible = _visibleServers;
+      if (visible.isNotEmpty) {
+        if (selectedId != null) {
+          _selectedServer = visible.firstWhere((s) => s.id == selectedId, orElse: () => visible.first);
+        } else {
+          _selectedServer = visible.first;
+        }
       }
 
       if (subJson != null && subJson.isNotEmpty) {
@@ -1592,20 +1637,19 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   void _rebuildServerPool() {
     final Map<String, ServerProfile> uniqueServers = {};
 
-    // Keep manually imported servers
+    // Keep manual configs
     for (var s in _servers) {
-      if (s.rawUrl.isNotEmpty) {
+      if (s.subscriptionId == null && s.rawUrl.isNotEmpty) {
         uniqueServers[s.rawUrl] = s;
       }
     }
 
-    // Add servers from active subscriptions
+    // Add subscription configs stamped with subscriptionId
     for (var sub in _subscriptions) {
-      if (sub.isActive) {
-        for (var s in sub.servers) {
-          if (s.rawUrl.isNotEmpty) {
-            uniqueServers[s.rawUrl] = s;
-          }
+      for (var s in sub.servers) {
+        s.subscriptionId = sub.id;
+        if (s.rawUrl.isNotEmpty) {
+          uniqueServers[s.rawUrl] = s;
         }
       }
     }
@@ -1614,16 +1658,47 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       _servers.clear();
       _servers.addAll(uniqueServers.values);
 
+      final visible = _visibleServers;
       if (_selectedServer != null) {
-        _selectedServer = _servers.firstWhere(
+        _selectedServer = visible.firstWhere(
           (s) => s.id == _selectedServer!.id || s.rawUrl == _selectedServer!.rawUrl,
-          orElse: () => _servers.isNotEmpty ? _servers.first : _selectedServer!,
+          orElse: () => visible.isNotEmpty ? visible.first : _selectedServer!,
         );
-      } else if (_servers.isNotEmpty) {
-        _selectedServer = _servers.first;
+      } else if (visible.isNotEmpty) {
+        _selectedServer = visible.first;
       }
     });
 
+    _savePersistedData();
+  }
+
+  // Active Subscription Getter & Visible Servers
+  SubscriptionItem? get _currentActiveSubscription {
+    if (_subscriptions.isEmpty) return null;
+    if (_activeSubscriptionId == null || _activeSubscriptionId == 'ALL') {
+      return _subscriptions.first;
+    }
+    return _subscriptions.firstWhere(
+      (s) => s.id == _activeSubscriptionId,
+      orElse: () => _subscriptions.first,
+    );
+  }
+
+  List<ServerProfile> get _visibleServers {
+    if (_activeSubscriptionId == null || _activeSubscriptionId == 'ALL') {
+      return _servers;
+    }
+    return _servers.where((s) => s.subscriptionId == _activeSubscriptionId).toList();
+  }
+
+  void _switchActiveSubscription(String subId) {
+    setState(() {
+      _activeSubscriptionId = subId;
+      final visible = _visibleServers;
+      if (_selectedServer == null || !visible.any((s) => s.id == _selectedServer!.id)) {
+        _selectedServer = visible.isNotEmpty ? visible.first : null;
+      }
+    });
     _savePersistedData();
   }
 
@@ -1635,6 +1710,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
       final subsJson = jsonEncode(_subscriptions.map((sub) => sub.toJson()).toList());
       await prefs.setString('subscription_list', subsJson);
+
+      if (_activeSubscriptionId != null) {
+        await prefs.setString('active_subscription_id', _activeSubscriptionId!);
+      }
 
       if (_selectedServer != null) {
         await prefs.setString('selected_server_id', _selectedServer!.id);
@@ -1679,7 +1758,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   // -------------------------------------------------------------------------
-  // Connect / Disconnect Action (Real Xray Core & State-Lock Fixed)
+  // Connect / Disconnect Action (Clean Disconnect Engine)
   // -------------------------------------------------------------------------
   Future<void> _toggleVpn() async {
     if (_isOperationInProgress) {
@@ -1706,14 +1785,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       _displayUploadSpeed = '0.0 KB/s';
     });
     _updateNativeTileState('disconnected');
-    VelocityNotificationService.cancelVpnNotification();
+    await VelocityNotificationService.cancelVpnNotification();
     try {
-      await _v2ray.stopV2Ray();
+      _v2ray.stopV2Ray();
     } catch (_) {}
   }
 
   Future<void> _connectVpn() async {
-    if (_selectedServer == null || _servers.isEmpty) {
+    final visible = _visibleServers;
+    if (_selectedServer == null || visible.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: VelocityColors.surfaceElevated,
@@ -1821,6 +1901,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   Future<void> _disconnectVpn() async {
+    // 1. Immediately set state to disconnected & reset speeds
     _isOperationInProgress = false;
     _durationTimer?.cancel();
     _durationTimer = null;
@@ -1833,10 +1914,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
     _addConnectionLog('[Xray Disconnected] Tunnel closed.');
     _updateNativeTileState('disconnected');
+
+    // 2. Immediately cancel and dismiss foreground notification
     await VelocityNotificationService.cancelVpnNotification();
 
+    // 3. Terminate Xray core cleanly
     try {
-      await _v2ray.stopV2Ray();
+      _v2ray.stopV2Ray();
     } catch (_) {}
   }
 
@@ -1856,63 +1940,46 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   // -------------------------------------------------------------------------
-  // Ping Engine
+  // Hiddify-Style Real TCP Ping Engine (Sub-200ms Latency & 10-Node Batches)
   // -------------------------------------------------------------------------
-  Future<void> _pingAllServers() async {
-    if (_servers.isEmpty) return;
-    _addConnectionLog('[Smart Ping] Starting latency check across all nodes...');
-    for (var s in _servers) {
-      _testServerDelay(s, log: false);
+  static Future<int> _testHiddifyTcpLatency(String host, int port, {Duration timeout = const Duration(milliseconds: 1500)}) async {
+    final sw = Stopwatch()..start();
+    try {
+      final socket = await Socket.connect(host.trim(), port, timeout: timeout);
+      sw.stop();
+      socket.destroy();
+      return sw.elapsedMilliseconds;
+    } catch (_) {
+      sw.stop();
+      return -1;
     }
   }
 
-  Future<void> _testServerDelay(ServerProfile server, {bool log = true}) async {
+  Future<void> _pingAllServers() async {
+    final visible = List<ServerProfile>.from(_visibleServers);
+    if (visible.isEmpty) return;
+
+    _addConnectionLog('[TCP Ping] Checking real-time TCP latency for ${visible.length} nodes...');
+
+    const chunkSize = 10;
+    for (var i = 0; i < visible.length; i += chunkSize) {
+      if (!mounted || _vpnState == VpnState.disconnecting) break;
+      final end = (i + chunkSize < visible.length) ? i + chunkSize : visible.length;
+      final chunk = visible.sublist(i, end);
+      await Future.wait(chunk.map((server) => _testServerTcpLatency(server, log: false)));
+    }
+
+    if (mounted) {
+      setState(() {});
+      _addConnectionLog('[TCP Ping] All node latencies updated.');
+    }
+  }
+
+  Future<void> _testServerTcpLatency(ServerProfile server, {bool log = true}) async {
     if (server.isTesting) return;
     setState(() => server.isTesting = true);
 
-    int delay = -1;
-
-    try {
-      final parsed = V2ray.parseFromURL(server.rawUrl);
-      delay = await _v2ray.getServerDelay(config: parsed.getFullConfiguration());
-    } catch (_) {
-      try {
-        delay = await _v2ray.getServerDelay(config: server.rawUrl);
-      } catch (_) {}
-    }
-
-    if (delay <= 0) {
-      final sw = Stopwatch()..start();
-      try {
-        final targetHost = server.host.trim();
-        if (server.port == 443 || server.protocol == VpnProtocol.vless || server.protocol == VpnProtocol.trojan) {
-          try {
-            final secSocket = await SecureSocket.connect(
-              targetHost,
-              server.port,
-              timeout: const Duration(milliseconds: 3500),
-              onBadCertificate: (_) => true,
-            );
-            sw.stop();
-            secSocket.destroy();
-            delay = sw.elapsedMilliseconds;
-          } catch (_) {
-            final socket = await Socket.connect(targetHost, server.port, timeout: const Duration(milliseconds: 3500));
-            sw.stop();
-            socket.destroy();
-            delay = sw.elapsedMilliseconds;
-          }
-        } else {
-          final socket = await Socket.connect(targetHost, server.port, timeout: const Duration(milliseconds: 3500));
-          sw.stop();
-          socket.destroy();
-          delay = sw.elapsedMilliseconds;
-        }
-      } catch (_) {
-        sw.stop();
-        delay = -1;
-      }
-    }
+    final delay = await _testHiddifyTcpLatency(server.host, server.port);
 
     if (mounted) {
       setState(() {
@@ -1926,10 +1993,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   // -------------------------------------------------------------------------
-  // Filtered & Sorted Servers
+  // Filtered & Sorted Visible Servers
   // -------------------------------------------------------------------------
   List<ServerProfile> get _filteredAndSortedServers {
-    List<ServerProfile> list = List.from(_servers);
+    List<ServerProfile> list = List.from(_visibleServers);
 
     if (_serverSearchQuery.trim().isNotEmpty) {
       final q = _serverSearchQuery.trim().toLowerCase();
@@ -2129,9 +2196,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           const SizedBox(height: 28),
           _buildTelemetryCard(),
           const SizedBox(height: 18),
+          _buildSubscriptionSwitcherBar(),
+          const SizedBox(height: 14),
           _buildActiveServerCard(),
           const SizedBox(height: 16),
-          if (_subscriptionInfo != null) _buildSubscriptionCard(),
+          _buildActiveSubscriptionQuotaCard(),
         ],
       ),
     );
@@ -2205,7 +2274,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   Widget _buildGlowingPowerButton() {
-    final hasServers = _servers.isNotEmpty && _selectedServer != null;
+    final visible = _visibleServers;
+    final hasServers = visible.isNotEmpty && _selectedServer != null;
     final isConnected = _vpnState == VpnState.connected;
     final isConnecting = _vpnState == VpnState.connecting;
 
@@ -2429,8 +2499,118 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
   }
 
+  // -------------------------------------------------------------------------
+  // Subscription Switcher Bar (Home & Servers Tab Sync)
+  // -------------------------------------------------------------------------
+  Widget _buildSubscriptionSwitcherBar() {
+    if (_subscriptions.isEmpty) return const SizedBox.shrink();
+
+    final activeSub = _currentActiveSubscription;
+    final isAll = _activeSubscriptionId == 'ALL';
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: VelocityColors.surfaceElevated,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: VelocityColors.deepCyan.withOpacity(0.4)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.folder_shared_rounded, color: VelocityColors.deepCyan, size: 18),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  I18n.t('active_sub'),
+                  style: const TextStyle(color: VelocityColors.textMuted, fontSize: 9.5),
+                ),
+                Text(
+                  isAll ? I18n.t('all_subscriptions') : (activeSub?.name ?? 'Subscription'),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: VelocityColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+          OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              side: const BorderSide(color: VelocityColors.deepCyan, width: 1),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            ),
+            onPressed: _showSubscriptionPickerSheet,
+            icon: const Icon(Icons.swap_horiz_rounded, size: 16, color: VelocityColors.deepCyan),
+            label: Text(
+              widget.currentLang == AppLanguage.fa ? 'تغییر' : 'Switch',
+              style: const TextStyle(color: VelocityColors.deepCyan, fontSize: 11, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSubscriptionPickerSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.all(16),
+        decoration: const BoxDecoration(
+          color: VelocityColors.surfaceDark,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          border: Border(top: BorderSide(color: VelocityColors.deepCyan, width: 1.5)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              I18n.t('manage_subscriptions'),
+              style: const TextStyle(color: VelocityColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 14),
+            ),
+            const SizedBox(height: 12),
+            ListTile(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              tileColor: _activeSubscriptionId == 'ALL' ? VelocityColors.deepCyan.withOpacity(0.15) : null,
+              leading: const Icon(Icons.layers_rounded, color: VelocityColors.deepCyan),
+              title: Text(I18n.t('all_subscriptions'), style: const TextStyle(color: VelocityColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 13)),
+              subtitle: Text('${_servers.length} nodes', style: const TextStyle(color: VelocityColors.textMuted, fontSize: 11)),
+              trailing: _activeSubscriptionId == 'ALL' ? const Icon(Icons.check_circle_rounded, color: VelocityColors.deepCyan) : null,
+              onTap: () {
+                _switchActiveSubscription('ALL');
+                Navigator.pop(ctx);
+              },
+            ),
+            ..._subscriptions.map((sub) {
+              final isSel = _activeSubscriptionId == sub.id;
+              return ListTile(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                tileColor: isSel ? VelocityColors.deepCyan.withOpacity(0.15) : null,
+                leading: const Icon(Icons.folder_outlined, color: VelocityColors.deepCyan),
+                title: Text(sub.name, style: const TextStyle(color: VelocityColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 13)),
+                subtitle: Text('${sub.servers.length} nodes | ${sub.trafficUsageFormatted}', style: const TextStyle(color: VelocityColors.textMuted, fontSize: 11)),
+                trailing: isSel ? const Icon(Icons.check_circle_rounded, color: VelocityColors.deepCyan) : null,
+                onTap: () {
+                  _switchActiveSubscription(sub.id);
+                  Navigator.pop(ctx);
+                },
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildActiveServerCard() {
-    if (_selectedServer == null || _servers.isEmpty) {
+    final visible = _visibleServers;
+    if (_selectedServer == null || visible.isEmpty) {
       return Container(
         margin: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
@@ -2571,8 +2751,17 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
   }
 
-  Widget _buildSubscriptionCard() {
-    final sub = _subscriptionInfo!;
+  // Bind strictly to currently active subscription
+  Widget _buildActiveSubscriptionQuotaCard() {
+    final sub = _currentActiveSubscription;
+    if (sub == null && _subscriptionInfo == null) return const SizedBox.shrink();
+
+    final planName = sub?.planName ?? _subscriptionInfo!.planName;
+    final expiryFormatted = sub?.expiryDateFormatted ?? _subscriptionInfo!.expiryDateFormatted;
+    final progress = sub?.quotaProgress ?? _subscriptionInfo!.quotaProgress;
+    final usage = sub?.trafficUsageFormatted ?? _subscriptionInfo!.trafficUsageFormatted;
+    final total = sub?.trafficTotalFormatted ?? _subscriptionInfo!.trafficTotalFormatted;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(14),
@@ -2592,7 +2781,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   const Icon(Icons.pie_chart_outline_rounded, color: VelocityColors.deepCyan, size: 18),
                   const SizedBox(width: 8),
                   Text(
-                    sub.planName,
+                    planName,
                     style: const TextStyle(
                       color: VelocityColors.textPrimary,
                       fontWeight: FontWeight.bold,
@@ -2602,7 +2791,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 ],
               ),
               Text(
-                '${I18n.t('sub_expiry')} ${sub.expiryDateFormatted}',
+                '${I18n.t('sub_expiry')} $expiryFormatted',
                 style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11),
               ),
             ],
@@ -2611,7 +2800,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
-              value: sub.quotaProgress,
+              value: progress,
               backgroundColor: VelocityColors.surfaceElevated,
               valueColor: const AlwaysStoppedAnimation<Color>(VelocityColors.deepCyan),
               minHeight: 6,
@@ -2622,11 +2811,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Used: ${sub.trafficUsageFormatted}',
+                'Used: $usage',
                 style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11),
               ),
               Text(
-                'Total: ${sub.trafficTotalFormatted}',
+                'Total: $total',
                 style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11),
               ),
             ],
@@ -2735,12 +2924,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   ),
                   const Divider(color: VelocityColors.borderDark),
 
-                  // Node list
                   Expanded(
                     child: displayServers.isEmpty
                         ? Center(
                             child: Text(
-                              _servers.isEmpty ? I18n.t('no_nodes_available') : I18n.t('no_nodes_found'),
+                              _visibleServers.isEmpty ? I18n.t('no_nodes_available') : I18n.t('no_nodes_found'),
                               style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 12),
                             ),
                           )
@@ -2836,7 +3024,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       border: Border.all(color: VelocityColors.borderDark),
                     ),
                     child: Text(
-                      '${_servers.length}',
+                      '${_visibleServers.length}',
                       style: const TextStyle(
                         color: VelocityColors.electricCyan,
                         fontSize: 11,
@@ -2867,7 +3055,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     ),
                   ),
                   const SizedBox(width: 6),
-                  if (_servers.isNotEmpty)
+                  if (_visibleServers.isNotEmpty)
                     OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: VelocityColors.electricCyan, width: 1),
@@ -2891,6 +3079,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             ],
           ),
         ),
+
+        // Subscription Switcher Quick Pill
+        _buildSubscriptionSwitcherBar(),
+        const SizedBox(height: 6),
 
         // Live Search Bar
         Padding(
@@ -2939,11 +3131,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         Expanded(
           child: displayServers.isEmpty
               ? _buildEmptyState(
-                  title: _servers.isEmpty ? I18n.t('no_nodes_available') : I18n.t('no_nodes_found'),
-                  subtitle: _servers.isEmpty
+                  title: _visibleServers.isEmpty ? I18n.t('no_nodes_available') : I18n.t('no_nodes_found'),
+                  subtitle: _visibleServers.isEmpty
                       ? (widget.currentLang == AppLanguage.fa
-                          ? 'هیچ کانفیگی وارد نشده است. سابسکریپشن اختصاصی خود را وارد نمایید.'
-                          : 'No server configurations loaded. Add subscriptions or import links.')
+                          ? 'هیچ سروری در این سابسکریپشن وجود ندارد.'
+                          : 'No servers in this subscription.')
                       : (widget.currentLang == AppLanguage.fa
                           ? 'سروری با فیلتر جستجو یافت نشد.'
                           : 'No server matches current filter.'),
@@ -3018,8 +3210,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                               onPressed: () {
                                 setState(() {
                                   _servers.removeWhere((s) => s.id == server.id);
+                                  for (var sub in _subscriptions) {
+                                    sub.servers.removeWhere((s) => s.id == server.id);
+                                  }
+                                  final visible = _visibleServers;
                                   if (_selectedServer?.id == server.id) {
-                                    _selectedServer = _servers.isNotEmpty ? _servers.first : null;
+                                    _selectedServer = visible.isNotEmpty ? visible.first : null;
                                   }
                                 });
                                 _savePersistedData();
@@ -3061,7 +3257,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             : '${ping}ms';
 
     return InkWell(
-      onTap: () => _testServerDelay(server),
+      onTap: () => _testServerTcpLatency(server),
       borderRadius: BorderRadius.circular(6),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -3154,6 +3350,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             itemCount: _subscriptions.length,
                             itemBuilder: (context, idx) {
                               final sub = _subscriptions[idx];
+                              final isCurrentActive = _activeSubscriptionId == sub.id;
+
                               return Container(
                                 margin: const EdgeInsets.only(bottom: 12),
                                 padding: const EdgeInsets.all(14),
@@ -3161,8 +3359,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                   color: VelocityColors.surfaceElevated,
                                   borderRadius: BorderRadius.circular(14),
                                   border: Border.all(
-                                    color: sub.isActive ? VelocityColors.deepCyan : VelocityColors.borderDark,
-                                    width: sub.isActive ? 1.2 : 1.0,
+                                    color: isCurrentActive ? VelocityColors.electricCyan : (sub.isActive ? VelocityColors.deepCyan : VelocityColors.borderDark),
+                                    width: isCurrentActive ? 1.5 : 1.0,
                                   ),
                                 ),
                                 child: Column(
@@ -3176,7 +3374,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                             children: [
                                               Text(
                                                 sub.name,
-                                                style: const TextStyle(color: VelocityColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 14),
+                                                style: TextStyle(
+                                                  color: isCurrentActive ? VelocityColors.electricCyan : VelocityColors.textPrimary,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 14,
+                                                ),
                                               ),
                                               IconButton(
                                                 icon: const Icon(Icons.edit_outlined, size: 16, color: VelocityColors.textMuted),
@@ -3185,15 +3387,36 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                             ],
                                           ),
                                         ),
-                                        Switch(
-                                          value: sub.isActive,
-                                          activeColor: VelocityColors.deepCyan,
-                                          onChanged: (val) {
-                                            setState(() => sub.isActive = val);
-                                            setSheetState(() {});
-                                            _rebuildServerPool();
-                                          },
-                                        ),
+                                        if (!isCurrentActive)
+                                          ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: VelocityColors.surfaceDark,
+                                              side: const BorderSide(color: VelocityColors.electricCyan),
+                                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                                            ),
+                                            onPressed: () {
+                                              _switchActiveSubscription(sub.id);
+                                              setSheetState(() {});
+                                            },
+                                            child: Text(
+                                              I18n.t('set_active_btn'),
+                                              style: const TextStyle(color: VelocityColors.electricCyan, fontSize: 10, fontWeight: FontWeight.bold),
+                                            ),
+                                          )
+                                        else
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                            decoration: BoxDecoration(
+                                              color: VelocityColors.electricCyan.withOpacity(0.15),
+                                              borderRadius: BorderRadius.circular(6),
+                                              border: Border.all(color: VelocityColors.electricCyan),
+                                            ),
+                                            child: Text(
+                                              I18n.t('active_sub'),
+                                              style: const TextStyle(color: VelocityColors.electricCyan, fontSize: 9.5, fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
                                       ],
                                     ),
                                     const SizedBox(height: 4),
@@ -3316,11 +3539,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             if (k.toLowerCase() == 'subscription-userinfo') userInfoHeader = v;
                           });
 
+                          final subId = 'sub_${DateTime.now().millisecondsSinceEpoch}';
                           final subInfo = SubscriptionInfo.fromHeader(userInfoHeader, url);
-                          final parsedServers = ConfigLinkParser.parseMultiple(response.body);
+                          final parsedServers = ConfigLinkParser.parseMultiple(response.body, subscriptionId: subId);
 
                           final newSub = SubscriptionItem(
-                            id: 'sub_${DateTime.now().millisecondsSinceEpoch}',
+                            id: subId,
                             name: nameCtrl.text.trim().isNotEmpty ? nameCtrl.text.trim() : 'Subscription ${_subscriptions.length + 1}',
                             url: url,
                             upload: subInfo.uploadBytes,
@@ -3333,6 +3557,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
                           setState(() {
                             _subscriptions.add(newSub);
+                            _activeSubscriptionId = newSub.id;
                             _subscriptionInfo = subInfo;
                           });
                           _rebuildServerPool();
@@ -3404,6 +3629,16 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             onPressed: () {
               setState(() {
                 _subscriptions.removeWhere((item) => item.id == sub.id);
+                _servers.removeWhere((s) => s.subscriptionId == sub.id);
+
+                if (_activeSubscriptionId == sub.id) {
+                  _activeSubscriptionId = _subscriptions.isNotEmpty ? _subscriptions.first.id : 'ALL';
+                }
+
+                final visible = _visibleServers;
+                if (_selectedServer?.subscriptionId == sub.id) {
+                  _selectedServer = visible.isNotEmpty ? visible.first : null;
+                }
               });
               _rebuildServerPool();
               setSheetState(() {});
@@ -3434,7 +3669,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         });
 
         final subInfo = SubscriptionInfo.fromHeader(userInfoHeader, sub.url);
-        final parsedServers = ConfigLinkParser.parseMultiple(response.body);
+        final parsedServers = ConfigLinkParser.parseMultiple(response.body, subscriptionId: sub.id);
 
         setState(() {
           sub.upload = subInfo.uploadBytes;
@@ -3465,7 +3700,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        // VIP Banner
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -3520,7 +3754,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         ),
         const SizedBox(height: 14),
 
-        // Telegram Link & Auth Section
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -3677,7 +3910,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        // Engine Status Card
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -3725,7 +3957,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         ),
         const SizedBox(height: 14),
 
-        // Bypass Iran Switch
         _buildSettingsSwitch(
           title: I18n.t('bypass_iran_title'),
           subtitle: I18n.t('bypass_iran_desc'),
@@ -3737,7 +3968,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           },
         ),
 
-        // Bypass LAN Switch
         _buildSettingsSwitch(
           title: I18n.t('bypass_lan_title'),
           subtitle: I18n.t('bypass_lan_desc'),
@@ -3749,7 +3979,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           },
         ),
 
-        // Foreground Service Notification Switch
         _buildSettingsSwitch(
           title: I18n.t('notif_settings_title'),
           subtitle: I18n.t('notif_settings_desc'),
@@ -3766,7 +3995,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
         const SizedBox(height: 14),
 
-        // Rerun Setup Wizard Button
         ListTile(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -3784,7 +4012,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
         const SizedBox(height: 10),
 
-        // Telegram Support Button
         ListTile(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -3803,7 +4030,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
         const SizedBox(height: 10),
 
-        // Logs Viewer Button
         ListTile(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -4107,11 +4333,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                   }
                                 });
 
+                                final subId = 'sub_${DateTime.now().millisecondsSinceEpoch}';
                                 fetchedSub = SubscriptionInfo.fromHeader(userInfoHeader, input);
-                                parsedProfiles = ConfigLinkParser.parseMultiple(response.body);
+                                parsedProfiles = ConfigLinkParser.parseMultiple(response.body, subscriptionId: subId);
 
                                 final subItem = SubscriptionItem(
-                                  id: 'sub_${DateTime.now().millisecondsSinceEpoch}',
+                                  id: subId,
                                   name: 'Subscription ${_subscriptions.length + 1}',
                                   url: input,
                                   upload: fetchedSub.uploadBytes,
@@ -4123,14 +4350,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                 );
                                 setState(() {
                                   _subscriptions.add(subItem);
+                                  _activeSubscriptionId = subItem.id;
                                 });
                               } else {
                                 throw Exception('HTTP ${response.statusCode}');
                               }
                             } else {
-                              parsedProfiles = ConfigLinkParser.parseMultiple(input);
+                              parsedProfiles = ConfigLinkParser.parseMultiple(input, subscriptionId: _activeSubscriptionId);
                               if (parsedProfiles.isEmpty) {
-                                final single = ConfigLinkParser.parse(input);
+                                final single = ConfigLinkParser.parse(input, subscriptionId: _activeSubscriptionId);
                                 if (single != null) {
                                   parsedProfiles = [single];
                                 }
