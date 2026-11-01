@@ -42,7 +42,6 @@ class VelocityColors {
   static const Color neonGreen = Color(0xFF00FF88);
   static const Color neonPink = Color(0xFFFF1744);
   static const Color neonYellow = Color(0xFFFFD600);
-  static const Color neonViolet = Color(0xFFD500F9);
   static const Color neonAmber = Color(0xFFFF9100);
 
   // Typography
@@ -63,8 +62,6 @@ class I18n {
     'app_title': {'en': 'VELOCITY', 'fa': 'ولوسیتی'},
     'subtitle_tagline': {'en': 'XRAY ULTRA TUNNEL', 'fa': 'تونل فوق‌پیشرفته Xray'},
     'telegram_support': {'en': 'Telegram Support', 'fa': 'پشتیبانی تلگرام'},
-    'telegram_channel': {'en': '@VelocityVPN_Official', 'fa': '@VelocityVPN_Official'},
-    'telegram_support_user': {'en': '@Velocity_Support', 'fa': '@Velocity_Support'},
     'status_connected': {'en': 'SECURE TUNNEL ACTIVE', 'fa': 'تونل امن Xray متصل است'},
     'status_disconnected': {'en': 'DISCONNECTED', 'fa': 'قطع ارتباط'},
     'status_connecting': {'en': 'CONNECTING TO XRAY...', 'fa': 'در حال اتصال به هسته Xray...'},
@@ -78,16 +75,10 @@ class I18n {
     'testing_ping': {'en': 'Measuring...', 'fa': 'در حال تست...'},
     'download_speed': {'en': 'DOWNLOAD', 'fa': 'دریافت'},
     'upload_speed': {'en': 'UPLOAD', 'fa': 'ارسال'},
-    'total_down': {'en': 'Down:', 'fa': 'دانلود:'},
-    'total_up': {'en': 'Up:', 'fa': 'آپلود:'},
     'routing_mode': {'en': 'Routing Mode', 'fa': 'حالت مسیریابی'},
-    'mode_rule': {'en': 'Smart Rule', 'fa': 'هوشمند'},
     'mode_global': {'en': 'Global Proxy', 'fa': 'سراسری'},
-    'mode_direct': {'en': 'Direct Bypass', 'fa': 'مستقیم'},
     'mode_bypass_lan': {'en': 'Bypass Iran/LAN', 'fa': 'دور زدن ایران و شبکه داخلی'},
-    'receipt_title': {'en': 'Velocity VIP Activation', 'fa': 'فعال‌سازی اشتراک VIP ولوسیتی'},
-    'receipt_desc': {'en': 'Upload transaction slip or purchase via Telegram support', 'fa': 'خرید یا تمدید اشتراک VIP از طریق پشتیبانی تلگرام'},
-    'import_config': {'en': 'Import Config', 'fa': 'افزودن کانفیگ / لینک'},
+    'import_config': {'en': 'Import Config', 'fa': 'افزودن کانفیگ / سابسکریپشن'},
     'import_prompt': {'en': 'Paste vless://, vmess://, trojan://, ss://, hy2:// or Subscription URL (http/https)', 'fa': 'لینک کانفیگ (vless, vmess, trojan, ss, hy2) یا لینک سابسکریپشن (http/https) را وارد کنید:'},
     'import_btn': {'en': 'Import & Test', 'fa': 'افزودن و تست سرورها'},
     'cancel': {'en': 'Cancel', 'fa': 'انصراف'},
@@ -103,10 +94,6 @@ class I18n {
       'en': 'Subscription Quota',
       'fa': 'حجم و اعتبار اشتراک',
     },
-    'subscription_imported': {
-      'en': 'Subscription imported successfully!',
-      'fa': 'سابسکریپشن با موفقیت دریافت و ذخیره گردید!',
-    },
     'fetching_sub': {
       'en': 'Fetching subscription & parsing nodes...',
       'fa': 'در حال دریافت سابسکریپشن و پردازش سرورها...',
@@ -117,18 +104,6 @@ class I18n {
     },
     'delete_node': {'en': 'Delete Node', 'fa': 'حذف سرور'},
     'clear_all_nodes': {'en': 'Clear All Nodes', 'fa': 'حذف تمام سرورها'},
-    'plan_select': {'en': 'Select Velocity Plan', 'fa': 'انتخاب پلن اشتراک ولوسیتی'},
-    'telegram_direct_buy': {
-      'en': 'Instant purchase & 24/7 VIP support available via Telegram.',
-      'fa': 'خرید فوری، تست رایگان و پشتیبانی ۲۴ ساعته از طریق تلگرام رسمی ولوسیتی.'
-    },
-    'open_telegram': {'en': 'Open Telegram', 'fa': 'ارتباط با پشتیبانی'},
-    'telegram_checkout_btn': {
-      'en': 'Contact Telegram Support to Buy & Activate',
-      'fa': 'ارتباط با تلگرام جهت خرید و فعال‌سازی فوری',
-    },
-    'close': {'en': 'Close', 'fa': 'بستن'},
-    'connected_time': {'en': 'Duration', 'fa': 'مدت اتصال'},
     'search_nodes': {'en': 'Search servers or protocols...', 'fa': 'جستجوی سرور یا پروتکل...'},
     'no_nodes_found': {'en': 'No servers match your filter.', 'fa': 'سروری مطابق جستجوی شما یافت نشد.'},
     'log_viewer_title': {'en': 'Xray Diagnostics & Logs', 'fa': 'لاگ‌ها و عیب‌یابی هسته Xray'},
@@ -139,7 +114,6 @@ class I18n {
     'no_logs_yet': {'en': 'No connection events recorded yet.', 'fa': 'هنوز رویدادی ثبت نشده است.'},
     'tab_home': {'en': 'Home', 'fa': 'خانه'},
     'tab_servers': {'en': 'Servers', 'fa': 'سرورها'},
-    'tab_vip': {'en': 'VIP Plans', 'fa': 'اشتراک VIP'},
     'tab_settings': {'en': 'Settings', 'fa': 'تنظیمات'},
     'bypass_iran_title': {'en': 'Bypass Iran (Domestic Sites)', 'fa': 'دور زدن سایت‌های داخلی (Bypass Iran)'},
     'bypass_iran_desc': {'en': 'Directly route Iranian banking, .ir domains and domestic apps', 'fa': 'عبور مستقیم سایت‌های بانکی و دامنه‌های ir بدون فیلترشکن'},
@@ -149,8 +123,6 @@ class I18n {
     'notif_settings_desc': {'en': 'Prevents Android OS from stopping the VPN in background', 'fa': 'جلوگیری از قطع شدن اتصال در پس‌زمینه توسط بهینه‌ساز باتری اندروید'},
     'perm_declined': {'en': 'VPN permission is required to create tunnel.', 'fa': 'برای برقراری اتصال امن، تایید دسترسی VPN الزامی است.'},
     'sort_lowest_ping': {'en': 'Sort by Ping', 'fa': 'چینش بر اساس کمترین پینگ'},
-    'sub_active': {'en': 'ACTIVE VIP', 'fa': 'اشتراک فعال'},
-    'sub_free': {'en': 'FREE TIER', 'fa': 'نسخه پایه'},
     'sub_expiry': {'en': 'Expiry:', 'fa': 'انقضا:'},
     'xray_core_title': {'en': 'Core Engine: Xray v26.9.9 (15-Protocol Ready)', 'fa': 'موتور هسته: Xray v26.9.9 (پشتیبانی کامل از ۱۵ پروتکل)'},
     'xray_core_desc': {'en': 'Native TUN VPN adapter with REALITY, TLS 1.3, VMess, Trojan, Shadowsocks, and Hysteria 2', 'fa': 'پشتیبانی بومی از VLESS Reality، پروتکل‌های مدرن TLS 1.3، هیتلریا ۲ و تمام پروتکل‌های نسل جدید و قدیم'},
@@ -230,7 +202,7 @@ class VelocityEmblemWidget extends StatelessWidget {
 // ---------------------------------------------------------------------------
 enum VpnState { disconnected, connecting, connected, disconnecting }
 
-enum RoutingMode { rule, bypassLan, global, direct }
+enum RoutingMode { bypassLan, global }
 
 enum VpnProtocol { vless, vmess, trojan, hysteria2, shadowsocks }
 
@@ -395,9 +367,9 @@ class ServerProfile {
     if (pingMs == null) return VelocityColors.textMuted;
     if (pingMs! < 0) return VelocityColors.neonPink;
     if (pingMs! < 120) return VelocityColors.neonGreen;
-    if (pingMs! < 260) return VelocityColors.electricCyan;
+    if (pingMs! < 250) return VelocityColors.electricCyan;
     if (pingMs! < 450) return VelocityColors.neonYellow;
-    return VelocityColors.neonPink;
+    return VelocityColors.neonAmber;
   }
 
   String get pingDisplay {
@@ -537,35 +509,6 @@ class ConfigLinkParser {
     }
     return results;
   }
-}
-
-// ---------------------------------------------------------------------------
-// Velocity Plans
-// ---------------------------------------------------------------------------
-class VelocityPlan {
-  final String id;
-  final String name;
-  final String dataQuota;
-  final int durationDays;
-  final String priceTomans;
-  final String priceUsdt;
-  final String protocolType;
-  final bool isActive;
-  final String badge;
-  final String nodesDescription;
-
-  VelocityPlan({
-    required this.id,
-    required this.name,
-    required this.dataQuota,
-    required this.durationDays,
-    required this.priceTomans,
-    required this.priceUsdt,
-    required this.protocolType,
-    required this.isActive,
-    required this.badge,
-    required this.nodesDescription,
-  });
 }
 
 // ---------------------------------------------------------------------------
@@ -738,7 +681,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
 
-  // Real Xray Core Plugin Controller
+  // Real Xray Core Controller
   late final V2ray _v2ray;
 
   // Telemetry
@@ -746,14 +689,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   int _connectedSeconds = 0;
   String _displayDownloadSpeed = '0.0 KB/s';
   String _displayUploadSpeed = '0.0 KB/s';
-  double _totalDownloadMb = 0.0;
-  double _totalUploadMb = 0.0;
 
   final List<ServerProfile> _servers = [];
   final List<String> _connectionLogs = [];
   ServerProfile? _selectedServer;
   SubscriptionInfo? _subscriptionInfo;
 
+  // 3 Tabs: 0: Home, 1: Servers, 2: Settings (VIP completely removed)
   int _currentTabIndex = 0;
   String _nodeSearchQuery = '';
   bool _sortByLowestPing = false;
@@ -761,7 +703,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   bool _bypassLan = true;
   bool _notificationsEnabled = true;
 
-  // Iran & LAN bypass CIDR subnets
+  // Subnets to bypass when Bypass Iran or LAN is on
   static const List<String> _bypassSubnets = [
     '0.0.0.0/8',
     '10.0.0.0/8',
@@ -779,45 +721,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     '224.0.0.0/4',
     '240.0.0.0/4',
     '255.255.255.255/32',
-  ];
-
-  final List<VelocityPlan> _plans = [
-    VelocityPlan(
-      id: 'plan-1',
-      name: 'Velocity VIP 30-Day',
-      dataQuota: '50 GB High-Speed',
-      durationDays: 30,
-      priceTomans: '۲۹۰,۰۰۰ تومان',
-      priceUsdt: '\$4.99 USDT',
-      protocolType: 'VLESS Reality + TLS 1.3',
-      isActive: true,
-      badge: 'محبوب‌ترین',
-      nodesDescription: 'سرورهای اختصاصی پرسرعت آلمان، فنلاند و هلند',
-    ),
-    VelocityPlan(
-      id: 'plan-2',
-      name: 'Velocity Turbo 90-Day',
-      dataQuota: '150 GB Turbo UDP',
-      durationDays: 90,
-      priceTomans: '۷۹۰,۰۰۰ تومان',
-      priceUsdt: '\$11.99 USDT',
-      protocolType: 'Hysteria 2 UDP + Reality',
-      isActive: true,
-      badge: 'به‌صرفه',
-      nodesDescription: 'مخصوص گیمینگ و استریم بدون پکت‌لاس با پینگ پایین',
-    ),
-    VelocityPlan(
-      id: 'plan-3',
-      name: 'Velocity Enterprise Annual',
-      dataQuota: 'نامحدود (Dedicated IP)',
-      durationDays: 365,
-      priceTomans: '۲,۵۰۰,۰۰۰ تومان',
-      priceUsdt: '\$39.99 USDT',
-      protocolType: 'Multi-Protocol Dedicated IP',
-      isActive: true,
-      badge: 'VIP اختصاصی',
-      nodesDescription: 'آی‌پی اختصاصی تمیز و پشتیبانی اولویت‌دار اختصاصی',
-    ),
   ];
 
   @override
@@ -849,10 +752,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         notificationIconResourceType: "mipmap",
         notificationIconResourceName: "ic_launcher",
       );
-      _addConnectionLog('[Xray Core] Initialized (Xray-Core v26 Multi-Protocol Engine Active)');
-    } catch (e) {
-      _addConnectionLog('[Xray Core Initialized] Ready');
-    }
+      _addConnectionLog('[Xray Core] Initialized (Xray-Core v26 Multi-Protocol Engine Ready)');
+    } catch (_) {}
   }
 
   void _handleV2RayStatus(V2RayStatus status) {
@@ -1005,7 +906,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         return;
       }
 
-      // Check VPN permission
       bool granted = false;
       try {
         granted = await _v2ray.requestPermission();
@@ -1119,24 +1019,30 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   // -------------------------------------------------------------------------
-  // Real Xray Delay & Socket Ping
+  // Smart Multi-Strategy Ping Engine (Real Xray Handshake + TLS/SNI Fallback)
   // -------------------------------------------------------------------------
   Future<void> _pingAllServers() async {
+    if (_servers.isEmpty) return;
+
     setState(() {
       for (var s in _servers) {
         s.isTesting = true;
       }
     });
 
-    _addConnectionLog('[Xray Ping All] Measuring latencies across ${_servers.length} nodes...');
+    _addConnectionLog('[Smart Ping] Batch measuring ${_servers.length} nodes...');
 
-    for (var server in _servers) {
+    // Run parallel batches of 4 servers at a time for high speed and accuracy
+    const batchSize = 4;
+    for (int i = 0; i < _servers.length; i += batchSize) {
       if (!mounted) return;
-      await _pingSingleServer(server, log: false);
+      final end = (i + batchSize < _servers.length) ? i + batchSize : _servers.length;
+      final batch = _servers.sublist(i, end);
+      await Future.wait(batch.map((s) => _pingSingleServer(s, log: false)));
     }
 
     if (mounted) {
-      _addConnectionLog('[Xray Ping All] Completed.');
+      _addConnectionLog('[Smart Ping] Latency check completed for all nodes.');
     }
   }
 
@@ -1144,6 +1050,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     setState(() => server.isTesting = true);
 
     int delay = -1;
+
+    // Strategy 1: Real Xray Core Delay Test
     try {
       delay = await _v2ray.getServerDelay(url: server.rawUrl);
     } catch (_) {
@@ -1153,14 +1061,40 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       } catch (_) {}
     }
 
+    // Strategy 2: If Xray core delay is <= 0 or unavailable, perform real TLS Handshake Probe
     if (delay <= 0) {
-      // Fallback TCP Socket Probe
       final sw = Stopwatch()..start();
       try {
-        final s = await Socket.connect(server.host, server.port, timeout: const Duration(seconds: 2));
-        sw.stop();
-        s.destroy();
-        delay = sw.elapsedMilliseconds;
+        final targetHost = server.host.trim();
+        final targetSni = server.sni.isNotEmpty ? server.sni.trim() : targetHost;
+
+        // Try SecureSocket first if server uses TLS or port 443
+        if (server.port == 443 || server.protocol == VpnProtocol.vless || server.protocol == VpnProtocol.trojan) {
+          try {
+            final secSocket = await SecureSocket.connect(
+              targetHost,
+              server.port,
+              host: targetSni,
+              timeout: const Duration(milliseconds: 3500),
+              onBadCertificate: (_) => true,
+            );
+            sw.stop();
+            secSocket.destroy();
+            delay = sw.elapsedMilliseconds;
+          } catch (_) {
+            // If secure handshake failed, fallback to plain TCP
+            final socket = await Socket.connect(targetHost, server.port, timeout: const Duration(milliseconds: 3500));
+            sw.stop();
+            socket.destroy();
+            delay = sw.elapsedMilliseconds;
+          }
+        } else {
+          // Standard TCP socket
+          final socket = await Socket.connect(targetHost, server.port, timeout: const Duration(milliseconds: 3500));
+          sw.stop();
+          socket.destroy();
+          delay = sw.elapsedMilliseconds;
+        }
       } catch (_) {
         sw.stop();
         delay = -1;
@@ -1311,7 +1245,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   // -------------------------------------------------------------------------
-  // Main Build
+  // Main Build: 3 Clean Tabs (Home, Servers, Settings)
   // -------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
@@ -1324,7 +1258,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           children: [
             _buildHomeTab(),
             _buildServersTab(),
-            _buildVipTab(),
             _buildSettingsTab(),
           ],
         ),
@@ -1354,10 +1287,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               label: I18n.t('tab_servers'),
             ),
             BottomNavigationBarItem(
-              icon: const Icon(Icons.star_rounded),
-              label: I18n.t('tab_vip'),
-            ),
-            BottomNavigationBarItem(
               icon: const Icon(Icons.tune_rounded),
               label: I18n.t('tab_settings'),
             ),
@@ -1371,7 +1300,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   // Top App Bar
   // -------------------------------------------------------------------------
   PreferredSizeWidget _buildTopAppBar() {
-    final isConnected = _vpnState == VpnState.connected;
     final isFa = widget.currentLang == AppLanguage.fa;
 
     return AppBar(
@@ -1451,28 +1379,17 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   Widget _buildHomeTab() {
     return Column(
       children: [
-        // Routing selector chips
         _buildRoutingChips(),
-
-        // Status Header
         const SizedBox(height: 10),
         _buildStatusHeader(),
-
-        // Power Switch
         Expanded(
           child: Center(
             child: _buildGlowingPowerButton(),
           ),
         ),
-
-        // Live Speed HUD Card
         _buildTelemetryCard(),
-
         const SizedBox(height: 12),
-
-        // Active Node Quick Select Card
         _buildActiveServerCard(),
-
         const SizedBox(height: 14),
       ],
     );
@@ -1629,7 +1546,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  // Outer Ring
                   Container(
                     width: 210,
                     height: 210,
@@ -1641,7 +1557,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       ),
                     ),
                   ),
-                  // Middle Aura Ring
                   Container(
                     width: 170,
                     height: 170,
@@ -1659,7 +1574,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       ),
                     ),
                   ),
-                  // Central Core Button
                   Container(
                     width: 130,
                     height: 130,
@@ -1734,7 +1648,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       ),
       child: Row(
         children: [
-          // Download Speed
           Expanded(
             child: Row(
               children: [
@@ -1775,7 +1688,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           ),
           Container(width: 1, height: 36, color: VelocityColors.borderDark),
           const SizedBox(width: 12),
-          // Upload Speed
           Expanded(
             child: Row(
               children: [
@@ -2025,7 +1937,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
     return Column(
       children: [
-        // Sub Info Card if available
         if (_subscriptionInfo != null) _buildSubscriptionCard(),
 
         // Header
@@ -2424,219 +2335,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   // -------------------------------------------------------------------------
-  // Tab 2: VIP Tab
-  // -------------------------------------------------------------------------
-  Widget _buildVipTab() {
-    final isFa = widget.currentLang == AppLanguage.fa;
-
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        // VIP Banner
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [VelocityColors.surfaceElevated, Color(0xFF161028)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: VelocityColors.neonYellow.withOpacity(0.6), width: 1.2),
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: VelocityColors.neonYellow.withOpacity(0.15),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: VelocityColors.neonYellow),
-                ),
-                child: const Icon(Icons.workspace_premium_rounded, color: VelocityColors.neonYellow, size: 26),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      isFa ? 'سرویس‌های اختصاصی VIP ولوسیتی' : 'VELOCITY VIP NETWORKS',
-                      style: const TextStyle(
-                        color: VelocityColors.textPrimary,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      isFa
-                          ? 'پروتکل‌های ضد فیلتر VLESS Reality و Hysteria 2 با آی‌پی تمیز و گارانتی سرعت'
-                          : 'Dedicated anti-censorship TLS 1.3 & Hysteria 2 UDP with clean IPs',
-                      style: const TextStyle(
-                        color: VelocityColors.textSecondary,
-                        fontSize: 11,
-                        height: 1.3,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 14),
-
-        // Telegram Support Button
-        InkWell(
-          onTap: _openTelegramSupport,
-          borderRadius: BorderRadius.circular(14),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            decoration: BoxDecoration(
-              color: const Color(0xFF0F1E2E),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: VelocityColors.electricCyan, width: 1.5),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: const BoxDecoration(
-                    color: VelocityColors.electricCyan,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.send_rounded, color: VelocityColors.pureBlack, size: 18),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        I18n.t('telegram_checkout_btn'),
-                        style: const TextStyle(
-                          color: VelocityColors.electricCyan,
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        I18n.t('telegram_direct_buy'),
-                        style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 10.5),
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(Icons.arrow_forward_ios_rounded, color: VelocityColors.electricCyan, size: 14),
-              ],
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 18),
-
-        // Plans
-        ..._plans.map((plan) {
-          return Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: VelocityColors.surfaceDark,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: VelocityColors.borderDark),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      plan.name,
-                      style: const TextStyle(
-                        color: VelocityColors.textPrimary,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: VelocityColors.neonYellow.withOpacity(0.18),
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: VelocityColors.neonYellow),
-                      ),
-                      child: Text(
-                        plan.badge,
-                        style: const TextStyle(
-                          color: VelocityColors.neonYellow,
-                          fontSize: 9.5,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    const Icon(Icons.data_usage_rounded, color: VelocityColors.electricCyan, size: 14),
-                    const SizedBox(width: 4),
-                    Text(plan.dataQuota, style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 12)),
-                    const SizedBox(width: 12),
-                    const Icon(Icons.timer_rounded, color: VelocityColors.textSecondary, size: 14),
-                    const SizedBox(width: 4),
-                    Text('${plan.durationDays} ${isFa ? "روزه" : "Days"}', style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 12)),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(plan.nodesDescription, style: const TextStyle(color: VelocityColors.textMuted, fontSize: 11)),
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          plan.priceTomans,
-                          style: const TextStyle(color: VelocityColors.neonGreen, fontSize: 13, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          plan.priceUsdt,
-                          style: const TextStyle(color: VelocityColors.textMuted, fontSize: 10),
-                        ),
-                      ],
-                    ),
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: VelocityColors.electricCyan,
-                        foregroundColor: VelocityColors.pureBlack,
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                      onPressed: _openTelegramSupport,
-                      icon: const Icon(Icons.send_rounded, size: 14),
-                      label: Text(
-                        isFa ? 'خرید از تلگرام' : 'Buy via Telegram',
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          );
-        }),
-      ],
-    );
-  }
-
-  // -------------------------------------------------------------------------
-  // Tab 3: Settings Tab
+  // Tab 2: Settings Tab
   // -------------------------------------------------------------------------
   Widget _buildSettingsTab() {
     return ListView(
@@ -2691,7 +2390,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
         const SizedBox(height: 14),
 
-        // Bypass Iran
+        // Bypass Iran Switch
         _buildSettingsSwitch(
           title: I18n.t('bypass_iran_title'),
           subtitle: I18n.t('bypass_iran_desc'),
@@ -2703,7 +2402,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           },
         ),
 
-        // Bypass LAN
+        // Bypass LAN Switch
         _buildSettingsSwitch(
           title: I18n.t('bypass_lan_title'),
           subtitle: I18n.t('bypass_lan_desc'),
@@ -2715,7 +2414,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           },
         ),
 
-        // Notifications
+        // Foreground Service Notification Switch
         _buildSettingsSwitch(
           title: I18n.t('notif_settings_title'),
           subtitle: I18n.t('notif_settings_desc'),
