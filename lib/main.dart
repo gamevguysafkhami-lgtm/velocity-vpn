@@ -1053,11 +1053,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
     // Strategy 1: Real Xray Core Delay Test
     try {
-      delay = await _v2ray.getServerDelay(url: server.rawUrl);
+      final parsed = V2ray.parseFromURL(server.rawUrl);
+      delay = await _v2ray.getServerDelay(config: parsed.getFullConfiguration());
     } catch (_) {
       try {
-        final parsed = V2ray.parseFromURL(server.rawUrl);
-        delay = await _v2ray.getServerDelay(config: parsed.getFullConfiguration());
+        delay = await _v2ray.getServerDelay(config: server.rawUrl);
       } catch (_) {}
     }
 
@@ -1066,7 +1066,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       final sw = Stopwatch()..start();
       try {
         final targetHost = server.host.trim();
-        final targetSni = server.sni.isNotEmpty ? server.sni.trim() : targetHost;
 
         // Try SecureSocket first if server uses TLS or port 443
         if (server.port == 443 || server.protocol == VpnProtocol.vless || server.protocol == VpnProtocol.trojan) {
@@ -1074,7 +1073,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             final secSocket = await SecureSocket.connect(
               targetHost,
               server.port,
-              host: targetSni,
               timeout: const Duration(milliseconds: 3500),
               onBadCertificate: (_) => true,
             );
