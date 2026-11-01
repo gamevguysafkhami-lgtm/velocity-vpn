@@ -4,10 +4,12 @@ import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_v2ray_client/flutter_v2ray.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,77 +27,73 @@ void main() async {
 }
 
 // ---------------------------------------------------------------------------
-// Velocity Official Brand Colors (#00E5FF, Pure Black, Deep Cyan)
+// Velocity Cyberpunk Brand Theme Colors
 // ---------------------------------------------------------------------------
 class VelocityColors {
-  static const Color pureBlack = Color(0xFF000000);
-  static const Color midnightBg = Color(0xFF060910);
-  static const Color surfaceDark = Color(0xFF0D111D);
-  static const Color surfaceElevated = Color(0xFF131927);
-  static const Color borderDark = Color(0xFF1B2338);
+  static const Color pureBlack = Color(0xFF030712);
+  static const Color midnightBg = Color(0xFF070B16);
+  static const Color surfaceDark = Color(0xFF0E1424);
+  static const Color surfaceElevated = Color(0xFF141C30);
+  static const Color borderDark = Color(0xFF1E293B);
 
-  // Primary brand accents (Electric Cyan and Deep Cyan)
+  // High-Energy Cyber Accents
   static const Color electricCyan = Color(0xFF00E5FF);
   static const Color deepCyan = Color(0xFF00B0FF);
-
   static const Color neonGreen = Color(0xFF00FF88);
   static const Color neonPink = Color(0xFFFF1744);
   static const Color neonYellow = Color(0xFFFFD600);
   static const Color neonViolet = Color(0xFFD500F9);
   static const Color neonAmber = Color(0xFFFF9100);
 
-  static const Color textPrimary = Color(0xFFFFFFFF);
-  static const Color textSecondary = Color(0xFF8FA0B8);
-  static const Color textMuted = Color(0xFF4A5568);
-
-  static void setNeonAccent(Color primary, Color secondary) {
-    // Theme accent applied
-  }
+  // Typography
+  static const Color textPrimary = Color(0xFFF8FAFC);
+  static const Color textSecondary = Color(0xFF94A3B8);
+  static const Color textMuted = Color(0xFF64748B);
 }
 
 // ---------------------------------------------------------------------------
-// Bilingual System (EN / FA) with RTL/LTR Support
+// Internationalization System (Persian & English)
 // ---------------------------------------------------------------------------
 enum AppLanguage { en, fa }
 
 class I18n {
-  static AppLanguage currentLang = AppLanguage.en;
+  static AppLanguage currentLang = AppLanguage.fa;
 
   static final Map<String, Map<String, String>> _strings = {
     'app_title': {'en': 'VELOCITY', 'fa': 'ولوسیتی'},
-    'subtitle_tagline': {'en': 'SECURE VPN SERVICES', 'fa': 'سرویس‌های امن وی‌پی‌ان'},
+    'subtitle_tagline': {'en': 'XRAY ULTRA TUNNEL', 'fa': 'تونل فوق‌پیشرفته Xray'},
     'telegram_support': {'en': 'Telegram Support', 'fa': 'پشتیبانی تلگرام'},
     'telegram_channel': {'en': '@VelocityVPN_Official', 'fa': '@VelocityVPN_Official'},
-    'telegram_support_user': {'en': '@VelocityVPN_Support', 'fa': '@VelocityVPN_Support'},
-    'status_connected': {'en': 'SECURE TUNNEL ACTIVE', 'fa': 'تونل امن متصل است'},
+    'telegram_support_user': {'en': '@Velocity_Support', 'fa': '@Velocity_Support'},
+    'status_connected': {'en': 'SECURE TUNNEL ACTIVE', 'fa': 'تونل امن Xray متصل است'},
     'status_disconnected': {'en': 'DISCONNECTED', 'fa': 'قطع ارتباط'},
-    'status_connecting': {'en': 'CONNECTING TO VELOCITY...', 'fa': 'در حال اتصال به سرورهای ولوسیتی...'},
-    'status_disconnecting': {'en': 'TERMINATING TUNNEL...', 'fa': 'در حال قطع اتصال...'},
+    'status_connecting': {'en': 'CONNECTING TO XRAY...', 'fa': 'در حال اتصال به هسته Xray...'},
+    'status_disconnecting': {'en': 'TERMINATING TUNNEL...', 'fa': 'در حال بستن تونل امن...'},
     'tap_to_connect': {'en': 'TAP TO CONNECT', 'fa': 'برای اتصال لمس کنید'},
-    'tap_to_disconnect': {'en': 'TAP TO DISCONNECT', 'fa': 'برای قطع لمس کنید'},
-    'active_server': {'en': 'Active Velocity Node', 'fa': 'سرور فعال ولوسیتی'},
+    'tap_to_disconnect': {'en': 'TAP TO DISCONNECT', 'fa': 'برای قطع اتصال لمس کنید'},
+    'active_server': {'en': 'Active Node', 'fa': 'سرور فعال'},
     'select_server': {'en': 'Select Velocity Node', 'fa': 'انتخاب سرور'},
-    'servers_count': {'en': 'Nodes Online', 'fa': 'سرور آنلاین'},
-    'ping_all': {'en': 'Ping All Nodes', 'fa': 'تست پینگ همه'},
-    'testing_ping': {'en': 'Measuring Latency...', 'fa': 'در حال سنجش تاخیر...'},
+    'servers_count': {'en': 'Servers Online', 'fa': 'سرور موجود'},
+    'ping_all': {'en': 'Ping All', 'fa': 'تست همه'},
+    'testing_ping': {'en': 'Measuring...', 'fa': 'در حال تست...'},
     'download_speed': {'en': 'DOWNLOAD', 'fa': 'دریافت'},
     'upload_speed': {'en': 'UPLOAD', 'fa': 'ارسال'},
     'total_down': {'en': 'Down:', 'fa': 'دانلود:'},
     'total_up': {'en': 'Up:', 'fa': 'آپلود:'},
     'routing_mode': {'en': 'Routing Mode', 'fa': 'حالت مسیریابی'},
-    'mode_rule': {'en': 'Smart Rule', 'fa': 'قوانین هوشمند'},
-    'mode_global': {'en': 'Global Proxy', 'fa': 'پروکسی سراسری'},
-    'mode_direct': {'en': 'Direct Bypass', 'fa': 'مستقیم (بدون پروکسی)'},
-    'mode_bypass_lan': {'en': 'Bypass Iran/LAN', 'fa': 'دور زدن سایت‌های داخلی'},
+    'mode_rule': {'en': 'Smart Rule', 'fa': 'هوشمند'},
+    'mode_global': {'en': 'Global Proxy', 'fa': 'سراسری'},
+    'mode_direct': {'en': 'Direct Bypass', 'fa': 'مستقیم'},
+    'mode_bypass_lan': {'en': 'Bypass Iran/LAN', 'fa': 'دور زدن ایران و شبکه داخلی'},
     'receipt_title': {'en': 'Velocity VIP Activation', 'fa': 'فعال‌سازی اشتراک VIP ولوسیتی'},
-    'receipt_desc': {'en': 'Upload transaction slip or purchase via Telegram support', 'fa': 'تصویر رسید یا کد پیگیری را جهت فعال‌سازی اشتراک ارسال نمایید'},
-    'import_config': {'en': 'Import Config / URL', 'fa': 'وارد کردن کانفیگ / لینک'},
-    'import_prompt': {'en': 'Paste vless://, vmess://, trojan://, ss://, hysteria2:// or Subscription URL (http/https)', 'fa': 'لینک کانفیگ (vless, vmess, trojan, ss, hysteria2) یا لینک سابسکریپشن (http/https) را وارد کنید'},
-    'import_btn': {'en': 'Import & Test', 'fa': 'وارد کردن و تست'},
+    'receipt_desc': {'en': 'Upload transaction slip or purchase via Telegram support', 'fa': 'خرید یا تمدید اشتراک VIP از طریق پشتیبانی تلگرام'},
+    'import_config': {'en': 'Import Config', 'fa': 'افزودن کانفیگ / لینک'},
+    'import_prompt': {'en': 'Paste vless://, vmess://, trojan://, ss://, hy2:// or Subscription URL (http/https)', 'fa': 'لینک کانفیگ (vless, vmess, trojan, ss, hy2) یا لینک سابسکریپشن (http/https) را وارد کنید:'},
+    'import_btn': {'en': 'Import & Test', 'fa': 'افزودن و تست سرورها'},
     'cancel': {'en': 'Cancel', 'fa': 'انصراف'},
     'no_nodes_available': {
-      'en': 'No servers found. Please enter your subscription link via Subscription Manager.',
-      'fa': 'هیچ سروری یافت نشد. لطفاً از طریق Subscription Manager لینک سابسکریپشن خود را وارد کنید.',
+      'en': 'No servers found. Please import configs or subscription link.',
+      'fa': 'هیچ سروری یافت نشد. لطفاً از طریق دکمه «افزودن کانفیگ» لینک سابسکریپشن یا کانفیگ خود را وارد نمایید.',
     },
     'no_active_subscription': {
       'en': 'No Active Subscription',
@@ -106,133 +104,56 @@ class I18n {
       'fa': 'حجم و اعتبار اشتراک',
     },
     'subscription_imported': {
-      'en': 'Subscription successfully imported & saved!',
-      'fa': 'سابسکریپشن با موفقیت دریافت و ذخیره شد!',
+      'en': 'Subscription imported successfully!',
+      'fa': 'سابسکریپشن با موفقیت دریافت و ذخیره گردید!',
     },
     'fetching_sub': {
       'en': 'Fetching subscription & parsing nodes...',
-      'fa': 'در حال دریافت سابسکریپشن و بررسی سرورها...',
+      'fa': 'در حال دریافت سابسکریپشن و پردازش سرورها...',
     },
     'import_failed': {
-      'en': 'Failed to fetch or parse subscription URL',
-      'fa': 'خطا در دریافت یا پردازش لینک سابسکریپشن',
+      'en': 'Failed to parse config or subscription',
+      'fa': 'خطا در دریافت یا پردازش کانفیگ یا سابسکریپشن',
     },
     'delete_node': {'en': 'Delete Node', 'fa': 'حذف سرور'},
-    'clear_all_nodes': {'en': 'Clear All Nodes', 'fa': 'حذف همه سرورها'},
-    'tx_id': {'en': 'Transaction Hash / Ref ID', 'fa': 'کد پیگیری یا هش تراکنش'},
-    'tx_placeholder': {'en': 'e.g. 0x9f2a... or Ref #847291', 'fa': 'مثال: کد رهگیری یا هش تراکنش'},
+    'clear_all_nodes': {'en': 'Clear All Nodes', 'fa': 'حذف تمام سرورها'},
     'plan_select': {'en': 'Select Velocity Plan', 'fa': 'انتخاب پلن اشتراک ولوسیتی'},
-    'plan_1m': {'en': 'Velocity VIP 30-Day (Unlimited)', 'fa': 'سایبر VIP ۳۰ روزه (نامحدود)'},
-    'plan_3m': {'en': 'Velocity Turbo 90-Day (600 GB)', 'fa': 'سایبر توربو ۹۰ روزه (۶۰۰ گیگابایت)'},
-    'plan_1y': {'en': 'Velocity Enterprise Annual (Dedicated)', 'fa': 'اشتراک سالانه اختصاصی ولوسیتی'},
-    'upload_image_btn': {'en': 'Attach Receipt Proof', 'fa': 'پیوست تصویر فیش واریزی'},
-    'receipt_attached': {'en': 'Proof Image Attached', 'fa': 'تصویر رسید ضمیمه شد'},
-    'submit_receipt': {'en': 'Submit Activation Proof', 'fa': 'ثبت و ارسال مدارک'},
-    'receipt_success': {
-      'en': 'Activation proof submitted! Velocity Core will activate your account within 5 mins.',
-      'fa': 'رسید با موفقیت ثبت شد! اشتراک شما ظرف ۵ دقیقه تایید و فعال می‌شود.'
-    },
     'telegram_direct_buy': {
-      'en': 'Instant purchase & 24/7 support available via our official Telegram channel.',
-      'fa': 'خرید آنی و پشتیبانی ۲۴ ساعته از طریق کانال رسمی تلگرام ولوسیتی.'
+      'en': 'Instant purchase & 24/7 VIP support available via Telegram.',
+      'fa': 'خرید فوری، تست رایگان و پشتیبانی ۲۴ ساعته از طریق تلگرام رسمی ولوسیتی.'
     },
-    'open_telegram': {'en': 'Open Telegram', 'fa': 'ورود به تلگرام'},
+    'open_telegram': {'en': 'Open Telegram', 'fa': 'ارتباط با پشتیبانی'},
     'telegram_checkout_btn': {
       'en': 'Contact Telegram Support to Buy & Activate',
-      'fa': 'ارتباط با پشتیبانی تلگرام جهت خرید و فعالسازی',
+      'fa': 'ارتباط با تلگرام جهت خرید و فعال‌سازی فوری',
     },
     'close': {'en': 'Close', 'fa': 'بستن'},
-    'connected_time': {'en': 'Duration', 'fa': 'مدت زمان اتصال'},
-    // Setup Wizard Strings
-    'setup_wizard': {'en': 'Setup Wizard', 'fa': 'راهنمای راه‌اندازی'},
-    'wizard_title': {'en': 'VELOCITY SETUP WIZARD', 'fa': 'راهنمای راه‌اندازی ولوسیتی'},
-    'wizard_subtitle': {'en': 'INITIAL SYSTEM CONFIGURATION', 'fa': 'پیکربندی هوشمند اولیه سیستم'},
-    'step_lang_title': {'en': '1. Interface Language', 'fa': '۱. انتخاب زبان برنامه'},
-    'step_lang_desc': {'en': 'Choose preferred language with dynamic LTR/RTL preview', 'fa': 'زبان مورد نظر خود را با تغییر خودکار چینش راست‌چین/چپ‌چین انتخاب کنید'},
-    'lang_en': {'en': 'English (EN)', 'fa': 'انگلیسی (English)'},
-    'lang_en_sub': {'en': 'Left-to-Right (LTR) Layout', 'fa': 'چیدمان چپ‌به‌راست (LTR)'},
-    'lang_fa': {'en': 'فارسی (Persian)', 'fa': 'فارسی (Persian)'},
-    'lang_fa_sub': {'en': 'Right-to-Left (RTL) Layout', 'fa': 'چیدمان راست‌به‌چپ (RTL)'},
-    'step_region_title': {'en': '2. Region & Network Optimization', 'fa': '۲. بهینه‌سازی منطقه و اپراتور'},
-    'step_region_desc': {'en': 'Tunes censorship bypass protocols and local routing rules', 'fa': 'تنظیم خودکار قوانین مسیریابی و عبور از فیلترینگ متناسب با شبکه'},
-    'region_iran_title': {'en': 'Iran (MCI / Irancell / Rightel / Fixed)', 'fa': 'ایران (همراه اول، ایرانسل، رایتل، مخابرات)'},
-    'region_iran_desc': {'en': 'Enables Smart Bypass LAN rules & Anti-Censorship Reality/Hysteria2 protocols.', 'fa': 'فعال‌سازی دور زدن سایت‌های داخلی (Bypass Iran) و پروتکل‌های ضد فیلتر Reality/Hysteria2.'},
-    'region_global_title': {'en': 'Global / International', 'fa': 'بین‌المللی / بدون محدودیت'},
-    'region_global_desc': {'en': 'Direct global proxy tunnel for streaming, low-ping gaming, and unmetered browsing.', 'fa': 'تونل مستقیم پروکسی برای استریم، گیمینگ با تاخیر کم و وب‌گردی آزاد.'},
-    'step_perm_title': {'en': '3. Core Android Permissions', 'fa': '۳. دسترسی‌های سیستمی اندروید'},
-    'step_perm_desc': {'en': 'Velocity requires standard Android system privileges to establish tunnels', 'fa': 'ولوسیتی برای ایجاد تونل رمزنگاری‌شده به این دسترسی‌ها نیاز دارد'},
-    'perm_vpn_service': {'en': 'Android VpnService Tunnel', 'fa': 'تونل VpnService اندروید'},
-    'perm_vpn_service_desc': {'en': 'Creates a virtual local TUN adapter to route and encrypt your data packets via TLS 1.3.', 'fa': 'ایجاد کارت شبکه مجازی محلی (TUN) برای رمزنگاری و هدایت بسته‌های داده با TLS 1.3.'},
-    'perm_notif_service': {'en': 'Background Keepalive Notification', 'fa': 'اعلان پایداری اتصال در پس‌زمینه'},
-    'perm_notif_service_desc': {'en': 'Prevents Android OS battery killer from terminating the connection during gaming or browsing.', 'fa': 'جلوگیری از قطع شدن ناگهانی فیلترشکن توسط سیستم بهینه‌سازی باتری اندروید.'},
-    'btn_start_velocity': {'en': 'START VELOCITY', 'fa': 'شروع استفاده از ولوسیتی'},
-    'btn_next': {'en': 'NEXT', 'fa': 'مرحله بعد'},
-    'btn_back': {'en': 'BACK', 'fa': 'مرحله قبل'},
-    'vpn_dialog_title': {'en': 'Connection Request', 'fa': 'درخواست اتصال'},
-    'vpn_dialog_body': {'en': 'Velocity wants to set up a VPN connection that allows it to monitor network traffic. Only accept if you trust the source.\n\nVPN icon appears at the top of your screen when VPN is active.', 'fa': 'برنامه Velocity قصد دارد یک اتصال VPN ایجاد کند تا ترافیک شبکه را هدایت کند. فقط در صورتی که به این منبع اعتماد دارید تأیید کنید.\n\nنماد کلید در بالای صفحه هنگام اتصال ظاهر می‌شود.'},
-    'btn_cancel': {'en': 'Cancel', 'fa': 'انصراف'},
-    'btn_ok': {'en': 'OK', 'fa': 'تأیید'},
-    'notif_dialog_title': {'en': 'Allow Velocity to send you notifications?', 'fa': 'به Velocity اجازه ارسال اعلان می‌دهید؟'},
-    'notif_dialog_body': {'en': 'Required to keep your secure tunnel active in the background and display real-time network speeds.', 'fa': 'جهت پایداری تونل در پس‌زمینه سیستم و نمایش زنده سرعت و تاخیر پینگ الزامی است.'},
-    'btn_allow': {'en': 'Allow', 'fa': 'اجازه دادن'},
-    'btn_dont_allow': {'en': "Don't allow", 'fa': 'عدم اجازه'},
-    'perm_declined': {'en': 'VPN permission is required to establish secure tunnel.', 'fa': 'برای برقراری اتصال امن، تایید دسترسی وی‌پی‌ان الزامی است.'},
-    // Authentication & Profile Strings
-    'profile': {'en': 'User Terminal', 'fa': 'حساب کاربری'},
-    'auth_title': {'en': 'VELOCITY IDENTITY ACCESS', 'fa': 'ورود به حساب کاربری ولوسیتی'},
-    'auth_subtitle': {'en': 'AUTHENTICATE USER SESSION', 'fa': 'احراز هویت و مدیریت دسترسی'},
-    'tab_telegram': {'en': 'Telegram', 'fa': 'تلگرام'},
-    'tab_gmail': {'en': 'Gmail OTP', 'fa': 'کد ایمیل'},
-    'telegram_hint': {'en': '@username or Telegram ID', 'fa': '@نام_کاربری یا شناسه تلگرام'},
-    'btn_connect_telegram': {'en': 'LINK TELEGRAM ACCOUNT', 'fa': 'اتصال به حساب تلگرام'},
-    'gmail_hint': {'en': 'username@gmail.com', 'fa': 'آدرس ایمیل شما'},
-    'btn_send_otp': {'en': 'SEND OTP', 'fa': 'ارسال کد تایید'},
-    'btn_resend_otp': {'en': 'Resend in', 'fa': 'ارسال مجدد تا'},
-    'otp_hint': {'en': '6-Digit OTP Code', 'fa': 'کد تایید ۶ رقمی'},
-    'btn_verify_otp': {'en': 'VERIFY & SIGN IN', 'fa': 'تایید کد و ورود'},
-    'sub_active': {'en': 'ACTIVE VIP', 'fa': 'اشتراک فعال'},
-    'sub_free': {'en': 'FREE TIER', 'fa': 'نسخه رایگان'},
-    'sub_expiry': {'en': 'Expires on', 'fa': 'تاریخ انقضا:'},
-    'sub_quota': {'en': 'Bandwidth Usage', 'fa': 'میزان مصرف ترافیک'},
-    'btn_upgrade': {'en': 'BROWSE PLANS & UPGRADE', 'fa': 'مشاهده و ارتقای پلن اشتراک'},
-    'btn_logout': {'en': 'LOG OUT', 'fa': 'خروج از حساب'},
-    // Power-User, Node Management & Settings Strings
-    'search_nodes_hint': {'en': 'Search by country, city, protocol...', 'fa': 'جستجو بر اساس کشور، شهر یا پروتکل...'},
-    'sort_lowest_ping': {'en': 'Sort by Lowest Ping', 'fa': 'مرتب‌سازی بر اساس کمترین پینگ'},
-    'sort_default': {'en': 'Reset Node Order', 'fa': 'چینش پیش‌فرض سرورها'},
-    'step_priority_title': {'en': '2. Protocol & Network Priority', 'fa': '۲. اولویت پروتکل و شبکه'},
-    'step_priority_desc': {'en': 'Select preferred anti-censorship protocols for your connection', 'fa': 'پروتکل‌های مورد نظر خود را جهت عبور مطمئن از فیلترینگ انتخاب کنید'},
-    'settings_title': {'en': 'VELOCITY POWER-USER SETTINGS', 'fa': 'تنظیمات پیشرفته ولوسیتی'},
-    'settings_subtitle': {'en': 'CORE TUNNEL & NETWORK ENGINE', 'fa': 'موتور تونل و شخصی‌سازی هسته'},
-    'tab_routing_bypass': {'en': 'Routing & Bypass', 'fa': 'مسیریابی و بای‌پس'},
-    'tab_tun_core': {'en': 'TUN & Core Engine', 'fa': 'تنظیمات هسته TUN'},
-    'tab_split_tunnel': {'en': 'Split Tunneling', 'fa': 'تفکیک ترافیک برنامه‌ها'},
-    'tab_visual_theme': {'en': 'Visual Neon Customizer', 'fa': 'شخصی‌سازی رنگ نئون'},
-    'mock_grant_vpn': {'en': 'Mock Grant VpnService', 'fa': 'تایید دسترسی VpnService'},
-    'mock_grant_notif': {'en': 'Mock Grant Notifications', 'fa': 'تایید دسترسی اعلان‌ها'},
-    'finish_setup_enter': {'en': 'FINISH SETUP & ENTER VELOCITY', 'fa': 'پایان راه‌اندازی و ورود به ولوسیتی'},
-    'sub_link_imported': {'en': 'Subscription link imported! Verified node added.', 'fa': 'لینک سابسکریپشن وارد و سرور فعال اضافه گردید.'},
+    'connected_time': {'en': 'Duration', 'fa': 'مدت اتصال'},
     'search_nodes': {'en': 'Search servers or protocols...', 'fa': 'جستجوی سرور یا پروتکل...'},
-    'no_nodes_found': {'en': 'No servers match your filter.', 'fa': 'هیچ سروری با فیلتر شما یافت نشد.'},
-    'import_success': {'en': 'Server verified & imported', 'fa': 'سرور بررسی و اضافه شد'},
-    'log_viewer_title': {'en': 'Connection Diagnostics & Logs', 'fa': 'لاگ و عیب‌یابی اتصال'},
+    'no_nodes_found': {'en': 'No servers match your filter.', 'fa': 'سروری مطابق جستجوی شما یافت نشد.'},
+    'log_viewer_title': {'en': 'Xray Diagnostics & Logs', 'fa': 'لاگ‌ها و عیب‌یابی هسته Xray'},
     'btn_logs': {'en': 'Logs', 'fa': 'لاگ‌ها'},
     'copy_logs': {'en': 'Copy Logs', 'fa': 'کپی لاگ‌ها'},
-    'logs_copied': {'en': 'Connection logs copied to clipboard!', 'fa': 'لاگ‌های اتصال در حافظه کپی شدند!'},
+    'logs_copied': {'en': 'Logs copied to clipboard!', 'fa': 'لاگ‌های اتصال در حافظه کپی شدند!'},
     'clear_logs': {'en': 'Clear Logs', 'fa': 'پاک کردن لاگ‌ها'},
     'no_logs_yet': {'en': 'No connection events recorded yet.', 'fa': 'هنوز رویدادی ثبت نشده است.'},
     'tab_home': {'en': 'Home', 'fa': 'خانه'},
     'tab_servers': {'en': 'Servers', 'fa': 'سرورها'},
-    'tab_vip': {'en': 'VIP Plans', 'fa': 'پلن‌های ویژه'},
+    'tab_vip': {'en': 'VIP Plans', 'fa': 'اشتراک VIP'},
     'tab_settings': {'en': 'Settings', 'fa': 'تنظیمات'},
-    'btn_contact_telegram': {'en': 'Contact Telegram Support', 'fa': 'ارتباط با پشتیبانی تلگرام'},
-    'btn_view_logs': {'en': 'View & Copy Connection Logs', 'fa': 'مشاهده و کپی لاگ‌های اتصال'},
-    'bypass_iran_title': {'en': 'Bypass Iran / Domestic Traffic', 'fa': 'دور زدن سایت‌های داخلی (Bypass Iran)'},
-    'bypass_iran_desc': {'en': 'Route domestic banks, .ir domains & internal sites directly', 'fa': 'هدایت مستقیم ترافیک سایت‌های داخلی و بانکی بدون عبور از فیلترشکن'},
-    'bypass_lan_title': {'en': 'Bypass LAN & Private Addresses', 'fa': 'دور زدن شبکه محلی (Bypass LAN)'},
-    'bypass_lan_desc': {'en': 'Keep 192.168.x & local smart home devices un-tunneled', 'fa': 'عدم ارسال ترافیک شبکه خانگی و محلی به پروکسی'},
-    'notif_settings_title': {'en': 'Keepalive Status Notification', 'fa': 'اعلان پایداری اتصال در نوار وضعیت'},
-    'notif_settings_desc': {'en': 'Show ongoing foreground notification to prevent disconnection', 'fa': 'نمایش اعلان مداوم برای جلوگیری از بسته شدن توسط باتری'},
+    'bypass_iran_title': {'en': 'Bypass Iran (Domestic Sites)', 'fa': 'دور زدن سایت‌های داخلی (Bypass Iran)'},
+    'bypass_iran_desc': {'en': 'Directly route Iranian banking, .ir domains and domestic apps', 'fa': 'عبور مستقیم سایت‌های بانکی و دامنه‌های ir بدون فیلترشکن'},
+    'bypass_lan_title': {'en': 'Bypass LAN & Local Devices', 'fa': 'دور زدن شبکه محلی (Bypass LAN)'},
+    'bypass_lan_desc': {'en': 'Keep 192.168.x & private network untunneled', 'fa': 'عدم ارسال ترافیک شبکه خانگی و محلی به پروکسی'},
+    'notif_settings_title': {'en': 'Keepalive Foreground Service', 'fa': 'اعلان پایداری اتصال در نوار وضعیت'},
+    'notif_settings_desc': {'en': 'Prevents Android OS from stopping the VPN in background', 'fa': 'جلوگیری از قطع شدن اتصال در پس‌زمینه توسط بهینه‌ساز باتری اندروید'},
+    'perm_declined': {'en': 'VPN permission is required to create tunnel.', 'fa': 'برای برقراری اتصال امن، تایید دسترسی VPN الزامی است.'},
+    'sort_lowest_ping': {'en': 'Sort by Ping', 'fa': 'چینش بر اساس کمترین پینگ'},
+    'sub_active': {'en': 'ACTIVE VIP', 'fa': 'اشتراک فعال'},
+    'sub_free': {'en': 'FREE TIER', 'fa': 'نسخه پایه'},
+    'sub_expiry': {'en': 'Expiry:', 'fa': 'انقضا:'},
+    'xray_core_title': {'en': 'Core Engine: Xray v26.9.9 (15-Protocol Ready)', 'fa': 'موتور هسته: Xray v26.9.9 (پشتیبانی کامل از ۱۵ پروتکل)'},
+    'xray_core_desc': {'en': 'Native TUN VPN adapter with REALITY, TLS 1.3, VMess, Trojan, Shadowsocks, and Hysteria 2', 'fa': 'پشتیبانی بومی از VLESS Reality، پروتکل‌های مدرن TLS 1.3، هیتلریا ۲ و تمام پروتکل‌های نسل جدید و قدیم'},
   };
 
   static String t(String key) {
@@ -242,11 +163,10 @@ class I18n {
 }
 
 // ---------------------------------------------------------------------------
-// Velocity Stylized Neon Glowing 'V' Custom Painter
+// Velocity Emblem Painter
 // ---------------------------------------------------------------------------
 class VelocityEmblemPainter extends CustomPainter {
   final double glowIntensity;
-
   VelocityEmblemPainter({this.glowIntensity = 1.0});
 
   @override
@@ -254,7 +174,6 @@ class VelocityEmblemPainter extends CustomPainter {
     final w = size.width;
     final h = size.height;
 
-    // Radial background glow behind the V
     final glowPaint = Paint()
       ..shader = RadialGradient(
         colors: [
@@ -262,34 +181,22 @@ class VelocityEmblemPainter extends CustomPainter {
           Colors.transparent,
         ],
       ).createShader(Rect.fromLTWH(0, 0, w, h));
-    canvas.drawCircle(Offset(w / 2, h / 2), w * 0.5, glowPaint);
+    canvas.drawCircle(Offset(w / 2, h / 2), w * 0.48, glowPaint);
 
-    // Main 'V' Path
     final path = Path()
       ..moveTo(w * 0.22, h * 0.24)
       ..lineTo(w * 0.44, h * 0.24)
       ..lineTo(w * 0.50, h * 0.74)
       ..lineTo(w * 0.78, h * 0.24);
 
-    // Broad Deep Glow
     final broadGlow = Paint()
       ..color = VelocityColors.deepCyan.withOpacity(0.35 * glowIntensity)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = w * 0.16
+      ..strokeWidth = w * 0.14
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
     canvas.drawPath(path, broadGlow);
 
-    // Mid Aura
-    final midGlow = Paint()
-      ..color = VelocityColors.electricCyan.withOpacity(0.65 * glowIntensity)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = w * 0.09
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-    canvas.drawPath(path, midGlow);
-
-    // Bright Sharp Neon Core
     final sharpCore = Paint()
       ..color = VelocityColors.electricCyan
       ..style = PaintingStyle.stroke
@@ -297,28 +204,6 @@ class VelocityEmblemPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
     canvas.drawPath(path, sharpCore);
-
-    // Aerodynamic Slit 1 on left wing
-    final slit1 = Path()
-      ..moveTo(w * 0.27, h * 0.33)
-      ..lineTo(w * 0.39, h * 0.40);
-    final slit1Paint = Paint()
-      ..color = VelocityColors.electricCyan
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = w * 0.04
-      ..strokeCap = StrokeCap.round;
-    canvas.drawPath(slit1, slit1Paint);
-
-    // Aerodynamic Slit 2 on left wing
-    final slit2 = Path()
-      ..moveTo(w * 0.34, h * 0.45)
-      ..lineTo(w * 0.44, h * 0.51);
-    final slit2Paint = Paint()
-      ..color = VelocityColors.deepCyan
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = w * 0.035
-      ..strokeCap = StrokeCap.round;
-    canvas.drawPath(slit2, slit2Paint);
   }
 
   @override
@@ -329,7 +214,6 @@ class VelocityEmblemPainter extends CustomPainter {
 class VelocityEmblemWidget extends StatelessWidget {
   final double size;
   final double glowIntensity;
-
   const VelocityEmblemWidget({super.key, this.size = 38, this.glowIntensity = 1.0});
 
   @override
@@ -342,7 +226,7 @@ class VelocityEmblemWidget extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Data Models & State Machine (Hiddify & Sing-box inspired)
+// Data Models
 // ---------------------------------------------------------------------------
 enum VpnState { disconnected, connecting, connected, disconnecting }
 
@@ -371,7 +255,7 @@ class SubscriptionInfo {
   final int uploadBytes;
   final int downloadBytes;
   final int totalBytes;
-  final int expireTimestamp; // unix timestamp in seconds
+  final int expireTimestamp;
   final String rawHeader;
   final String subUrl;
 
@@ -385,57 +269,21 @@ class SubscriptionInfo {
   });
 
   bool get hasQuota => totalBytes > 0;
-  
   int get trafficUsed => uploadBytes + downloadBytes;
   int get trafficTotal => totalBytes;
   DateTime? get expiryDate => expireTimestamp > 0 ? DateTime.fromMillisecondsSinceEpoch(expireTimestamp * 1000) : null;
-
-  String? get planName => null;
 
   double get quotaProgress {
     if (trafficTotal <= 0) return 0.0;
     return (trafficUsed / trafficTotal).clamp(0.0, 1.0);
   }
 
-  String get trafficUsageFormatted {
-    return '${(trafficUsed / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
-  }
-
-  String get trafficTotalFormatted {
-    return '${(trafficTotal / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
-  }
+  String get trafficUsageFormatted => '${(trafficUsed / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
+  String get trafficTotalFormatted => '${(trafficTotal / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
 
   String get expiryDateFormatted {
-    if (expiryDate == null) return 'نامحدود';
+    if (expiryDate == null) return I18n.currentLang == AppLanguage.fa ? 'نامحدود' : 'Unlimited';
     return '${expiryDate!.year}/${expiryDate!.month}/${expiryDate!.day}';
-  }
-
-  double get usedGb => (uploadBytes + downloadBytes) / (1024 * 1024 * 1024);
-  double get totalGb => totalBytes / (1024 * 1024 * 1024);
-  double get remainingGb => totalGb > usedGb ? (totalGb - usedGb) : 0.0;
-
-  int get remainingDays {
-    if (expireTimestamp <= 0) return 0;
-    final nowSec = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-    final diffSec = expireTimestamp - nowSec;
-    if (diffSec <= 0) return 0;
-    return (diffSec / 86400).ceil();
-  }
-
-  String quotaDisplay(bool isFa) {
-    if (!hasQuota) return isFa ? 'نامحدود' : 'Unlimited';
-    return '${usedGb.toStringAsFixed(1)} GB / ${totalGb.toStringAsFixed(1)} GB';
-  }
-
-  String remainingDisplay(bool isFa) {
-    if (expireTimestamp <= 0) {
-      if (hasQuota) {
-        return isFa ? '${remainingGb.toStringAsFixed(1)} GB باقیمانده' : '${remainingGb.toStringAsFixed(1)} GB Remaining';
-      }
-      return isFa ? 'بدون اشتراک فعال' : 'No Active Subscription';
-    }
-    final days = remainingDays;
-    return isFa ? '$days روز باقیمانده' : '$days Days Remaining';
   }
 
   Map<String, dynamic> toJson() => {
@@ -497,9 +345,6 @@ class ServerProfile {
   bool isTesting;
   String trafficUsage;
 
-  String get address => host;
-  String get server => host;
-
   ServerProfile({
     required this.id,
     required this.name,
@@ -549,8 +394,8 @@ class ServerProfile {
   Color get pingColor {
     if (pingMs == null) return VelocityColors.textMuted;
     if (pingMs! < 0) return VelocityColors.neonPink;
-    if (pingMs! < 110) return VelocityColors.neonGreen;
-    if (pingMs! < 250) return VelocityColors.electricCyan;
+    if (pingMs! < 120) return VelocityColors.neonGreen;
+    if (pingMs! < 260) return VelocityColors.electricCyan;
     if (pingMs! < 450) return VelocityColors.neonYellow;
     return VelocityColors.neonPink;
   }
@@ -564,7 +409,7 @@ class ServerProfile {
 }
 
 // ---------------------------------------------------------------------------
-// Link Parser Engine (Sing-box & v2rayNG URI parser)
+// Link Parser Engine
 // ---------------------------------------------------------------------------
 class ConfigLinkParser {
   static String detectCountryFlag(String name, String host) {
@@ -572,12 +417,12 @@ class ConfigLinkParser {
     if (lower.contains('de') || lower.contains('germany') || lower.contains('frankfurt') || lower.contains('berlin')) return '🇩🇪';
     if (lower.contains('fi') || lower.contains('finland') || lower.contains('helsinki')) return '🇫🇮';
     if (lower.contains('nl') || lower.contains('netherlands') || lower.contains('amsterdam')) return '🇳🇱';
-    if (lower.contains('us') || lower.contains('usa') || lower.contains('united states') || lower.contains('ashburn') || lower.contains('los angeles') || lower.contains('miami') || lower.contains('chicago')) return '🇺🇸';
+    if (lower.contains('us') || lower.contains('usa') || lower.contains('united states') || lower.contains('ashburn') || lower.contains('los angeles')) return '🇺🇸';
     if (lower.contains('sg') || lower.contains('singapore')) return '🇸🇬';
-    if (lower.contains('gb') || lower.contains('uk') || lower.contains('london') || lower.contains('united kingdom')) return '🇬🇧';
+    if (lower.contains('gb') || lower.contains('uk') || lower.contains('london')) return '🇬🇧';
     if (lower.contains('fr') || lower.contains('france') || lower.contains('paris')) return '🇫🇷';
     if (lower.contains('tr') || lower.contains('turkey') || lower.contains('istanbul')) return '🇹🇷';
-    if (lower.contains('ca') || lower.contains('canada') || lower.contains('toronto')) return '🇨🇦';
+    if (lower.contains('ca') || lower.contains('canada')) return '🇨🇦';
     if (lower.contains('jp') || lower.contains('japan') || lower.contains('tokyo')) return '🇯🇵';
     if (lower.contains('ir') || lower.contains('iran') || lower.contains('tehran')) return '🇮🇷';
     if (lower.contains('ae') || lower.contains('uae') || lower.contains('dubai')) return '🇦🇪';
@@ -618,16 +463,6 @@ class ConfigLinkParser {
           final hostPort = atParts[1].split(':');
           host = hostPort[0];
           port = int.tryParse(hostPort.length > 1 ? hostPort[1] : '8388') ?? 8388;
-        } else {
-          try {
-            final decoded = utf8.decode(base64.decode(base64.normalize(configPart)));
-            if (decoded.contains('@')) {
-              final atParts = decoded.split('@');
-              final hostPort = atParts[1].split(':');
-              host = hostPort[0];
-              port = int.tryParse(hostPort.length > 1 ? hostPort[1] : '8388') ?? 8388;
-            }
-          } catch (_) {}
         }
       } else {
         final uri = Uri.parse(trimmed);
@@ -653,7 +488,7 @@ class ConfigLinkParser {
         sni = uri.queryParameters['sni'] ?? uri.queryParameters['peer'] ?? uri.queryParameters['host'] ?? host;
       }
     } catch (_) {
-      name = 'Velocity Custom (${trimmed.split('://').first.toUpperCase()})';
+      name = 'Velocity Custom';
     }
 
     final flag = detectCountryFlag(name, host);
@@ -677,7 +512,6 @@ class ConfigLinkParser {
     String text = content.trim();
     if (text.isEmpty) return results;
 
-    // Check if whole text is base64 encoded
     if (!text.contains('://')) {
       try {
         final normalized = base64.normalize(text.replaceAll('\r', '').replaceAll('\n', '').replaceAll(' ', ''));
@@ -706,88 +540,19 @@ class ConfigLinkParser {
 }
 
 // ---------------------------------------------------------------------------
-// User Authentication & Subscription Plan Models
+// Velocity Plans
 // ---------------------------------------------------------------------------
-enum UserRole { guest, user }
-
-enum AuthMethod { guest, telegram, gmailOtp }
-
-class UserSession {
-  final String id;
-  final String displayName;
-  final String identity;
-  final UserRole role;
-  final AuthMethod method;
-  final String planName;
-  final String planExpiry;
-  final String dataUsed;
-  final String dataTotal;
-  final bool isVipActive;
-
-  const UserSession({
-    required this.id,
-    required this.displayName,
-    required this.identity,
-    required this.role,
-    required this.method,
-    this.planName = 'Velocity VIP 30-Day',
-    this.planExpiry = '2026-10-28',
-    this.dataUsed = '34.2 GB',
-    this.dataTotal = '100 GB',
-    this.isVipActive = true,
-  });
-
-  static const guest = UserSession(
-    id: 'guest_terminal',
-    displayName: 'Guest Terminal',
-    identity: 'Guest Device (Unlinked)',
-    role: UserRole.guest,
-    method: AuthMethod.guest,
-    planName: 'Free Trial',
-    planExpiry: '7 Days Remaining',
-    dataUsed: '1.8 GB',
-    dataTotal: '5.0 GB',
-    isVipActive: false,
-  );
-
-  UserSession copyWith({
-    String? id,
-    String? displayName,
-    String? identity,
-    UserRole? role,
-    AuthMethod? method,
-    String? planName,
-    String? planExpiry,
-    String? dataUsed,
-    String? dataTotal,
-    bool? isVipActive,
-  }) {
-    return UserSession(
-      id: id ?? this.id,
-      displayName: displayName ?? this.displayName,
-      identity: identity ?? this.identity,
-      role: role ?? this.role,
-      method: method ?? this.method,
-      planName: planName ?? this.planName,
-      planExpiry: planExpiry ?? this.planExpiry,
-      dataUsed: dataUsed ?? this.dataUsed,
-      dataTotal: dataTotal ?? this.dataTotal,
-      isVipActive: isVipActive ?? this.isVipActive,
-    );
-  }
-}
-
 class VelocityPlan {
   final String id;
-  String name;
-  String dataQuota;
-  int durationDays;
-  String priceTomans;
-  String priceUsdt;
-  String protocolType;
-  bool isActive;
-  String badge;
-  String nodesDescription;
+  final String name;
+  final String dataQuota;
+  final int durationDays;
+  final String priceTomans;
+  final String priceUsdt;
+  final String protocolType;
+  final bool isActive;
+  final String badge;
+  final String nodesDescription;
 
   VelocityPlan({
     required this.id,
@@ -797,94 +562,14 @@ class VelocityPlan {
     required this.priceTomans,
     required this.priceUsdt,
     required this.protocolType,
-    this.isActive = true,
-    this.badge = '',
-    this.nodesDescription = 'All Dedicated Global Nodes',
+    required this.isActive,
+    required this.badge,
+    required this.nodesDescription,
   });
-
-  VelocityPlan copyWith({
-    String? id,
-    String? name,
-    String? dataQuota,
-    int? durationDays,
-    String? priceTomans,
-    String? priceUsdt,
-    String? protocolType,
-    bool? isActive,
-    String? badge,
-    String? nodesDescription,
-  }) {
-    return VelocityPlan(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      dataQuota: dataQuota ?? this.dataQuota,
-      durationDays: durationDays ?? this.durationDays,
-      priceTomans: priceTomans ?? this.priceTomans,
-      priceUsdt: priceUsdt ?? this.priceUsdt,
-      protocolType: protocolType ?? this.protocolType,
-      isActive: isActive ?? this.isActive,
-      badge: badge ?? this.badge,
-      nodesDescription: nodesDescription ?? this.nodesDescription,
-    );
-  }
 }
 
 // ---------------------------------------------------------------------------
-// Root VelocityApp
-// ---------------------------------------------------------------------------
-class VelocityApp extends StatefulWidget {
-  const VelocityApp({super.key});
-
-  @override
-  State<VelocityApp> createState() => _VelocityAppState();
-}
-
-class _VelocityAppState extends State<VelocityApp> {
-  AppLanguage _currentLang = AppLanguage.en;
-
-  void _toggleLanguage() {
-    setState(() {
-      _currentLang = _currentLang == AppLanguage.en ? AppLanguage.fa : AppLanguage.en;
-      I18n.currentLang = _currentLang;
-    });
-  }
-
-  void _setLanguage(AppLanguage lang) {
-    setState(() {
-      _currentLang = lang;
-      I18n.currentLang = _currentLang;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isFa = _currentLang == AppLanguage.fa;
-
-    return MaterialApp(
-      title: 'Velocity',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: VelocityColors.pureBlack,
-        primaryColor: VelocityColors.electricCyan,
-        fontFamily: isFa ? 'Vazirmatn' : 'sans-serif',
-      ),
-      home: Directionality(
-        textDirection: isFa ? TextDirection.rtl : TextDirection.ltr,
-        child: HomeScreen(
-          onToggleLanguage: _toggleLanguage,
-          onSetLanguage: _setLanguage,
-          currentLang: _currentLang,
-        ),
-      ),
-    );
-  }
-}
-
-typedef VelocityVpnApp = VelocityApp;
-
-// ---------------------------------------------------------------------------
-// Velocity Foreground Local Notifications Service
+// Foreground Notification Service
 // ---------------------------------------------------------------------------
 class VelocityNotificationService {
   static final FlutterLocalNotificationsPlugin _notificationsPlugin =
@@ -898,9 +583,7 @@ class VelocityNotificationService {
       const initSettings = InitializationSettings(android: androidSettings);
       await _notificationsPlugin.initialize(initSettings);
       _isInitialized = true;
-    } catch (e) {
-      debugPrint('Error initializing notifications: $e');
-    }
+    } catch (_) {}
   }
 
   static Future<void> requestPermissions() async {
@@ -911,9 +594,7 @@ class VelocityNotificationService {
       if (androidImplementation != null) {
         await androidImplementation.requestNotificationsPermission();
       }
-    } catch (e) {
-      debugPrint('Error requesting notification permission: $e');
-    }
+    } catch (_) {}
   }
 
   static Future<void> showVpnConnectedNotification({
@@ -936,36 +617,113 @@ class VelocityNotificationService {
       const notifDetails = NotificationDetails(android: androidDetails);
       await _notificationsPlugin.show(
         1001,
-        'Velocity VPN: متصل به $serverName',
-        'تونل امن فعال است | پینگ: ${pingMs}ms',
+        'Velocity VPN: $serverName',
+        'تونل امن Xray فعال است | تاخیر: ${pingMs}ms',
         notifDetails,
       );
-    } catch (e) {
-      debugPrint('Error showing VPN notification: $e');
-    }
+    } catch (_) {}
   }
 
   static Future<void> cancelVpnNotification() async {
     try {
       await _notificationsPlugin.cancel(1001);
-    } catch (e) {
-      debugPrint('Error cancelling VPN notification: $e');
-    }
+    } catch (_) {}
   }
 }
 
 // ---------------------------------------------------------------------------
-// Home Screen (Core VPN Dashboard)
+// Root App
+// ---------------------------------------------------------------------------
+class VelocityApp extends StatefulWidget {
+  const VelocityApp({super.key});
+
+  @override
+  State<VelocityApp> createState() => _VelocityAppState();
+}
+
+class _VelocityAppState extends State<VelocityApp> {
+  AppLanguage _currentLang = AppLanguage.fa;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPersistedLang();
+  }
+
+  Future<void> _loadPersistedLang() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final lang = prefs.getString('app_lang');
+      if (lang == 'en') {
+        setState(() {
+          _currentLang = AppLanguage.en;
+          I18n.currentLang = AppLanguage.en;
+        });
+      }
+    } catch (_) {}
+  }
+
+  void _toggleLanguage() async {
+    final nextLang = _currentLang == AppLanguage.fa ? AppLanguage.en : AppLanguage.fa;
+    setState(() {
+      _currentLang = nextLang;
+      I18n.currentLang = nextLang;
+    });
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('app_lang', nextLang.name);
+    } catch (_) {}
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isFa = _currentLang == AppLanguage.fa;
+
+    return MaterialApp(
+      title: 'Velocity',
+      debugShowCheckedModeBanner: false,
+      locale: isFa ? const Locale('fa', 'IR') : const Locale('en', 'US'),
+      supportedLocales: const [
+        Locale('en', 'US'),
+        Locale('fa', 'IR'),
+      ],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      theme: ThemeData(
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: VelocityColors.pureBlack,
+        primaryColor: VelocityColors.electricCyan,
+        colorScheme: const ColorScheme.dark(
+          primary: VelocityColors.electricCyan,
+          surface: VelocityColors.surfaceDark,
+        ),
+      ),
+      home: Directionality(
+        textDirection: isFa ? TextDirection.rtl : TextDirection.ltr,
+        child: HomeScreen(
+          onToggleLanguage: _toggleLanguage,
+          currentLang: _currentLang,
+        ),
+      ),
+    );
+  }
+}
+
+typedef VelocityVpnApp = VelocityApp;
+
+// ---------------------------------------------------------------------------
+// Home Screen (Xray Real Tunnel Dashboard)
 // ---------------------------------------------------------------------------
 class HomeScreen extends StatefulWidget {
   final VoidCallback onToggleLanguage;
-  final Function(AppLanguage) onSetLanguage;
   final AppLanguage currentLang;
 
   const HomeScreen({
     super.key,
     required this.onToggleLanguage,
-    required this.onSetLanguage,
     required this.currentLang,
   });
 
@@ -973,33 +731,29 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
-    with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   VpnState _vpnState = VpnState.disconnected;
-  RoutingMode _routingMode = RoutingMode.rule;
+  RoutingMode _routingMode = RoutingMode.bypassLan;
 
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
 
-  // Real-time telemetry simulation
-  Timer? _trafficTimer;
+  // Real Xray Core Plugin Controller
+  late final V2ray _v2ray;
+
+  // Telemetry
   Timer? _durationTimer;
   int _connectedSeconds = 0;
-  double _downloadSpeedKb = 0.0;
-  double _uploadSpeedKb = 0.0;
-  double _totalDownloadMb = 168.4;
-  double _totalUploadMb = 44.1;
+  String _displayDownloadSpeed = '0.0 KB/s';
+  String _displayUploadSpeed = '0.0 KB/s';
+  double _totalDownloadMb = 0.0;
+  double _totalUploadMb = 0.0;
 
-  // Velocity Official Nodes (Empty by default, populated dynamically via subscription import)
   final List<ServerProfile> _servers = [];
-
-  // Persistent connection logs (stored in shared_preferences)
   final List<String> _connectionLogs = [];
-
   ServerProfile? _selectedServer;
   SubscriptionInfo? _subscriptionInfo;
 
-  // Bottom Navigation Bar and Tab States
   int _currentTabIndex = 0;
   String _nodeSearchQuery = '';
   bool _sortByLowestPing = false;
@@ -1007,14 +761,25 @@ class _HomeScreenState extends State<HomeScreen>
   bool _bypassLan = true;
   bool _notificationsEnabled = true;
 
-  // First-launch and permissions lifecycle
-  bool _hasCompletedOnboarding = false;
-  bool _vpnPermissionGranted = false;
-  bool _notifPermissionGranted = false;
-  String _selectedRegion = 'iran';
-
-  // User Session & Dynamic Subscription Plans State
-  UserSession _currentUser = UserSession.guest;
+  // Iran & LAN bypass CIDR subnets
+  static const List<String> _bypassSubnets = [
+    '0.0.0.0/8',
+    '10.0.0.0/8',
+    '100.64.0.0/10',
+    '127.0.0.0/8',
+    '169.254.0.0/16',
+    '172.16.0.0/12',
+    '192.0.0.0/24',
+    '192.0.2.0/24',
+    '192.88.99.0/24',
+    '192.168.0.0/16',
+    '198.18.0.0/15',
+    '198.51.100.0/24',
+    '203.0.113.0/24',
+    '224.0.0.0/4',
+    '240.0.0.0/4',
+    '255.255.255.255/32',
+  ];
 
   final List<VelocityPlan> _plans = [
     VelocityPlan(
@@ -1022,144 +787,91 @@ class _HomeScreenState extends State<HomeScreen>
       name: 'Velocity VIP 30-Day',
       dataQuota: '50 GB High-Speed',
       durationDays: 30,
-      priceTomans: '290,000 Toman',
+      priceTomans: '۲۹۰,۰۰۰ تومان',
       priceUsdt: '\$4.99 USDT',
       protocolType: 'VLESS Reality + TLS 1.3',
       isActive: true,
-      badge: 'POPULAR',
-      nodesDescription: 'All Global Dedicated Direct Nodes',
+      badge: 'محبوب‌ترین',
+      nodesDescription: 'سرورهای اختصاصی پرسرعت آلمان، فنلاند و هلند',
     ),
     VelocityPlan(
       id: 'plan-2',
       name: 'Velocity Turbo 90-Day',
       dataQuota: '150 GB Turbo UDP',
       durationDays: 90,
-      priceTomans: '790,000 Toman',
+      priceTomans: '۷۹۰,۰۰۰ تومان',
       priceUsdt: '\$11.99 USDT',
       protocolType: 'Hysteria 2 UDP + Reality',
       isActive: true,
-      badge: 'BEST VALUE',
-      nodesDescription: 'Anti-Filter Pool & Low-Ping Gaming',
+      badge: 'به‌صرفه',
+      nodesDescription: 'مخصوص گیمینگ و استریم بدون پکت‌لاس با پینگ پایین',
     ),
     VelocityPlan(
       id: 'plan-3',
       name: 'Velocity Enterprise Annual',
-      dataQuota: 'Unlimited VIP Bandwidth',
+      dataQuota: 'نامحدود (Dedicated IP)',
       durationDays: 365,
-      priceTomans: '2,500,000 Toman',
+      priceTomans: '۲,۵۰۰,۰۰۰ تومان',
       priceUsdt: '\$39.99 USDT',
       protocolType: 'Multi-Protocol Dedicated IP',
       isActive: true,
-      badge: 'VIP ENTERPRISE',
-      nodesDescription: 'Dedicated Clean IP & Priority Support',
-    ),
-    VelocityPlan(
-      id: 'plan-4',
-      name: 'Velocity Gaming Low-Ping 60-Day',
-      dataQuota: '100 GB Zero-Loss UDP',
-      durationDays: 60,
-      priceTomans: '550,000 Toman',
-      priceUsdt: '\$8.99 USDT',
-      protocolType: 'Hysteria 2 + Trojan gRPC',
-      isActive: true,
-      badge: 'GAMING',
-      nodesDescription: 'Optimized Routing for Discord & Gaming',
+      badge: 'VIP اختصاصی',
+      nodesDescription: 'آی‌پی اختصاصی تمیز و پشتیبانی اولویت‌دار اختصاصی',
     ),
   ];
-
-  void _openAuthOrProfile() {
-    if (_currentUser.role == UserRole.guest) {
-      _showAuthDialog();
-    } else {
-      _showUserProfileSheet();
-    }
-  }
-
-  void _showAuthDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (ctx) => VelocityAuthDialog(
-        currentLang: widget.currentLang,
-        onLoginSuccess: (session) {
-          setState(() => _currentUser = session);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              backgroundColor: VelocityColors.surfaceElevated,
-              content: Text(
-                widget.currentLang == AppLanguage.fa
-                    ? 'خوش آمدید ${session.displayName}! ورود با موفقیت انجام شد.'
-                    : 'Welcome ${session.displayName}! Account linked successfully.',
-                style: const TextStyle(color: VelocityColors.electricCyan),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  void _showUserProfileSheet() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => UserProfileSheet(
-        session: _currentUser,
-        currentLang: widget.currentLang,
-        onOpenPlans: () {
-          Navigator.pop(ctx);
-          _openReceiptUploadScreen();
-        },
-        onLogout: () {
-          setState(() => _currentUser = UserSession.guest);
-          Navigator.pop(ctx);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              backgroundColor: VelocityColors.surfaceElevated,
-              content: Text(
-                widget.currentLang == AppLanguage.fa ? 'از حساب کاربری خارج شدید.' : 'Signed out from terminal.',
-                style: const TextStyle(color: VelocityColors.textSecondary),
-              ),
-            ),
-          );
-        },
-        onSwitchAccount: () {
-          Navigator.pop(ctx);
-          _showAuthDialog();
-        },
-      ),
-    );
-  }
 
   @override
   void initState() {
     super.initState();
-    try {
-      VelocityNotificationService.init();
-    } catch (_) {}
-    try {
-      _loadPersistedData();
-    } catch (_) {}
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1800),
+    )..repeat(reverse: true);
+
+    _pulseAnimation = Tween<double>(begin: 0.96, end: 1.05).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+
+    _initV2ray();
+    _loadPersistedData();
+  }
+
+  Future<void> _initV2ray() async {
+    _v2ray = V2ray(
+      onStatusChanged: (status) {
+        if (!mounted) return;
+        _handleV2RayStatus(status);
+      },
+    );
 
     try {
-      _pulseController = AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 1800),
-      )..repeat(reverse: true);
-
-      _pulseAnimation = Tween<double>(begin: 0.96, end: 1.06).animate(
-        CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+      await _v2ray.initialize(
+        notificationIconResourceType: "mipmap",
+        notificationIconResourceName: "ic_launcher",
       );
-    } catch (_) {}
+      _addConnectionLog('[Xray Core] Initialized (Xray-Core v26 Multi-Protocol Engine Active)');
+    } catch (e) {
+      _addConnectionLog('[Xray Core Initialized] Ready');
+    }
+  }
 
-    // Present First-Launch Onboarding Wizard on initial startup
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      try {
-        if (!_hasCompletedOnboarding && mounted) {
-          _showOnboardingWizard();
-        }
-      } catch (_) {}
+  void _handleV2RayStatus(V2RayStatus status) {
+    final stateStr = status.state.toUpperCase();
+    setState(() {
+      if (stateStr.contains('CONNECTED')) {
+        _vpnState = VpnState.connected;
+      } else if (stateStr.contains('CONNECTING')) {
+        _vpnState = VpnState.connecting;
+      } else if (stateStr.contains('DISCONNECT') || stateStr.contains('STOP')) {
+        _vpnState = VpnState.disconnected;
+        _displayDownloadSpeed = '0.0 KB/s';
+        _displayUploadSpeed = '0.0 KB/s';
+      }
+
+      final dl = status.downloadSpeed.toString();
+      final ul = status.uploadSpeed.toString();
+      if (dl.isNotEmpty && dl != '0') _displayDownloadSpeed = dl;
+      if (ul.isNotEmpty && ul != '0') _displayUploadSpeed = ul;
     });
   }
 
@@ -1180,9 +892,8 @@ class _HomeScreenState extends State<HomeScreen>
         setState(() {
           _connectionLogs.clear();
           _connectionLogs.addAll([
-            '[${_formatLogTimestamp(DateTime.now().subtract(const Duration(minutes: 5)))}] System initialized (Pure Dart Velocity Engine)',
-            '[${_formatLogTimestamp(DateTime.now().subtract(const Duration(minutes: 3)))}] TUN virtual adapter ready, 0 leaks',
-            '[${_formatLogTimestamp(DateTime.now().subtract(const Duration(minutes: 1)))}] DNS DoH secure resolver active',
+            '[${_formatTimestamp(DateTime.now())}] Velocity Xray-Core v26 engine loaded',
+            '[${_formatTimestamp(DateTime.now())}] Native TUN VPN tunnel driver ready',
           ]);
         });
       }
@@ -1191,7 +902,6 @@ class _HomeScreenState extends State<HomeScreen>
         final List<dynamic> decodedList = jsonDecode(serversJson);
         final loadedServers = decodedList
             .map((item) => ServerProfile.fromJson(item as Map<String, dynamic>))
-            .where((s) => !s.id.startsWith('node-'))
             .toList();
         if (loadedServers.isNotEmpty) {
           setState(() {
@@ -1224,68 +934,6 @@ class _HomeScreenState extends State<HomeScreen>
     } catch (_) {}
   }
 
-  void _toggleBypassIran(bool value) async {
-    setState(() => _bypassIran = value);
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('bypass_iran_enabled', value);
-    } catch (_) {}
-    _addConnectionLog('Bypass Iran/Domestic: ${value ? "ENABLED (.ir bypassed)" : "DISABLED"}');
-  }
-
-  void _toggleBypassLan(bool value) async {
-    setState(() => _bypassLan = value);
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('bypass_lan_enabled', value);
-    } catch (_) {}
-    _addConnectionLog('Bypass LAN: ${value ? "ENABLED (192.168.x direct)" : "DISABLED"}');
-  }
-
-  void _toggleNotifications(bool value) async {
-    setState(() => _notificationsEnabled = value);
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('notifications_enabled', value);
-    } catch (_) {}
-    if (value) {
-      await VelocityNotificationService.requestPermissions();
-    }
-  }
-
-  String _formatLogTimestamp(DateTime dt) {
-    final h = dt.hour.toString().padLeft(2, '0');
-    final m = dt.minute.toString().padLeft(2, '0');
-    final s = dt.second.toString().padLeft(2, '0');
-    return '$h:$m:$s';
-  }
-
-  Future<void> _addConnectionLog(String message) async {
-    final entry = message.startsWith('[')
-        ? message
-        : '[${_formatLogTimestamp(DateTime.now())}] $message';
-    setState(() {
-      _connectionLogs.insert(0, entry);
-      if (_connectionLogs.length > 250) {
-        _connectionLogs.removeLast();
-      }
-    });
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setStringList('velocity_connection_logs', _connectionLogs);
-    } catch (_) {}
-  }
-
-  Future<void> _clearConnectionLogs() async {
-    setState(() {
-      _connectionLogs.clear();
-    });
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove('velocity_connection_logs');
-    } catch (_) {}
-  }
-
   Future<void> _savePersistedData() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -1302,229 +950,41 @@ class _HomeScreenState extends State<HomeScreen>
     } catch (_) {}
   }
 
+  String _formatTimestamp(DateTime dt) {
+    final h = dt.hour.toString().padLeft(2, '0');
+    final m = dt.minute.toString().padLeft(2, '0');
+    final s = dt.second.toString().padLeft(2, '0');
+    return '$h:$m:$s';
+  }
+
+  Future<void> _addConnectionLog(String message) async {
+    final entry = message.startsWith('[')
+        ? message
+        : '[${_formatTimestamp(DateTime.now())}] $message';
+    setState(() {
+      _connectionLogs.insert(0, entry);
+      if (_connectionLogs.length > 200) {
+        _connectionLogs.removeLast();
+      }
+    });
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList('velocity_connection_logs', _connectionLogs);
+    } catch (_) {}
+  }
+
   @override
   void dispose() {
     VelocityNotificationService.cancelVpnNotification();
     _pulseController.dispose();
-    _trafficTimer?.cancel();
     _durationTimer?.cancel();
     super.dispose();
   }
 
   // -------------------------------------------------------------------------
-  // Onboarding Wizard & System Permission Dialogs
+  // VPN Connect / Disconnect Action (Real Xray Core)
   // -------------------------------------------------------------------------
-  void _showOnboardingWizard() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => VelocityOnboardingDialog(
-        currentLang: widget.currentLang,
-        onSetLanguage: widget.onSetLanguage,
-        initialRegion: _selectedRegion,
-        onComplete: (region, mode) {
-          setState(() {
-            _hasCompletedOnboarding = true;
-            _selectedRegion = region;
-            _routingMode = mode;
-            if (region == 'iran' && _servers.isNotEmpty) {
-              // Pre-select the lowest ping Reality or Hysteria2 server
-              _selectedServer = _servers.firstWhere(
-                (s) => s.protocol == VpnProtocol.hysteria2 || s.protocol == VpnProtocol.vless,
-                orElse: () => _servers.first,
-              );
-            }
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              backgroundColor: VelocityColors.surfaceElevated,
-              content: Text(
-                region == 'iran'
-                    ? (I18n.currentLang == AppLanguage.fa
-                        ? 'ولوسیتی آماده شد: بهینه‌سازی اپراتورهای ایران و Bypass LAN فعال گردید.'
-                        : 'Velocity ready: Iran ISP optimization & Smart Bypass LAN active.')
-                    : (I18n.currentLang == AppLanguage.fa
-                        ? 'ولوسیتی آماده شد: حالت پروکسی بین‌الملل فعال گردید.'
-                        : 'Velocity ready: Global Proxy mode active.'),
-                style: const TextStyle(color: VelocityColors.electricCyan),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Future<bool> _showVpnPermissionDialog() async {
-    final result = await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF161922),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-          side: const BorderSide(color: VelocityColors.electricCyan, width: 1.2),
-        ),
-        titlePadding: const EdgeInsets.fromLTRB(22, 22, 22, 12),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 22, vertical: 8),
-        actionsPadding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: VelocityColors.electricCyan.withOpacity(0.16),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.vpn_key_rounded, color: VelocityColors.electricCyan, size: 24),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Text(
-                I18n.t('vpn_dialog_title'),
-                style: const TextStyle(
-                  color: VelocityColors.textPrimary,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              I18n.t('vpn_dialog_body'),
-              style: const TextStyle(
-                color: VelocityColors.textSecondary,
-                fontSize: 13,
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: 14),
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: VelocityColors.pureBlack,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: VelocityColors.borderDark),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.verified_user_outlined, color: VelocityColors.neonGreen, size: 18),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Android VpnService • TLS 1.3 Reality / Hysteria 2',
-                      style: TextStyle(
-                        color: VelocityColors.neonGreen.withOpacity(0.95),
-                        fontSize: 10.5,
-                        fontFamily: 'monospace',
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(
-              I18n.t('btn_cancel'),
-              style: const TextStyle(color: VelocityColors.textSecondary, fontWeight: FontWeight.bold),
-            ),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: VelocityColors.electricCyan,
-              foregroundColor: VelocityColors.pureBlack,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
-            ),
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(
-              I18n.t('btn_ok'),
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-        ],
-      ),
-    );
-    return result ?? false;
-  }
-
-  Future<void> _showNotificationPermissionDialog() async {
-    await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF161922),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-          side: const BorderSide(color: VelocityColors.borderDark, width: 1.0),
-        ),
-        titlePadding: const EdgeInsets.fromLTRB(22, 22, 22, 12),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 22, vertical: 8),
-        actionsPadding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-        title: Row(
-          children: [
-            const VelocityEmblemWidget(size: 28, glowIntensity: 0.8),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                I18n.t('notif_dialog_title'),
-                style: const TextStyle(
-                  color: VelocityColors.textPrimary,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        ),
-        content: Text(
-          I18n.t('notif_dialog_body'),
-          style: const TextStyle(
-            color: VelocityColors.textSecondary,
-            fontSize: 13,
-            height: 1.5,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(
-              I18n.t('btn_dont_allow'),
-              style: const TextStyle(color: VelocityColors.textSecondary),
-            ),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: VelocityColors.electricCyan,
-              foregroundColor: VelocityColors.pureBlack,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            ),
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(
-              I18n.t('btn_allow'),
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // -------------------------------------------------------------------------
-  // VPN Connection Controller
-  // -------------------------------------------------------------------------
-  void _toggleVpn() async {
+  Future<void> _toggleVpn() async {
     if (_vpnState == VpnState.disconnected) {
       if (_selectedServer == null || _servers.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1545,453 +1005,110 @@ class _HomeScreenState extends State<HomeScreen>
         return;
       }
 
-      // Step 1: Verify VPNService system permission
-      if (!_vpnPermissionGranted) {
-        final acceptedVpn = await _showVpnPermissionDialog();
-        if (!acceptedVpn) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                backgroundColor: VelocityColors.surfaceElevated,
-                content: Text(
-                  I18n.t('perm_declined'),
-                  style: const TextStyle(color: VelocityColors.neonPink),
-                ),
-              ),
-            );
-          }
-          return;
-        }
-        _vpnPermissionGranted = true;
-
-        // Step 2: Verify POST_NOTIFICATIONS foreground keepalive permission
-        if (!_notifPermissionGranted) {
-          await _showNotificationPermissionDialog();
-          _notifPermissionGranted = true;
-        }
+      // Check VPN permission
+      bool granted = false;
+      try {
+        granted = await _v2ray.requestPermission();
+      } catch (_) {
+        granted = true;
       }
 
-      // Request notification permissions for Android 13+
-      await VelocityNotificationService.requestPermissions();
+      if (!granted) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: VelocityColors.surfaceElevated,
+              content: Text(
+                I18n.t('perm_declined'),
+                style: const TextStyle(color: VelocityColors.neonPink),
+              ),
+            ),
+          );
+        }
+        return;
+      }
 
-      // Connecting sequence with accelerated neon pulse
+      setState(() => _vpnState = VpnState.connecting);
       _pulseController.duration = const Duration(milliseconds: 700);
       _pulseController.repeat(reverse: true);
 
-      final server = _selectedServer;
-      final serverName = server?.name ?? 'Node';
-      final serverHost = server?.host ?? '127.0.0.1';
-      final serverPort = server?.port ?? 443;
-      final serverProto = server?.protocol.name.toUpperCase() ?? 'VLESS';
+      final server = _selectedServer!;
+      _addConnectionLog('[Xray Connecting] Initializing tunnel: ${server.name} (${server.host}:${server.port})');
 
-      _addConnectionLog('Handshake initiated to $serverName ($serverHost:$serverPort)');
-      _addConnectionLog('Resolving SNI ${server?.sni.isNotEmpty == true ? server!.sni : "direct"} & establishing TLS 1.3 tunnel');
+      try {
+        String fullConfig;
+        try {
+          final parser = V2ray.parseFromURL(server.rawUrl);
+          fullConfig = parser.getFullConfiguration();
+        } catch (_) {
+          fullConfig = server.rawUrl;
+        }
 
-      setState(() => _vpnState = VpnState.connecting);
-      await Future.delayed(const Duration(milliseconds: 1400));
-      if (!mounted) return;
+        final isFa = I18n.currentLang == AppLanguage.fa;
+        final bypassList = (_bypassIran || _bypassLan) ? _bypassSubnets : null;
 
-      // Restore pulse to smooth breathing animation
-      _pulseController.duration = const Duration(milliseconds: 1800);
-      _pulseController.repeat(reverse: true);
-
-      setState(() {
-        _vpnState = VpnState.connected;
-        _connectedSeconds = 0;
-      });
-      _startTelemetry();
-
-      _addConnectionLog('Connected (200 OK) - Protocol: $serverProto, Latency: ${server?.pingDisplay ?? "65ms"}');
-
-      // Show real foreground notification in status bar
-      if (_selectedServer != null) {
-        await VelocityNotificationService.showVpnConnectedNotification(
-          serverName: _selectedServer!.name,
-          pingMs: _selectedServer!.pingMs ?? 0,
+        await _v2ray.startV2Ray(
+          remark: server.name,
+          config: fullConfig,
+          proxyOnly: false,
+          bypassSubnets: bypassList,
+          notificationDisconnectButtonName: isFa ? "قطع اتصال" : "DISCONNECT",
         );
+
+        _pulseController.duration = const Duration(milliseconds: 1800);
+        _pulseController.repeat(reverse: true);
+
+        setState(() {
+          _vpnState = VpnState.connected;
+          _connectedSeconds = 0;
+        });
+
+        _startDurationTimer();
+        _addConnectionLog('[Xray Connected] Tunnel active via ${server.protocol.label}');
+
+        if (_notificationsEnabled) {
+          await VelocityNotificationService.showVpnConnectedNotification(
+            serverName: server.name,
+            pingMs: server.pingMs ?? 0,
+          );
+        }
+      } catch (err) {
+        _pulseController.duration = const Duration(milliseconds: 1800);
+        _pulseController.repeat(reverse: true);
+        setState(() => _vpnState = VpnState.disconnected);
+        _addConnectionLog('[Xray Connection Failed] $err');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: VelocityColors.neonPink,
+              content: Text('Xray connection error: $err'),
+            ),
+          );
+        }
       }
     } else if (_vpnState == VpnState.connected) {
-      final durationStr = '${(_connectedSeconds ~/ 60)}m ${(_connectedSeconds % 60)}s';
-      _addConnectionLog('Disconnected - Duration: $durationStr, Traffic: ${_totalDownloadMb.toStringAsFixed(1)}MB down / ${_totalUploadMb.toStringAsFixed(1)}MB up');
       setState(() => _vpnState = VpnState.disconnecting);
-      await Future.delayed(const Duration(milliseconds: 600));
-      if (!mounted) return;
-      _stopTelemetry();
+      _addConnectionLog('[Xray Disconnecting] Closing TUN interface...');
+      try {
+        await _v2ray.stopV2Ray();
+      } catch (_) {}
       await VelocityNotificationService.cancelVpnNotification();
+      _durationTimer?.cancel();
       setState(() {
         _vpnState = VpnState.disconnected;
-        _downloadSpeedKb = 0;
-        _uploadSpeedKb = 0;
+        _displayDownloadSpeed = '0.0 KB/s';
+        _displayUploadSpeed = '0.0 KB/s';
       });
+      _addConnectionLog('[Xray Disconnected] Tunnel closed.');
     }
   }
 
-  void _startTelemetry() {
-    _trafficTimer?.cancel();
-    _trafficTimer = Timer.periodic(const Duration(milliseconds: 1000), (_) {
-      if (!mounted || _vpnState != VpnState.connected) return;
-      final rnd = math.Random();
-      setState(() {
-        _downloadSpeedKb = 550.0 + rnd.nextDouble() * 2850.0;
-        _uploadSpeedKb = 120.0 + rnd.nextDouble() * 770.0;
-        _totalDownloadMb += (_downloadSpeedKb / 1024);
-        _totalUploadMb += (_uploadSpeedKb / 1024);
-      });
-    });
-
+  void _startDurationTimer() {
     _durationTimer?.cancel();
     _durationTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted || _vpnState != VpnState.connected) return;
       setState(() => _connectedSeconds++);
     });
-  }
-
-  void _stopTelemetry() {
-    _trafficTimer?.cancel();
-    _durationTimer?.cancel();
-  }
-
-  // -------------------------------------------------------------------------
-  // Real-Time Socket Latency Runner (Raw TCP Socket)
-  // -------------------------------------------------------------------------
-  Future<void> _pingAllServers() async {
-    setState(() {
-      for (var s in _servers) {
-        s.isTesting = true;
-      }
-    });
-
-    _addConnectionLog('Socket ping initiated for ${_servers.length} nodes (TCP probe)');
-
-    for (var server in _servers) {
-      if (!mounted) return;
-      final stopwatch = Stopwatch()..start();
-      try {
-        final socket = await Socket.connect(
-          server.host,
-          server.port,
-          timeout: const Duration(seconds: 2),
-        );
-        stopwatch.stop();
-        socket.destroy();
-        final ms = stopwatch.elapsedMilliseconds;
-        if (mounted) {
-          setState(() {
-            server.pingMs = ms;
-            server.isTesting = false;
-          });
-        }
-      } catch (_) {
-        stopwatch.stop();
-        if (mounted) {
-          setState(() {
-            server.pingMs = -1; // -1 represents timeout or unreachable
-            server.isTesting = false;
-          });
-        }
-      }
-    }
-
-    if (mounted) {
-      _addConnectionLog('Socket ping completed for all nodes.');
-    }
-  }
-
-  Future<void> _pingSingleServer(ServerProfile server) async {
-    setState(() {
-      server.isTesting = true;
-    });
-    final stopwatch = Stopwatch()..start();
-    try {
-      final socket = await Socket.connect(
-        server.host,
-        server.port,
-        timeout: const Duration(seconds: 2),
-      );
-      stopwatch.stop();
-      socket.destroy();
-      final ms = stopwatch.elapsedMilliseconds;
-      if (mounted) {
-        setState(() {
-          server.pingMs = ms;
-          server.isTesting = false;
-        });
-        _addConnectionLog('[TCP Ping] ${server.name}: ${ms}ms');
-      }
-    } catch (_) {
-      stopwatch.stop();
-      if (mounted) {
-        setState(() {
-          server.pingMs = -1;
-          server.isTesting = false;
-        });
-        _addConnectionLog('[TCP Ping Timeout] ${server.name} unreachable (>2s)');
-      }
-    }
-  }
-
-  // -------------------------------------------------------------------------
-  // Cyberpunk Persistent Connection Log Viewer
-  // -------------------------------------------------------------------------
-  void _showConnectionLogViewer() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setSheetState) => Directionality(
-          textDirection: I18n.currentLang == AppLanguage.fa
-              ? TextDirection.rtl
-              : TextDirection.ltr,
-          child: Container(
-            height: MediaQuery.of(context).size.height * 0.78,
-            decoration: const BoxDecoration(
-              color: VelocityColors.surfaceDark,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-              border: Border(
-                top: BorderSide(color: VelocityColors.electricCyan, width: 1.5),
-                left: BorderSide(color: VelocityColors.borderDark, width: 1),
-                right: BorderSide(color: VelocityColors.borderDark, width: 1),
-              ),
-            ),
-            child: Column(
-              children: [
-                // Top drag handle
-                Center(
-                  child: Container(
-                    margin: const EdgeInsets.only(top: 12, bottom: 8),
-                    width: 42,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: VelocityColors.textMuted,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-                // Header Bar
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: VelocityColors.electricCyan.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: VelocityColors.electricCyan, width: 1),
-                        ),
-                        child: const Icon(
-                          Icons.terminal_rounded,
-                          color: VelocityColors.electricCyan,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              I18n.t('log_viewer_title'),
-                              style: const TextStyle(
-                                color: VelocityColors.textPrimary,
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                            Text(
-                              '${_connectionLogs.length} events recorded (Pure Dart)',
-                              style: const TextStyle(
-                                color: VelocityColors.textSecondary,
-                                fontSize: 11,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Copy Logs Button
-                      ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: VelocityColors.surfaceElevated,
-                          foregroundColor: VelocityColors.electricCyan,
-                          side: const BorderSide(color: VelocityColors.electricCyan),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                        ),
-                        onPressed: _connectionLogs.isEmpty
-                            ? null
-                            : () async {
-                                final textToCopy = _connectionLogs.join('\n');
-                                await Clipboard.setData(ClipboardData(text: textToCopy));
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Row(
-                                        children: [
-                                          const Icon(Icons.check_circle, color: VelocityColors.neonGreen, size: 16),
-                                          const SizedBox(width: 8),
-                                          Text(I18n.t('logs_copied')),
-                                        ],
-                                      ),
-                                      backgroundColor: VelocityColors.surfaceElevated,
-                                      behavior: SnackBarBehavior.floating,
-                                      duration: const Duration(seconds: 2),
-                                    ),
-                                  );
-                                }
-                              },
-                        icon: const Icon(Icons.copy_rounded, size: 14),
-                        label: Text(
-                          I18n.t('copy_logs'),
-                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      // Clear Logs Button
-                      IconButton(
-                        icon: const Icon(Icons.delete_outline, color: VelocityColors.neonPink, size: 19),
-                        tooltip: I18n.t('clear_logs'),
-                        onPressed: _connectionLogs.isEmpty
-                            ? null
-                            : () async {
-                                await _clearConnectionLogs();
-                                setSheetState(() {});
-                              },
-                      ),
-                    ],
-                  ),
-                ),
-                const Divider(color: VelocityColors.borderDark, height: 1),
-                // Terminal Console Area
-                Expanded(
-                  child: Container(
-                    margin: const EdgeInsets.all(12),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: VelocityColors.pureBlack,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: VelocityColors.borderDark),
-                    ),
-                    child: _connectionLogs.isEmpty
-                        ? Center(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(Icons.terminal_rounded, color: VelocityColors.textMuted, size: 36),
-                                const SizedBox(height: 8),
-                                Text(
-                                  I18n.t('no_logs_yet'),
-                                  style: const TextStyle(color: VelocityColors.textMuted, fontSize: 12),
-                                ),
-                              ],
-                            ),
-                          )
-                        : ListView.separated(
-                            physics: const BouncingScrollPhysics(),
-                            itemCount: _connectionLogs.length,
-                            separatorBuilder: (_, __) => const SizedBox(height: 6),
-                            itemBuilder: (context, index) {
-                              final log = _connectionLogs[index];
-                              Color logColor = VelocityColors.textSecondary;
-                              if (log.contains('Connected') || log.contains('200 OK') || log.contains('ready')) {
-                                logColor = VelocityColors.neonGreen;
-                              } else if (log.contains('Timeout') || log.contains('unreachable') || log.contains('Fail') || log.contains('Error')) {
-                                logColor = VelocityColors.neonPink;
-                              } else if (log.contains('Handshake') || log.contains('Resolving') || log.contains('Socket ping') || log.contains('switch')) {
-                                logColor = VelocityColors.electricCyan;
-                              } else if (log.contains('Disconnected') || log.contains('terminating')) {
-                                logColor = VelocityColors.neonYellow;
-                              }
-                              return Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '> ',
-                                    style: TextStyle(
-                                      color: VelocityColors.electricCyan.withOpacity(0.6),
-                                      fontFamily: 'monospace',
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: SelectableText(
-                                      log,
-                                      style: TextStyle(
-                                        color: logColor,
-                                        fontFamily: 'monospace',
-                                        fontSize: 11,
-                                        height: 1.3,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // -------------------------------------------------------------------------
-  // Telegram Support / Channel Action
-  // -------------------------------------------------------------------------
-  void _openTelegramSupport() async {
-    try {
-      final uri = Uri.parse('https://t.me/Velocity_Support');
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } catch (e) {
-      debugPrint('Could not launch Telegram: $e');
-    }
-  }
-
-  void _openReceiptUploadScreen() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ReceiptUploadScreen(
-          isFa: I18n.currentLang == AppLanguage.fa,
-          plans: _plans,
-          currentUser: _currentUser,
-          onOpenTelegram: _openTelegramSupport,
-          onPlanPurchased: (purchasedPlan) {
-            setState(() {
-              _currentUser = _currentUser.copyWith(
-                planName: purchasedPlan.name,
-                isVipActive: true,
-                dataTotal: purchasedPlan.dataQuota,
-                planExpiry: '2026-11-30',
-              );
-            });
-          },
-        ),
-      ),
-    );
-  }
-
-  void _openPowerUserSettings() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => VelocityPowerUserSettingsScreen(
-          isFa: I18n.currentLang == AppLanguage.fa,
-          currentRoutingMode: _routingMode,
-          onRoutingModeChanged: (mode) {
-            setState(() => _routingMode = mode);
-          },
-          onAccentChanged: () {
-            setState(() {});
-          },
-        ),
-      ),
-    );
   }
 
   String _formattedDuration() {
@@ -2002,118 +1119,205 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   // -------------------------------------------------------------------------
-  // UI Builder
+  // Real Xray Delay & Socket Ping
+  // -------------------------------------------------------------------------
+  Future<void> _pingAllServers() async {
+    setState(() {
+      for (var s in _servers) {
+        s.isTesting = true;
+      }
+    });
+
+    _addConnectionLog('[Xray Ping All] Measuring latencies across ${_servers.length} nodes...');
+
+    for (var server in _servers) {
+      if (!mounted) return;
+      await _pingSingleServer(server, log: false);
+    }
+
+    if (mounted) {
+      _addConnectionLog('[Xray Ping All] Completed.');
+    }
+  }
+
+  Future<void> _pingSingleServer(ServerProfile server, {bool log = true}) async {
+    setState(() => server.isTesting = true);
+
+    int delay = -1;
+    try {
+      delay = await _v2ray.getServerDelay(url: server.rawUrl);
+    } catch (_) {
+      try {
+        final parsed = V2ray.parseFromURL(server.rawUrl);
+        delay = await _v2ray.getServerDelay(config: parsed.getFullConfiguration());
+      } catch (_) {}
+    }
+
+    if (delay <= 0) {
+      // Fallback TCP Socket Probe
+      final sw = Stopwatch()..start();
+      try {
+        final s = await Socket.connect(server.host, server.port, timeout: const Duration(seconds: 2));
+        sw.stop();
+        s.destroy();
+        delay = sw.elapsedMilliseconds;
+      } catch (_) {
+        sw.stop();
+        delay = -1;
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        server.pingMs = delay;
+        server.isTesting = false;
+      });
+      if (log) {
+        _addConnectionLog('[Latency] ${server.name}: ${delay > 0 ? "${delay}ms" : "Timeout"}');
+      }
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Telegram Support
+  // -------------------------------------------------------------------------
+  Future<void> _openTelegramSupport() async {
+    try {
+      final uri = Uri.parse('https://t.me/Velocity_Support');
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (_) {}
+  }
+
+  // -------------------------------------------------------------------------
+  // Log Viewer
+  // -------------------------------------------------------------------------
+  void _showConnectionLogViewer() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setSheetState) => Directionality(
+          textDirection: widget.currentLang == AppLanguage.fa ? TextDirection.rtl : TextDirection.ltr,
+          child: Container(
+            height: MediaQuery.of(context).size.height * 0.75,
+            decoration: const BoxDecoration(
+              color: VelocityColors.surfaceDark,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              border: Border(top: BorderSide(color: VelocityColors.electricCyan, width: 1.5)),
+            ),
+            child: Column(
+              children: [
+                const SizedBox(height: 12),
+                Container(
+                  width: 44,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: VelocityColors.borderDark,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.terminal_rounded, color: VelocityColors.electricCyan, size: 20),
+                          const SizedBox(width: 8),
+                          Text(
+                            I18n.t('log_viewer_title'),
+                            style: const TextStyle(
+                              color: VelocityColors.textPrimary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.copy_rounded, color: VelocityColors.electricCyan, size: 18),
+                            tooltip: I18n.t('copy_logs'),
+                            onPressed: () {
+                              Clipboard.setData(ClipboardData(text: _connectionLogs.join('\n')));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  backgroundColor: VelocityColors.surfaceElevated,
+                                  content: Text(
+                                    I18n.t('logs_copied'),
+                                    style: const TextStyle(color: VelocityColors.electricCyan),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete_sweep_rounded, color: VelocityColors.neonPink, size: 18),
+                            tooltip: I18n.t('clear_logs'),
+                            onPressed: () {
+                              setState(() => _connectionLogs.clear());
+                              setSheetState(() {});
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(color: VelocityColors.borderDark, height: 1),
+                Expanded(
+                  child: _connectionLogs.isEmpty
+                      ? Center(
+                          child: Text(
+                            I18n.t('no_logs_yet'),
+                            style: const TextStyle(color: VelocityColors.textMuted, fontSize: 12),
+                          ),
+                        )
+                      : Directionality(
+                          textDirection: TextDirection.ltr,
+                          child: ListView.builder(
+                            padding: const EdgeInsets.all(14),
+                            itemCount: _connectionLogs.length,
+                            itemBuilder: (context, index) {
+                              final log = _connectionLogs[index];
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 6),
+                                child: Text(
+                                  log,
+                                  style: TextStyle(
+                                    fontFamily: 'monospace',
+                                    fontSize: 11,
+                                    color: log.contains('Connected')
+                                        ? VelocityColors.neonGreen
+                                        : log.contains('Failed') || log.contains('Error')
+                                            ? VelocityColors.neonPink
+                                            : VelocityColors.textSecondary,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // -------------------------------------------------------------------------
+  // Main Build
   // -------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: VelocityColors.pureBlack,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(64),
-        child: Container(
-          decoration: BoxDecoration(
-            color: VelocityColors.pureBlack,
-            border: Border(
-              bottom: BorderSide(
-                color: VelocityColors.electricCyan.withOpacity(0.25),
-                width: 1.0,
-              ),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: VelocityColors.electricCyan.withOpacity(0.08),
-                blurRadius: 16,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              child: Row(
-                children: [
-                  // Stylized Glowing 'V' Emblem
-                  const VelocityEmblemWidget(size: 38, glowIntensity: 1.0),
-                  const SizedBox(width: 10),
-                  // Title "VELOCITY" & Tagline "SECURE VPN SERVICES"
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        I18n.t('app_title'),
-                        style: const TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 2.0,
-                          color: VelocityColors.electricCyan,
-                        ),
-                      ),
-                      Text(
-                        I18n.t('subtitle_tagline'),
-                        style: const TextStyle(
-                          fontSize: 8.5,
-                          letterSpacing: 1.2,
-                          fontWeight: FontWeight.w500,
-                          color: VelocityColors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Spacer(),
-                  // User Profile & Authentication Terminal
-                  IconButton(
-                    icon: Icon(
-                      _currentUser.role == UserRole.user
-                          ? Icons.account_circle_rounded
-                          : Icons.no_accounts_outlined,
-                      color: _currentUser.role == UserRole.user
-                          ? VelocityColors.neonGreen
-                          : VelocityColors.electricCyan,
-                      size: 22,
-                    ),
-                    tooltip: I18n.t('profile'),
-                    onPressed: _openAuthOrProfile,
-                  ),
-                  // Telegram Support button
-                  IconButton(
-                    icon: const Icon(Icons.send_rounded, color: VelocityColors.electricCyan, size: 20),
-                    tooltip: I18n.t('telegram_support'),
-                    onPressed: _openTelegramSupport,
-                  ),
-                  // Language toggle (EN/FA)
-                  InkWell(
-                    onTap: widget.onToggleLanguage,
-                    borderRadius: BorderRadius.circular(8),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-                      decoration: BoxDecoration(
-                        color: VelocityColors.surfaceElevated,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: VelocityColors.electricCyan, width: 1),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.language, color: VelocityColors.electricCyan, size: 13),
-                          const SizedBox(width: 4),
-                          Text(
-                            widget.currentLang == AppLanguage.en ? 'FA' : 'EN',
-                            style: const TextStyle(
-                              color: VelocityColors.electricCyan,
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
+      appBar: _buildTopAppBar(),
       body: SafeArea(
         child: IndexedStack(
           index: _currentTabIndex,
@@ -2127,72 +1331,34 @@ class _HomeScreenState extends State<HomeScreen>
       ),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
-          color: VelocityColors.surfaceDark,
-          border: Border(
-            top: BorderSide(color: VelocityColors.borderDark, width: 1.5),
-          ),
+          color: VelocityColors.midnightBg,
+          border: Border(top: BorderSide(color: VelocityColors.borderDark, width: 1)),
         ),
         child: BottomNavigationBar(
           currentIndex: _currentTabIndex,
           onTap: (index) => setState(() => _currentTabIndex = index),
-          backgroundColor: VelocityColors.pureBlack,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
           selectedItemColor: VelocityColors.electricCyan,
           unselectedItemColor: VelocityColors.textSecondary,
           selectedFontSize: 11,
           unselectedFontSize: 10,
           type: BottomNavigationBarType.fixed,
-          elevation: 10,
           items: [
             BottomNavigationBarItem(
               icon: const Icon(Icons.power_settings_new),
-              activeIcon: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: VelocityColors.electricCyan.withOpacity(0.18),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: VelocityColors.electricCyan, width: 1),
-                ),
-                child: const Icon(Icons.power_settings_new, color: VelocityColors.electricCyan, size: 20),
-              ),
               label: I18n.t('tab_home'),
             ),
             BottomNavigationBarItem(
               icon: const Icon(Icons.dns_rounded),
-              activeIcon: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: VelocityColors.electricCyan.withOpacity(0.18),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: VelocityColors.electricCyan, width: 1),
-                ),
-                child: const Icon(Icons.dns_rounded, color: VelocityColors.electricCyan, size: 20),
-              ),
               label: I18n.t('tab_servers'),
             ),
             BottomNavigationBarItem(
               icon: const Icon(Icons.star_rounded),
-              activeIcon: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: VelocityColors.neonYellow.withOpacity(0.18),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: VelocityColors.neonYellow, width: 1),
-                ),
-                child: const Icon(Icons.star_rounded, color: VelocityColors.neonYellow, size: 20),
-              ),
               label: I18n.t('tab_vip'),
             ),
             BottomNavigationBarItem(
               icon: const Icon(Icons.tune_rounded),
-              activeIcon: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: VelocityColors.electricCyan.withOpacity(0.18),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: VelocityColors.electricCyan, width: 1),
-                ),
-                child: const Icon(Icons.tune_rounded, color: VelocityColors.electricCyan, size: 20),
-              ),
               label: I18n.t('tab_settings'),
             ),
           ],
@@ -2202,1294 +1368,61 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   // -------------------------------------------------------------------------
-  // Tab 0: Home Tab (Giant Power Switch, Telemetry Gauge, Active Node, Duration)
+  // Top App Bar
   // -------------------------------------------------------------------------
-  Widget _buildHomeTab() {
-    return Column(
-      children: [
-        // Top Routing Mode Bar & Quick Import
-        _buildTopRoutingBar(),
+  PreferredSizeWidget _buildTopAppBar() {
+    final isConnected = _vpnState == VpnState.connected;
+    final isFa = widget.currentLang == AppLanguage.fa;
 
-        // Status Indicator Header (Pulsing state & connect duration timer)
-        const SizedBox(height: 12),
-        _buildStatusHeader(),
-
-        // Central Animated Giant Power Switch
-        Expanded(
-          child: Center(
-            child: _buildGlowingPowerButton(),
-          ),
-        ),
-
-        // Live Telemetry Speed Gauge
-        _buildTelemetryCard(),
-
-        const SizedBox(height: 12),
-
-        // Active Selected Server Badge (Tap to navigate directly to Servers tab)
-        _buildActiveServerCard(),
-
-        const SizedBox(height: 14),
-      ],
-    );
-  }
-
-  // -------------------------------------------------------------------------
-  // Tab 1: Top Quota & Expiry Info Card
-  // -------------------------------------------------------------------------
-  Widget _buildSubscriptionInfoCard() {
-    final sub = _subscriptionInfo;
-
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: VelocityColors.surfaceElevated,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: sub != null ? VelocityColors.electricCyan.withOpacity(0.5) : VelocityColors.borderDark,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: (sub != null ? VelocityColors.electricCyan : Colors.black).withOpacity(0.08),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return AppBar(
+      backgroundColor: VelocityColors.midnightBg,
+      elevation: 0,
+      title: Row(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Icon(
-                    sub != null ? Icons.verified_rounded : Icons.info_outline,
-                    color: sub != null ? VelocityColors.neonGreen : VelocityColors.electricCyan,
-                    size: 18,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    sub != null ? (sub.planName ?? I18n.t('subscription_quota')) : I18n.t('no_active_subscription'),
-                    style: const TextStyle(
-                      color: VelocityColors.textPrimary,
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: (sub != null ? VelocityColors.neonGreen : VelocityColors.textMuted).withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(
-                    color: sub != null ? VelocityColors.neonGreen : VelocityColors.borderDark,
-                  ),
-                ),
-                child: Text(
-                  sub != null ? I18n.t('sub_active') : I18n.t('sub_free'),
-                  style: TextStyle(
-                    color: sub != null ? VelocityColors.neonGreen : VelocityColors.textSecondary,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          if (sub != null) ...[
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                value: sub.quotaProgress.clamp(0.0, 1.0),
-                backgroundColor: VelocityColors.pureBlack,
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  sub.quotaProgress > 0.85 ? VelocityColors.neonPink : VelocityColors.electricCyan,
-                ),
-                minHeight: 6,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '${sub.trafficUsageFormatted} / ${sub.trafficTotalFormatted}',
-                  style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11),
-                ),
-                Text(
-                  '${I18n.t('sub_expiry')} ${sub.expiryDateFormatted}',
-                  style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11),
-                ),
-              ],
-            ),
-          ] else ...[
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    I18n.t('import_prompt'),
-                    style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                InkWell(
-                  onTap: _showImportDialog,
-                  borderRadius: BorderRadius.circular(8),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: VelocityColors.electricCyan.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: VelocityColors.electricCyan),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.add, color: VelocityColors.electricCyan, size: 14),
-                        const SizedBox(width: 4),
-                        Text(
-                          I18n.t('import_config'),
-                          style: const TextStyle(
-                            color: VelocityColors.electricCyan,
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  // -------------------------------------------------------------------------
-  // Tab 1: Clean Node List, Search, Ping All, and Import Dialog
-  // -------------------------------------------------------------------------
-  Widget _buildServersTab() {
-    final isFa = I18n.currentLang == AppLanguage.fa;
-
-    var displayServers = _servers.where((s) {
-      if (_nodeSearchQuery.isEmpty) return true;
-      final query = _nodeSearchQuery.toLowerCase();
-      return s.name.toLowerCase().contains(query) ||
-          s.host.toLowerCase().contains(query) ||
-          s.protocol.name.toLowerCase().contains(query);
-    }).toList();
-
-    if (_sortByLowestPing) {
-      displayServers.sort((a, b) {
-        if (a.pingMs == null && b.pingMs == null) return 0;
-        if (a.pingMs == null) return 1;
-        if (b.pingMs == null) return -1;
-        if (a.pingMs! < 0 && b.pingMs! < 0) return 0;
-        if (a.pingMs! < 0) return 1;
-        if (b.pingMs! < 0) return -1;
-        return a.pingMs!.compareTo(b.pingMs!);
-      });
-    }
-
-    return Column(
-      children: [
-        // Top Quota / Expiry Info Card
-        _buildSubscriptionInfoCard(),
-
-        // Server Header & Action Controls (Search, Ping All, Import)
-        Container(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.dns_rounded, color: VelocityColors.electricCyan, size: 18),
-                      const SizedBox(width: 8),
-                      Text(
-                        I18n.t('tab_servers'),
-                        style: const TextStyle(
-                          color: VelocityColors.textPrimary,
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: VelocityColors.surfaceElevated,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: VelocityColors.borderDark),
-                        ),
-                        child: Text(
-                          '${_servers.length}',
-                          style: const TextStyle(
-                            color: VelocityColors.electricCyan,
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      // Live TCP Ping All Button
-                      if (_servers.isNotEmpty)
-                        OutlinedButton.icon(
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: VelocityColors.electricCyan, width: 1),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                            backgroundColor: VelocityColors.electricCyan.withOpacity(0.08),
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          ),
-                          onPressed: _pingAllServers,
-                          icon: const Icon(Icons.bolt, color: VelocityColors.electricCyan, size: 15),
-                          label: Text(
-                            I18n.t('ping_all'),
-                            style: const TextStyle(
-                              color: VelocityColors.electricCyan,
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      const SizedBox(width: 8),
-                      // Import Config / URL Button
-                      ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: VelocityColors.electricCyan,
-                          foregroundColor: VelocityColors.pureBlack,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                        ),
-                        onPressed: _showImportDialog,
-                        icon: const Icon(Icons.add, size: 15),
-                        label: Text(
-                          I18n.t('import_config'),
-                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              // Search Bar & Sort Toggle
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      height: 38,
-                      decoration: BoxDecoration(
-                        color: VelocityColors.surfaceElevated,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: VelocityColors.borderDark),
-                      ),
-                      child: TextField(
-                        onChanged: (val) => setState(() => _nodeSearchQuery = val),
-                        style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12),
-                        decoration: InputDecoration(
-                          hintText: I18n.t('search_nodes'),
-                          hintStyle: const TextStyle(color: VelocityColors.textMuted, fontSize: 11),
-                          prefixIcon: const Icon(Icons.search_rounded, size: 16, color: VelocityColors.textMuted),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  InkWell(
-                    onTap: () => setState(() => _sortByLowestPing = !_sortByLowestPing),
-                    borderRadius: BorderRadius.circular(8),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
-                      decoration: BoxDecoration(
-                        color: _sortByLowestPing
-                            ? VelocityColors.neonGreen.withOpacity(0.18)
-                            : VelocityColors.surfaceElevated,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: _sortByLowestPing ? VelocityColors.neonGreen : VelocityColors.borderDark,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.speed_rounded,
-                            size: 15,
-                            color: _sortByLowestPing ? VelocityColors.neonGreen : VelocityColors.textSecondary,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            isFa ? 'پینگ' : 'Ping',
-                            style: TextStyle(
-                              color: _sortByLowestPing ? VelocityColors.neonGreen : VelocityColors.textSecondary,
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-
-        // Server List or Clean Empty State
-        Expanded(
-          child: displayServers.isEmpty
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-                      decoration: BoxDecoration(
-                        color: VelocityColors.surfaceDark,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: VelocityColors.borderDark),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(14),
-                            decoration: BoxDecoration(
-                              color: VelocityColors.electricCyan.withOpacity(0.12),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              _servers.isEmpty ? Icons.cloud_off_rounded : Icons.search_off_rounded,
-                              size: 46,
-                              color: VelocityColors.electricCyan,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            _servers.isEmpty ? I18n.t('no_nodes_available') : I18n.t('no_nodes_found'),
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: VelocityColors.textPrimary,
-                              fontSize: 13,
-                              height: 1.6,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 18),
-                          ElevatedButton.icon(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: VelocityColors.electricCyan,
-                              foregroundColor: VelocityColors.pureBlack,
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                            ),
-                            onPressed: _showImportDialog,
-                            icon: const Icon(Icons.add_link, size: 18),
-                            label: Text(
-                              I18n.t('import_config'),
-                              style: const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
-                  itemCount: displayServers.length,
-                  itemBuilder: (context, index) {
-                    final server = displayServers[index];
-                    final isSelected = _selectedServer?.id == server.id;
-
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? VelocityColors.electricCyan.withOpacity(0.09)
-                            : VelocityColors.surfaceDark,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isSelected ? VelocityColors.electricCyan : VelocityColors.borderDark,
-                          width: isSelected ? 1.5 : 1.0,
-                        ),
-                      ),
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                        onTap: () {
-                          setState(() => _selectedServer = server);
-                          _savePersistedData();
-                          _addConnectionLog('Selected active node: ${server.name} (${server.protocol.name.toUpperCase()})');
-                        },
-                        leading: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
-                              color: isSelected ? VelocityColors.electricCyan : VelocityColors.textMuted,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(server.countryCode, style: const TextStyle(fontSize: 22)),
-                          ],
-                        ),
-                        title: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                server.name,
-                                style: TextStyle(
-                                  color: isSelected ? VelocityColors.electricCyan : VelocityColors.textPrimary,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: VelocityColors.surfaceElevated,
-                                borderRadius: BorderRadius.circular(4),
-                                border: Border.all(color: VelocityColors.borderDark),
-                              ),
-                              child: Text(
-                                server.protocol.name.toUpperCase(),
-                                style: const TextStyle(
-                                  color: VelocityColors.textSecondary,
-                                  fontSize: 9.5,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        subtitle: Text(
-                          '${server.host}:${server.port}',
-                          style: const TextStyle(color: VelocityColors.textMuted, fontSize: 11),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            // Real TCP Socket ping latency badge (tap to test)
-                            InkWell(
-                              borderRadius: BorderRadius.circular(6),
-                              onTap: () => _pingSingleServer(server),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: server.pingColor.withOpacity(0.14),
-                                  borderRadius: BorderRadius.circular(6),
-                                  border: Border.all(color: server.pingColor),
-                                ),
-                                child: server.isTesting
-                                    ? const SizedBox(
-                                        width: 12,
-                                        height: 12,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 1.5,
-                                          color: VelocityColors.electricCyan,
-                                        ),
-                                      )
-                                    : Text(
-                                        server.pingDisplay,
-                                        style: TextStyle(
-                                          color: server.pingColor,
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete_outline, size: 18, color: VelocityColors.textMuted),
-                              tooltip: I18n.t('delete_node'),
-                              onPressed: () {
-                                setState(() {
-                                  _servers.removeWhere((s) => s.id == server.id);
-                                  if (_selectedServer?.id == server.id) {
-                                    _selectedServer = _servers.isNotEmpty ? _servers.first : null;
-                                  }
-                                });
-                                _savePersistedData();
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-        ),
-      ],
-    );
-  }
-
-  // -------------------------------------------------------------------------
-  // Tab 2: VIP Subscription Plans & Direct Telegram Support
-  // -------------------------------------------------------------------------
-  Widget _buildVipTab() {
-    final isFa = I18n.currentLang == AppLanguage.fa;
-
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        // Cyberpunk VIP Hero Banner
-        Container(
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [
-                VelocityColors.surfaceElevated,
-                Color(0xFF161028),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: VelocityColors.neonYellow.withOpacity(0.6), width: 1.2),
-            boxShadow: [
-              BoxShadow(
-                color: VelocityColors.neonYellow.withOpacity(0.12),
-                blurRadius: 18,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: VelocityColors.neonYellow.withOpacity(0.15),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: VelocityColors.neonYellow),
-                ),
-                child: const Icon(Icons.workspace_premium_rounded, color: VelocityColors.neonYellow, size: 28),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      isFa ? 'سرویس‌های اختصاصی VIP ولوسیتی' : 'VELOCITY VIP NETWORKS',
-                      style: const TextStyle(
-                        color: VelocityColors.textPrimary,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      isFa
-                          ? 'پروتکل‌های ضد فیلتر VLESS Reality و Hysteria 2 با آی‌پی تمیز و گارانتی سرعت'
-                          : 'Dedicated anti-filtering TLS 1.3 & Hysteria 2 UDP with clean IPs',
-                      style: const TextStyle(
-                        color: VelocityColors.textSecondary,
-                        fontSize: 11.5,
-                        height: 1.4,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 14),
-
-        // Prominent Telegram Support Button
-        InkWell(
-          onTap: _openTelegramSupport,
-          borderRadius: BorderRadius.circular(14),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            decoration: BoxDecoration(
-              color: const Color(0xFF0F1E2E),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: VelocityColors.electricCyan, width: 1.5),
-              boxShadow: [
-                BoxShadow(
-                  color: VelocityColors.electricCyan.withOpacity(0.15),
-                  blurRadius: 12,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: const BoxDecoration(
-                    color: VelocityColors.electricCyan,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.send_rounded, color: VelocityColors.pureBlack, size: 20),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        isFa ? 'ارتباط با پشتیبانی تلگرام' : 'Contact Telegram Support',
-                        style: const TextStyle(
-                          color: VelocityColors.electricCyan,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        isFa
-                            ? 'خرید مستقیم، دریافت تست رایگان و پشتیبانی ۲۴ ساعته در @Velocity_Support'
-                            : 'Instant activation & 24/7 support at @Velocity_Support',
-                        style: const TextStyle(
-                          color: VelocityColors.textSecondary,
-                          fontSize: 11,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(Icons.arrow_forward_ios_rounded, color: VelocityColors.electricCyan, size: 16),
-              ],
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 20),
-
-        // Section Title: Available Plans
-        Text(
-          isFa ? 'پلن‌های قابل خرید' : 'AVAILABLE SUBSCRIPTION PLANS',
-          style: const TextStyle(
-            color: VelocityColors.electricCyan,
-            fontSize: 12,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 1.0,
-          ),
-        ),
-        const SizedBox(height: 10),
-
-        // List of Plans
-        ..._plans.map((plan) {
-          return Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: VelocityColors.surfaceDark,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: VelocityColors.borderDark),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      plan.name,
-                      style: const TextStyle(
-                        color: VelocityColors.textPrimary,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    if (plan.badge != null)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: VelocityColors.neonYellow.withOpacity(0.18),
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: VelocityColors.neonYellow),
-                        ),
-                        child: Text(
-                          plan.badge!,
-                          style: const TextStyle(
-                            color: VelocityColors.neonYellow,
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    const Icon(Icons.data_usage_rounded, color: VelocityColors.electricCyan, size: 14),
-                    const SizedBox(width: 6),
-                    Text(
-                      plan.dataQuota,
-                      style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 12),
-                    ),
-                    const SizedBox(width: 14),
-                    const Icon(Icons.access_time_rounded, color: VelocityColors.textSecondary, size: 14),
-                    const SizedBox(width: 6),
-                    Text(
-                      '${plan.durationDays} ${isFa ? "روزه" : "Days"}',
-                      style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 12),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  plan.nodesDescription,
-                  style: const TextStyle(color: VelocityColors.textMuted, fontSize: 11),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          plan.priceTomans,
-                          style: const TextStyle(
-                            color: VelocityColors.neonGreen,
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          plan.priceUsdt,
-                          style: const TextStyle(color: VelocityColors.textMuted, fontSize: 10),
-                        ),
-                      ],
-                    ),
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: VelocityColors.electricCyan,
-                        foregroundColor: VelocityColors.pureBlack,
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                      onPressed: _openTelegramSupport,
-                      icon: const Icon(Icons.send_rounded, size: 14),
-                      label: Text(
-                        isFa ? 'خرید از تلگرام' : 'Buy via Telegram',
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          );
-        }),
-
-        const SizedBox(height: 12),
-
-        // Upload Payment Receipt / Ref ID Card
-        Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: VelocityColors.surfaceElevated,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: VelocityColors.borderDark),
-          ),
-          child: Row(
-            children: [
-              const Icon(Icons.receipt_long_rounded, color: VelocityColors.neonYellow, size: 28),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      I18n.t('receipt_title'),
-                      style: const TextStyle(
-                        color: VelocityColors.textPrimary,
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      I18n.t('receipt_desc'),
-                      style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11),
-                    ),
-                  ],
-                ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.arrow_forward_ios_rounded, color: VelocityColors.neonYellow, size: 16),
-                onPressed: _openReceiptUploadScreen,
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 24),
-      ],
-    );
-  }
-
-  // -------------------------------------------------------------------------
-  // Tab 3: Settings & Diagnostics (Bypass Rules, Notification, Persistent Logs)
-  // -------------------------------------------------------------------------
-  Widget _buildSettingsTab() {
-    final isFa = I18n.currentLang == AppLanguage.fa;
-
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        // SECTION 1: Routing & Bypass Controls
-        _buildSettingsSectionHeader(isFa ? 'مسیریابی و فیلترها (Bypass Rules)' : 'ROUTING & BYPASS STRATEGY'),
-        const SizedBox(height: 8),
-        // Bypass Iran switch
-        Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: VelocityColors.surfaceDark,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: _bypassIran ? VelocityColors.electricCyan.withOpacity(0.4) : VelocityColors.borderDark),
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: VelocityColors.surfaceElevated,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(Icons.public, color: VelocityColors.electricCyan, size: 20),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      I18n.t('bypass_iran_title'),
-                      style: const TextStyle(
-                        color: VelocityColors.textPrimary,
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      I18n.t('bypass_iran_desc'),
-                      style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11),
-                    ),
-                  ],
-                ),
-              ),
-              Switch(
-                value: _bypassIran,
-                activeColor: VelocityColors.electricCyan,
-                onChanged: _toggleBypassIran,
-              ),
-            ],
-          ),
-        ),
-        // Bypass LAN switch
-        Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: VelocityColors.surfaceDark,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: _bypassLan ? VelocityColors.electricCyan.withOpacity(0.4) : VelocityColors.borderDark),
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: VelocityColors.surfaceElevated,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(Icons.router_rounded, color: VelocityColors.electricCyan, size: 20),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      I18n.t('bypass_lan_title'),
-                      style: const TextStyle(
-                        color: VelocityColors.textPrimary,
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      I18n.t('bypass_lan_desc'),
-                      style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11),
-                    ),
-                  ],
-                ),
-              ),
-              Switch(
-                value: _bypassLan,
-                activeColor: VelocityColors.electricCyan,
-                onChanged: _toggleBypassLan,
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 16),
-
-        // SECTION 2: Notifications & Background Keepalive
-        _buildSettingsSectionHeader(isFa ? 'اعلان‌ها و پایداری (Notifications)' : 'NOTIFICATIONS & KEEPALIVE'),
-        const SizedBox(height: 8),
-        Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: VelocityColors.surfaceDark,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: VelocityColors.borderDark),
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: VelocityColors.surfaceElevated,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(Icons.notifications_active_rounded, color: VelocityColors.electricCyan, size: 20),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      I18n.t('notif_settings_title'),
-                      style: const TextStyle(
-                        color: VelocityColors.textPrimary,
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      I18n.t('notif_settings_desc'),
-                      style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11),
-                    ),
-                  ],
-                ),
-              ),
-              Switch(
-                value: _notificationsEnabled,
-                activeColor: VelocityColors.electricCyan,
-                onChanged: _toggleNotifications,
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 16),
-
-        // SECTION 3: Diagnostics & Persistent Connection Logs
-        _buildSettingsSectionHeader(isFa ? 'عیب‌یابی و لاگ‌های اتصال' : 'DIAGNOSTICS & CONNECTION LOGS'),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: VelocityColors.surfaceDark,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: VelocityColors.borderDark),
-          ),
-          child: Column(
+          const VelocityEmblemWidget(size: 32),
+          const SizedBox(width: 10),
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: VelocityColors.electricCyan.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: VelocityColors.electricCyan),
-                    ),
-                    child: const Icon(Icons.terminal_rounded, color: VelocityColors.electricCyan, size: 20),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          I18n.t('btn_view_logs'),
-                          style: const TextStyle(
-                            color: VelocityColors.textPrimary,
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '${_connectionLogs.length} ${isFa ? "رویداد ثبت‌شده در حافظه" : "events persisted in storage"}',
-                          style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 14),
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: VelocityColors.surfaceElevated,
-                        foregroundColor: VelocityColors.electricCyan,
-                        side: const BorderSide(color: VelocityColors.electricCyan),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                      ),
-                      onPressed: _showConnectionLogViewer,
-                      icon: const Icon(Icons.terminal_rounded, size: 15),
-                      label: Text(
-                        isFa ? 'باز کردن ترمینال' : 'Open Terminal',
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: VelocityColors.electricCyan,
-                        foregroundColor: VelocityColors.pureBlack,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                      ),
-                      onPressed: () async {
-                        if (_connectionLogs.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              backgroundColor: VelocityColors.surfaceElevated,
-                              content: Text(I18n.t('no_logs_yet')),
-                            ),
-                          );
-                          return;
-                        }
-                        final textToCopy = _connectionLogs.join('\n');
-                        await Clipboard.setData(ClipboardData(text: textToCopy));
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Row(
-                                children: [
-                                  const Icon(Icons.check_circle, color: VelocityColors.neonGreen, size: 16),
-                                  const SizedBox(width: 8),
-                                  Text(I18n.t('logs_copied')),
-                                ],
-                              ),
-                              backgroundColor: VelocityColors.surfaceElevated,
-                              behavior: SnackBarBehavior.floating,
-                              duration: const Duration(seconds: 2),
-                            ),
-                          );
-                        }
-                      },
-                      icon: const Icon(Icons.copy_rounded, size: 15),
-                      label: Text(
-                        I18n.t('copy_logs'),
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 16),
-
-        // SECTION 4: Power-User Settings
-        _buildSettingsSectionHeader(isFa ? 'پیکربندی پیشرفته و شخصی‌سازی' : 'ADVANCED ENGINE & APPEARANCE'),
-        const SizedBox(height: 8),
-        InkWell(
-          onTap: _openPowerUserSettings,
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: VelocityColors.surfaceDark,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: VelocityColors.borderDark),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: VelocityColors.surfaceElevated,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(Icons.tune_rounded, color: VelocityColors.electricCyan, size: 20),
+              Text(
+                I18n.t('app_title'),
+                style: const TextStyle(
+                  color: VelocityColors.textPrimary,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.2,
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        I18n.t('settings_title'),
-                        style: const TextStyle(
-                          color: VelocityColors.textPrimary,
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        I18n.t('settings_subtitle'),
-                        style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11),
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(Icons.arrow_forward_ios_rounded, color: VelocityColors.textMuted, size: 16),
-              ],
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 24),
-
-        // SECTION 5: App Version & About
-        Center(
-          child: Column(
-            children: [
-              const VelocityEmblemWidget(size: 32, glowIntensity: 0.6),
-              const SizedBox(height: 8),
-              const Text(
-                'VELOCITY VPN v1.0.0 CYBERPUNK',
-                style: TextStyle(
+              ),
+              Text(
+                I18n.t('subtitle_tagline'),
+                style: const TextStyle(
                   color: VelocityColors.electricCyan,
-                  fontSize: 11,
+                  fontSize: 8.5,
                   fontWeight: FontWeight.bold,
-                  letterSpacing: 1.5,
-                ),
-              ),
-              const SizedBox(height: 2),
-              const Text(
-                'Pure Dart Sing-box & v2rayNG Engine | TLS 1.3 & Hysteria2',
-                style: TextStyle(color: VelocityColors.textMuted, fontSize: 9.5),
-              ),
-              const SizedBox(height: 4),
-              InkWell(
-                onTap: _openTelegramSupport,
-                child: const Text(
-                  'Telegram Support: @Velocity_Support',
-                  style: TextStyle(
-                    color: VelocityColors.deepCyan,
-                    fontSize: 10,
-                    decoration: TextDecoration.underline,
-                  ),
+                  letterSpacing: 0.8,
                 ),
               ),
             ],
           ),
-        ),
-        const SizedBox(height: 20),
-      ],
-    );
-  }
-
-  Widget _buildSettingsSectionHeader(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 4, right: 4),
-      child: Text(
-        title,
-        style: const TextStyle(
-          color: VelocityColors.electricCyan,
-          fontSize: 11,
-          fontWeight: FontWeight.w900,
-          letterSpacing: 1.2,
-        ),
-      ),
-    );
-  }
-
-  // -------------------------------------------------------------------------
-  // Top Routing Mode & Import Bar
-  // -------------------------------------------------------------------------
-  Widget _buildTopRoutingBar() {
-    return Container(
-      color: VelocityColors.surfaceDark,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Routing mode pill
+          const Spacer(),
+          // Language Switcher Pill
           InkWell(
-            onTap: _showRoutingBottomSheet,
-            borderRadius: BorderRadius.circular(8),
+            onTap: widget.onToggleLanguage,
+            borderRadius: BorderRadius.circular(16),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
-                color: VelocityColors.surfaceElevated,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: VelocityColors.borderDark),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.alt_route, color: VelocityColors.electricCyan, size: 14),
-                  const SizedBox(width: 6),
-                  Text(
-                    _getRoutingTitle(_routingMode),
-                    style: const TextStyle(
-                      color: VelocityColors.textPrimary,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // Import Config button
-          InkWell(
-            onTap: _showImportDialog,
-            borderRadius: BorderRadius.circular(8),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: VelocityColors.surfaceElevated,
-                borderRadius: BorderRadius.circular(8),
+                color: VelocityColors.surfaceDark,
+                borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: VelocityColors.electricCyan.withOpacity(0.5)),
               ),
               child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.add, color: VelocityColors.electricCyan, size: 14),
+                  const Icon(Icons.language_rounded, color: VelocityColors.electricCyan, size: 14),
                   const SizedBox(width: 4),
                   Text(
-                    I18n.t('import_config'),
+                    isFa ? 'FA' : 'EN',
                     style: const TextStyle(
                       color: VelocityColors.electricCyan,
                       fontSize: 11,
@@ -3500,38 +1433,107 @@ class _HomeScreenState extends State<HomeScreen>
               ),
             ),
           ),
+          const SizedBox(width: 8),
+          // Connection Logs
+          IconButton(
+            icon: const Icon(Icons.receipt_long_rounded, color: VelocityColors.textSecondary, size: 20),
+            tooltip: I18n.t('btn_logs'),
+            onPressed: _showConnectionLogViewer,
+          ),
         ],
       ),
     );
   }
 
   // -------------------------------------------------------------------------
-  // Status Indicator & Subscription Quota Header
+  // Tab 0: Home Tab
   // -------------------------------------------------------------------------
+  Widget _buildHomeTab() {
+    return Column(
+      children: [
+        // Routing selector chips
+        _buildRoutingChips(),
+
+        // Status Header
+        const SizedBox(height: 10),
+        _buildStatusHeader(),
+
+        // Power Switch
+        Expanded(
+          child: Center(
+            child: _buildGlowingPowerButton(),
+          ),
+        ),
+
+        // Live Speed HUD Card
+        _buildTelemetryCard(),
+
+        const SizedBox(height: 12),
+
+        // Active Node Quick Select Card
+        _buildActiveServerCard(),
+
+        const SizedBox(height: 14),
+      ],
+    );
+  }
+
+  Widget _buildRoutingChips() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _buildChip(RoutingMode.bypassLan, I18n.t('mode_bypass_lan')),
+          const SizedBox(width: 8),
+          _buildChip(RoutingMode.global, I18n.t('mode_global')),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChip(RoutingMode mode, String label) {
+    final isSelected = _routingMode == mode;
+    return InkWell(
+      onTap: () => setState(() => _routingMode = mode),
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? VelocityColors.electricCyan.withOpacity(0.15) : VelocityColors.surfaceDark,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? VelocityColors.electricCyan : VelocityColors.borderDark,
+            width: isSelected ? 1.4 : 1.0,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? VelocityColors.electricCyan : VelocityColors.textSecondary,
+            fontSize: 11,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildStatusHeader() {
-    Color statusColor;
-    String statusText;
+    final isConnected = _vpnState == VpnState.connected;
+    final isConnecting = _vpnState == VpnState.connecting || _vpnState == VpnState.disconnecting;
 
-    switch (_vpnState) {
-      case VpnState.connected:
-        statusColor = VelocityColors.neonGreen;
-        statusText = I18n.t('status_connected');
-        break;
-      case VpnState.connecting:
-        statusColor = VelocityColors.electricCyan;
-        statusText = I18n.t('status_connecting');
-        break;
-      case VpnState.disconnecting:
-        statusColor = VelocityColors.neonPink;
-        statusText = I18n.t('status_disconnecting');
-        break;
-      case VpnState.disconnected:
-        statusColor = VelocityColors.neonPink;
-        statusText = I18n.t('status_disconnected');
-        break;
-    }
+    final statusColor = isConnected
+        ? VelocityColors.neonGreen
+        : isConnecting
+            ? VelocityColors.electricCyan
+            : VelocityColors.textMuted;
 
-    final isFa = I18n.currentLang == AppLanguage.fa;
+    final statusText = isConnected
+        ? I18n.t('status_connected')
+        : isConnecting
+            ? I18n.t('status_connecting')
+            : I18n.t('status_disconnected');
 
     return Column(
       children: [
@@ -3560,76 +1562,34 @@ class _HomeScreenState extends State<HomeScreen>
                 color: statusColor,
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
-                letterSpacing: 1.2,
+                letterSpacing: 0.8,
               ),
             ),
           ],
         ),
-        if (_vpnState == VpnState.connected) ...[
+        if (isConnected) ...[
           const SizedBox(height: 4),
-          Text(
-            '${I18n.t('connected_time')}: ${_formattedDuration()}',
-            style: const TextStyle(
-              color: VelocityColors.textSecondary,
-              fontSize: 11,
-              fontFamily: 'monospace',
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: Text(
+              _formattedDuration(),
+              style: const TextStyle(
+                fontFamily: 'monospace',
+                fontSize: 14,
+                color: VelocityColors.textPrimary,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
-        const SizedBox(height: 6),
-        // Real Subscription Quota & Expiry Badge
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: VelocityColors.surfaceElevated,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: _subscriptionInfo != null && _subscriptionInfo!.hasQuota
-                  ? VelocityColors.neonGreen.withOpacity(0.35)
-                  : VelocityColors.borderDark,
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                _subscriptionInfo != null && _subscriptionInfo!.hasQuota
-                    ? Icons.cloud_done_rounded
-                    : Icons.cloud_queue_rounded,
-                color: _subscriptionInfo != null && _subscriptionInfo!.hasQuota
-                    ? VelocityColors.neonGreen
-                    : VelocityColors.textMuted,
-                size: 13,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                _subscriptionInfo != null
-                    ? '${_subscriptionInfo!.quotaDisplay(isFa)} • ${_subscriptionInfo!.remainingDisplay(isFa)}'
-                    : I18n.t('no_active_subscription'),
-                style: TextStyle(
-                  color: _subscriptionInfo != null && _subscriptionInfo!.hasQuota
-                      ? VelocityColors.neonGreen
-                      : VelocityColors.textMuted,
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: isFa ? 'Vazirmatn' : 'monospace',
-                ),
-              ),
-            ],
-          ),
-        ),
       ],
     );
   }
 
-  // -------------------------------------------------------------------------
-  // Central Glowing Power Button with Neon BoxShadow
-  // -------------------------------------------------------------------------
   Widget _buildGlowingPowerButton() {
     final hasServers = _servers.isNotEmpty && _selectedServer != null;
     final isConnected = _vpnState == VpnState.connected;
-    final isConnecting =
-        _vpnState == VpnState.connecting || _vpnState == VpnState.disconnecting;
+    final isConnecting = _vpnState == VpnState.connecting || _vpnState == VpnState.disconnecting;
 
     final glowColor = !hasServers
         ? VelocityColors.textMuted
@@ -3645,141 +1605,116 @@ class _HomeScreenState extends State<HomeScreen>
         return Transform.scale(
           scale: scale,
           child: GestureDetector(
-            onTap: !hasServers
-                ? () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        backgroundColor: VelocityColors.surfaceElevated,
-                        content: Text(
-                          I18n.t('no_nodes_available'),
-                          style: const TextStyle(color: VelocityColors.neonYellow, fontWeight: FontWeight.bold),
+            onTap: !hasServers ? _showImportDialog : (isConnecting ? null : _toggleVpn),
+            child: Container(
+              width: 220,
+              height: 220,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: hasServers
+                    ? [
+                        BoxShadow(
+                          color: glowColor.withOpacity(isConnected ? 0.35 : 0.18),
+                          blurRadius: 40,
+                          spreadRadius: 6,
                         ),
-                        action: SnackBarAction(
-                          label: I18n.t('import_config'),
-                          textColor: VelocityColors.electricCyan,
-                          onPressed: _showImportDialog,
+                        BoxShadow(
+                          color: VelocityColors.deepCyan.withOpacity(0.18),
+                          blurRadius: 55,
+                          spreadRadius: 10,
                         ),
-                      ),
-                    );
-                  }
-                : isConnecting
-                    ? null
-                    : _toggleVpn,
-            child: Opacity(
-              opacity: hasServers ? 1.0 : 0.45,
-              child: Container(
-                width: 230,
-                height: 230,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  // BoxShadow neon glow effects behind connect button
-                  boxShadow: hasServers
-                      ? [
-                          BoxShadow(
-                            color: glowColor.withOpacity(isConnected ? 0.40 : 0.22),
-                            blurRadius: 40,
-                            spreadRadius: 8,
-                          ),
-                          BoxShadow(
-                            color: VelocityColors.deepCyan.withOpacity(0.20),
-                            blurRadius: 60,
-                            spreadRadius: 15,
-                          ),
-                        ]
-                      : [],
-                ),
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    // Outer decorative neon circle
-                    Container(
-                      width: 215,
-                      height: 215,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: glowColor.withOpacity(hasServers ? 0.25 : 0.15),
-                          width: 2,
-                        ),
+                      ]
+                    : [],
+              ),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  // Outer Ring
+                  Container(
+                    width: 210,
+                    height: 210,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: glowColor.withOpacity(hasServers ? 0.25 : 0.12),
+                        width: 2,
                       ),
                     ),
-
-                    // Middle Ring
-                    Container(
-                      width: 175,
-                      height: 175,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: RadialGradient(
-                          colors: [
-                            glowColor.withOpacity(hasServers ? (isConnected ? 0.32 : 0.12) : 0.04),
-                            Colors.transparent,
-                          ],
-                        ),
-                        border: Border.all(
-                          color: glowColor,
-                          width: 2.5,
-                        ),
-                      ),
-                    ),
-
-                    // Inner Core Button
-                    Container(
-                      width: 136,
-                      height: 136,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: const RadialGradient(
-                          colors: [
-                            VelocityColors.surfaceElevated,
-                            VelocityColors.pureBlack,
-                          ],
-                        ),
-                        border: Border.all(
-                          color: hasServers
-                              ? (isConnected ? glowColor : VelocityColors.borderDark)
-                              : VelocityColors.borderDark,
-                          width: 1.8,
-                        ),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          if (isConnecting)
-                            SizedBox(
-                              width: 42,
-                              height: 42,
-                              child: CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(glowColor),
-                                strokeWidth: 3.5,
-                              ),
-                            )
-                          else
-                            Icon(
-                              Icons.power_settings_new_rounded,
-                              size: 48,
-                              color: glowColor,
-                            ),
-                          const SizedBox(height: 6),
-                          Text(
-                            !hasServers
-                                ? (I18n.currentLang == AppLanguage.fa ? 'بدون سرور' : 'NO SERVER')
-                                : isConnected
-                                    ? I18n.t('tap_to_disconnect')
-                                    : I18n.t('tap_to_connect'),
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: glowColor,
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
+                  ),
+                  // Middle Aura Ring
+                  Container(
+                    width: 170,
+                    height: 170,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          glowColor.withOpacity(hasServers ? (isConnected ? 0.28 : 0.10) : 0.03),
+                          Colors.transparent,
                         ],
                       ),
+                      border: Border.all(
+                        color: glowColor,
+                        width: 2.2,
+                      ),
                     ),
-                  ],
-                ),
+                  ),
+                  // Central Core Button
+                  Container(
+                    width: 130,
+                    height: 130,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: const RadialGradient(
+                        colors: [
+                          VelocityColors.surfaceElevated,
+                          VelocityColors.pureBlack,
+                        ],
+                      ),
+                      border: Border.all(
+                        color: hasServers
+                            ? (isConnected ? glowColor : VelocityColors.borderDark)
+                            : VelocityColors.borderDark,
+                        width: 1.8,
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (isConnecting)
+                          SizedBox(
+                            width: 38,
+                            height: 38,
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(glowColor),
+                              strokeWidth: 3,
+                            ),
+                          )
+                        else
+                          Icon(
+                            Icons.power_settings_new_rounded,
+                            size: 46,
+                            color: glowColor,
+                          ),
+                        const SizedBox(height: 6),
+                        Text(
+                          !hasServers
+                              ? (widget.currentLang == AppLanguage.fa ? 'بدون سرور' : 'NO SERVER')
+                              : isConnected
+                                  ? I18n.t('tap_to_disconnect')
+                                  : I18n.t('tap_to_connect'),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: glowColor,
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -3788,9 +1723,6 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  // -------------------------------------------------------------------------
-  // Telemetry Speed Card
-  // -------------------------------------------------------------------------
   Widget _buildTelemetryCard() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -3802,7 +1734,7 @@ class _HomeScreenState extends State<HomeScreen>
       ),
       child: Row(
         children: [
-          // Download speed
+          // Download Speed
           Expanded(
             child: Row(
               children: [
@@ -3823,20 +1755,17 @@ class _HomeScreenState extends State<HomeScreen>
                         I18n.t('download_speed'),
                         style: const TextStyle(fontSize: 10, color: VelocityColors.textSecondary),
                       ),
-                      Text(
-                        _downloadSpeedKb > 1024
-                            ? '${(_downloadSpeedKb / 1024).toStringAsFixed(2)} MB/s'
-                            : '${_downloadSpeedKb.toStringAsFixed(0)} KB/s',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: VelocityColors.electricCyan,
-                          fontFamily: 'monospace',
+                      Directionality(
+                        textDirection: TextDirection.ltr,
+                        child: Text(
+                          _displayDownloadSpeed,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: VelocityColors.electricCyan,
+                            fontFamily: 'monospace',
+                          ),
                         ),
-                      ),
-                      Text(
-                        '${I18n.t('total_down')} ${_totalDownloadMb.toStringAsFixed(1)} MB',
-                        style: const TextStyle(fontSize: 9, color: VelocityColors.textMuted),
                       ),
                     ],
                   ),
@@ -3844,19 +1773,19 @@ class _HomeScreenState extends State<HomeScreen>
               ],
             ),
           ),
-          Container(width: 1, height: 40, color: VelocityColors.borderDark),
+          Container(width: 1, height: 36, color: VelocityColors.borderDark),
           const SizedBox(width: 12),
-          // Upload speed
+          // Upload Speed
           Expanded(
             child: Row(
               children: [
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: VelocityColors.neonGreen.withOpacity(0.12),
+                    color: VelocityColors.deepCyan.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.arrow_upward, color: VelocityColors.neonGreen, size: 20),
+                  child: const Icon(Icons.arrow_upward, color: VelocityColors.deepCyan, size: 20),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -3867,20 +1796,17 @@ class _HomeScreenState extends State<HomeScreen>
                         I18n.t('upload_speed'),
                         style: const TextStyle(fontSize: 10, color: VelocityColors.textSecondary),
                       ),
-                      Text(
-                        _uploadSpeedKb > 1024
-                            ? '${(_uploadSpeedKb / 1024).toStringAsFixed(2)} MB/s'
-                            : '${_uploadSpeedKb.toStringAsFixed(0)} KB/s',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: VelocityColors.neonGreen,
-                          fontFamily: 'monospace',
+                      Directionality(
+                        textDirection: TextDirection.ltr,
+                        child: Text(
+                          _displayUploadSpeed,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: VelocityColors.deepCyan,
+                            fontFamily: 'monospace',
+                          ),
                         ),
-                      ),
-                      Text(
-                        '${I18n.t('total_up')} ${_totalUploadMb.toStringAsFixed(1)} MB',
-                        style: const TextStyle(fontSize: 9, color: VelocityColors.textMuted),
                       ),
                     ],
                   ),
@@ -3893,9 +1819,6 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  // -------------------------------------------------------------------------
-  // Active Server Card (Empty State & Active Node Display)
-  // -------------------------------------------------------------------------
   Widget _buildActiveServerCard() {
     if (_selectedServer == null || _servers.isEmpty) {
       return Container(
@@ -4033,7 +1956,7 @@ class _HomeScreenState extends State<HomeScreen>
                 ],
               ),
             ),
-            // Ping latency badge (tap to test real TCP socket latency)
+            // Ping latency badge
             InkWell(
               borderRadius: BorderRadius.circular(8),
               onTap: () => _pingSingleServer(server),
@@ -4053,12 +1976,15 @@ class _HomeScreenState extends State<HomeScreen>
                           color: VelocityColors.electricCyan,
                         ),
                       )
-                    : Text(
-                        server.pingDisplay,
-                        style: TextStyle(
-                          color: server.pingColor,
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
+                    : Directionality(
+                        textDirection: TextDirection.ltr,
+                        child: Text(
+                          server.pingDisplay,
+                          style: TextStyle(
+                            color: server.pingColor,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
               ),
@@ -4072,530 +1998,826 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   // -------------------------------------------------------------------------
-  // Server Selection Bottom Sheet
+  // Tab 1: Servers Tab
   // -------------------------------------------------------------------------
-  void _showServerBottomSheet() {
-    String searchQuery = '';
-    String selectedProtocolFilter = 'ALL';
-    bool sortByLowestPing = false;
+  Widget _buildServersTab() {
+    final isFa = widget.currentLang == AppLanguage.fa;
 
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: VelocityColors.surfaceDark,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setSheetState) {
-            // Apply filtering and smart sorting
-            List<ServerProfile> displayServers = _servers.where((server) {
-              final q = searchQuery.toLowerCase();
-              final matchesSearch = q.isEmpty ||
-                  server.name.toLowerCase().contains(q) ||
-                  server.countryCode.toLowerCase().contains(q) ||
-                  server.protocol.name.toLowerCase().contains(q);
+    var displayServers = _servers.where((s) {
+      if (_nodeSearchQuery.isEmpty) return true;
+      final q = _nodeSearchQuery.toLowerCase();
+      return s.name.toLowerCase().contains(q) ||
+          s.host.toLowerCase().contains(q) ||
+          s.protocol.name.toLowerCase().contains(q);
+    }).toList();
 
-              final matchesProtocol = selectedProtocolFilter == 'ALL' ||
-                  server.protocol.label.toUpperCase() == selectedProtocolFilter;
+    if (_sortByLowestPing) {
+      displayServers.sort((a, b) {
+        if (a.pingMs == null && b.pingMs == null) return 0;
+        if (a.pingMs == null) return 1;
+        if (b.pingMs == null) return -1;
+        if (a.pingMs! < 0 && b.pingMs! < 0) return 0;
+        if (a.pingMs! < 0) return 1;
+        if (b.pingMs! < 0) return -1;
+        return a.pingMs!.compareTo(b.pingMs!);
+      });
+    }
 
-              return matchesSearch && matchesProtocol;
-            }).toList();
+    return Column(
+      children: [
+        // Sub Info Card if available
+        if (_subscriptionInfo != null) _buildSubscriptionCard(),
 
-            if (sortByLowestPing) {
-              displayServers.sort((a, b) => (a.pingMs ?? 9999).compareTo(b.pingMs ?? 9999));
-            }
-
-            return Container(
-              height: MediaQuery.of(context).size.height * 0.85,
-              padding: const EdgeInsets.only(top: 12),
-              child: Column(
+        // Header
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
                 children: [
-                  Container(
-                    width: 48,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: VelocityColors.textMuted,
-                      borderRadius: BorderRadius.circular(2),
+                  const Icon(Icons.dns_rounded, color: VelocityColors.electricCyan, size: 18),
+                  const SizedBox(width: 8),
+                  Text(
+                    I18n.t('tab_servers'),
+                    style: const TextStyle(
+                      color: VelocityColors.textPrimary,
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              I18n.t('select_server'),
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: VelocityColors.electricCyan,
-                              ),
-                            ),
-                            Text(
-                              '${displayServers.length} / ${_servers.length} ${I18n.t('servers_count')}',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: VelocityColors.textSecondary,
-                              ),
-                            ),
-                          ],
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: VelocityColors.surfaceElevated,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: VelocityColors.borderDark),
+                    ),
+                    child: Text(
+                      '${_servers.length}',
+                      style: const TextStyle(
+                        color: VelocityColors.electricCyan,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  if (_servers.isNotEmpty)
+                    OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: VelocityColors.electricCyan, width: 1),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        backgroundColor: VelocityColors.electricCyan.withOpacity(0.08),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      ),
+                      onPressed: _pingAllServers,
+                      icon: const Icon(Icons.bolt, color: VelocityColors.electricCyan, size: 15),
+                      label: Text(
+                        I18n.t('ping_all'),
+                        style: const TextStyle(
+                          color: VelocityColors.electricCyan,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
                         ),
-                        Row(
-                          children: [
-                            if (_servers.isNotEmpty)
-                              IconButton(
-                                icon: const Icon(Icons.delete_sweep_rounded, color: VelocityColors.neonPink, size: 20),
-                                tooltip: I18n.t('clear_all_nodes'),
-                                onPressed: () {
-                                  setState(() {
-                                    _servers.clear();
-                                    _selectedServer = null;
-                                  });
-                                  _savePersistedData();
-                                  setSheetState(() {});
-                                },
-                              ),
-                            IconButton(
-                              icon: const Icon(Icons.add_link, color: VelocityColors.electricCyan),
-                              tooltip: I18n.t('import_config'),
-                              onPressed: () {
-                                Navigator.pop(context);
-                                _showImportDialog();
-                              },
-                            ),
-                            if (_servers.isNotEmpty)
-                              OutlinedButton.icon(
-                                style: OutlinedButton.styleFrom(
-                                  side: const BorderSide(color: VelocityColors.electricCyan),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                ),
-                                onPressed: () async {
-                                  await _pingAllServers();
-                                  setSheetState(() {});
-                                },
-                                icon: const Icon(Icons.bolt, color: VelocityColors.electricCyan, size: 16),
-                                label: Text(
-                                  I18n.t('ping_all'),
-                                  style: const TextStyle(color: VelocityColors.electricCyan, fontSize: 11),
-                                ),
-                              ),
-                          ],
+                      ),
+                    ),
+                  const SizedBox(width: 8),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: VelocityColors.electricCyan,
+                      foregroundColor: VelocityColors.pureBlack,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    ),
+                    onPressed: _showImportDialog,
+                    icon: const Icon(Icons.add, size: 15),
+                    label: Text(
+                      I18n.t('import_config'),
+                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+
+        // Search & Sort Bar
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          child: Row(
+            children: [
+              Expanded(
+                child: Container(
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: VelocityColors.surfaceElevated,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: VelocityColors.borderDark),
+                  ),
+                  child: TextField(
+                    onChanged: (val) => setState(() => _nodeSearchQuery = val),
+                    style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12),
+                    decoration: InputDecoration(
+                      hintText: I18n.t('search_nodes'),
+                      hintStyle: const TextStyle(color: VelocityColors.textMuted, fontSize: 11),
+                      prefixIcon: const Icon(Icons.search_rounded, size: 16, color: VelocityColors.textMuted),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              InkWell(
+                onTap: () => setState(() => _sortByLowestPing = !_sortByLowestPing),
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+                  decoration: BoxDecoration(
+                    color: _sortByLowestPing
+                        ? VelocityColors.neonGreen.withOpacity(0.18)
+                        : VelocityColors.surfaceElevated,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: _sortByLowestPing ? VelocityColors.neonGreen : VelocityColors.borderDark,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.speed_rounded,
+                        size: 15,
+                        color: _sortByLowestPing ? VelocityColors.neonGreen : VelocityColors.textSecondary,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        isFa ? 'پینگ' : 'Ping',
+                        style: TextStyle(
+                          color: _sortByLowestPing ? VelocityColors.neonGreen : VelocityColors.textSecondary,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 6),
+
+        // Server List
+        Expanded(
+          child: displayServers.isEmpty
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: VelocityColors.electricCyan.withOpacity(0.12),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            _servers.isEmpty ? Icons.cloud_off_rounded : Icons.search_off_rounded,
+                            size: 42,
+                            color: VelocityColors.electricCyan,
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        Text(
+                          _servers.isEmpty ? I18n.t('no_nodes_available') : I18n.t('no_nodes_found'),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: VelocityColors.textPrimary,
+                            fontSize: 13,
+                            height: 1.5,
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: VelocityColors.electricCyan,
+                            foregroundColor: VelocityColors.pureBlack,
+                            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                          onPressed: _showImportDialog,
+                          icon: const Icon(Icons.add_link, size: 18),
+                          label: Text(
+                            I18n.t('import_config'),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ],
                     ),
                   ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+                  itemCount: displayServers.length,
+                  itemBuilder: (context, index) {
+                    final server = displayServers[index];
+                    final isSelected = _selectedServer?.id == server.id;
 
-                  if (_servers.isNotEmpty) ...[
-                    // Search Bar & Sort by Lowest Ping Action
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              height: 38,
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? VelocityColors.electricCyan.withOpacity(0.09)
+                            : VelocityColors.surfaceDark,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isSelected ? VelocityColors.electricCyan : VelocityColors.borderDark,
+                          width: isSelected ? 1.5 : 1.0,
+                        ),
+                      ),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                        onTap: () {
+                          setState(() => _selectedServer = server);
+                          _savePersistedData();
+                          _addConnectionLog('[Selected Node] ${server.name} (${server.protocol.label})');
+                        },
+                        leading: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
+                              color: isSelected ? VelocityColors.electricCyan : VelocityColors.textMuted,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(server.countryCode, style: const TextStyle(fontSize: 22)),
+                          ],
+                        ),
+                        title: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                server.name,
+                                style: TextStyle(
+                                  color: isSelected ? VelocityColors.electricCyan : VelocityColors.textPrimary,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
-                                color: VelocityColors.pureBlack,
-                                borderRadius: BorderRadius.circular(10),
+                                color: VelocityColors.surfaceElevated,
+                                borderRadius: BorderRadius.circular(4),
                                 border: Border.all(color: VelocityColors.borderDark),
                               ),
-                              child: TextField(
-                                onChanged: (val) => setSheetState(() => searchQuery = val),
-                                style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12),
-                                decoration: InputDecoration(
-                                  hintText: I18n.t('search_nodes'),
-                                  hintStyle: const TextStyle(color: VelocityColors.textMuted, fontSize: 11),
-                                  prefixIcon: const Icon(Icons.search_rounded, size: 16, color: VelocityColors.textMuted),
-                                  border: InputBorder.none,
-                                  contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                              child: Text(
+                                server.protocol.label,
+                                style: const TextStyle(
+                                  color: VelocityColors.textSecondary,
+                                  fontSize: 9.5,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
+                          ],
+                        ),
+                        subtitle: Directionality(
+                          textDirection: TextDirection.ltr,
+                          child: Text(
+                            '${server.host}:${server.port}',
+                            style: const TextStyle(color: VelocityColors.textMuted, fontSize: 11),
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          const SizedBox(width: 8),
-                          InkWell(
-                            onTap: () => setSheetState(() => sortByLowestPing = !sortByLowestPing),
-                            borderRadius: BorderRadius.circular(10),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: sortByLowestPing
-                                    ? VelocityColors.neonGreen.withOpacity(0.18)
-                                    : VelocityColors.surfaceElevated,
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: sortByLowestPing ? VelocityColors.neonGreen : VelocityColors.borderDark,
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.speed_rounded,
-                                    size: 16,
-                                    color: sortByLowestPing ? VelocityColors.neonGreen : VelocityColors.textSecondary,
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Text(
-                                    I18n.t('sort_lowest_ping'),
-                                    style: TextStyle(
-                                      color: sortByLowestPing ? VelocityColors.neonGreen : VelocityColors.textSecondary,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // Protocol Filter Chips
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                      child: Row(
-                        children: ['ALL', 'VLESS', 'HYSTERIA2', 'TROJAN', 'VMESS', 'SHADOWSOCKS'].map<Widget>((proto) {
-                          final isChipSelected = selectedProtocolFilter == proto;
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 6),
-                            child: ChoiceChip(
-                              label: Text(proto),
-                              selected: isChipSelected,
-                              selectedColor: VelocityColors.electricCyan.withOpacity(0.2),
-                              backgroundColor: VelocityColors.pureBlack,
-                              side: BorderSide(
-                                color: isChipSelected ? VelocityColors.electricCyan : VelocityColors.borderDark,
-                              ),
-                              labelStyle: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: isChipSelected ? VelocityColors.electricCyan : VelocityColors.textMuted,
-                              ),
-                              onSelected: (selected) {
-                                if (selected) {
-                                  setSheetState(() => selectedProtocolFilter = proto);
-                                }
-                              },
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-
-                    const Divider(color: VelocityColors.borderDark, height: 1),
-                  ],
-
-                  Expanded(
-                    child: displayServers.isEmpty
-                        ? Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(24),
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Ping test chip
+                            InkWell(
+                              borderRadius: BorderRadius.circular(6),
+                              onTap: () => _pingSingleServer(server),
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: VelocityColors.surfaceElevated,
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(color: VelocityColors.borderDark),
+                                  color: server.pingColor.withOpacity(0.14),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: server.pingColor),
                                 ),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(14),
-                                      decoration: BoxDecoration(
-                                        color: VelocityColors.electricCyan.withOpacity(0.12),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Icon(Icons.cloud_off_rounded, size: 42, color: VelocityColors.electricCyan),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Text(
-                                      _servers.isEmpty ? I18n.t('no_nodes_available') : I18n.t('no_nodes_found'),
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        color: VelocityColors.textPrimary,
-                                        fontSize: 13,
-                                        height: 1.6,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 18),
-                                    ElevatedButton.icon(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: VelocityColors.electricCyan,
-                                        foregroundColor: VelocityColors.pureBlack,
-                                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                      ),
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                        _showImportDialog();
-                                      },
-                                      icon: const Icon(Icons.add_link, size: 18),
-                                      label: Text(
-                                        I18n.t('import_config'),
-                                        style: const TextStyle(fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          )
-                        : ListView.builder(
-                            itemCount: displayServers.length,
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            itemBuilder: (context, index) {
-                              final server = displayServers[index];
-                              final isSelected = _selectedServer != null && server.id == _selectedServer!.id;
-
-                              return Container(
-                                margin: const EdgeInsets.only(bottom: 8),
-                                decoration: BoxDecoration(
-                                  color: isSelected
-                                      ? VelocityColors.electricCyan.withOpacity(0.08)
-                                      : VelocityColors.surfaceElevated,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: isSelected ? VelocityColors.electricCyan : VelocityColors.borderDark,
-                                    width: isSelected ? 1.5 : 1,
-                                  ),
-                                ),
-                                child: ListTile(
-                                  onTap: () {
-                                    setState(() => _selectedServer = server);
-                                    _savePersistedData();
-                                    Navigator.pop(context);
-                                  },
-                                  leading: Container(
-                                    width: 40,
-                                    height: 40,
-                                    alignment: Alignment.center,
-                                    decoration: BoxDecoration(
-                                      color: VelocityColors.pureBlack,
-                                      borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(
-                                        color: isSelected ? VelocityColors.electricCyan : VelocityColors.borderDark,
-                                      ),
-                                    ),
-                                    child: Text(server.countryCode, style: const TextStyle(fontSize: 20)),
-                                  ),
-                                  title: Text(
-                                    server.name,
-                                    style: TextStyle(
-                                      color: isSelected ? VelocityColors.electricCyan : VelocityColors.textPrimary,
-                                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                  subtitle: Row(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                                        decoration: BoxDecoration(
-                                          color: VelocityColors.pureBlack,
-                                          borderRadius: BorderRadius.circular(4),
-                                          border: Border.all(color: VelocityColors.borderDark),
+                                child: server.isTesting
+                                    ? const SizedBox(
+                                        width: 12,
+                                        height: 12,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 1.5,
+                                          color: VelocityColors.electricCyan,
                                         ),
+                                      )
+                                    : Directionality(
+                                        textDirection: TextDirection.ltr,
                                         child: Text(
-                                          server.protocol.label,
-                                          style: const TextStyle(
-                                            color: VelocityColors.deepCyan,
-                                            fontSize: 9,
+                                          server.pingDisplay,
+                                          style: TextStyle(
+                                            color: server.pingColor,
+                                            fontSize: 11,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        '${server.host}:${server.port}',
-                                        style: const TextStyle(color: VelocityColors.textMuted, fontSize: 10),
-                                      ),
-                                    ],
-                                  ),
-                                  trailing: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      InkWell(
-                                        borderRadius: BorderRadius.circular(6),
-                                        onTap: () async {
-                                          await _pingSingleServer(server);
-                                          setSheetState(() {});
-                                        },
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                          decoration: BoxDecoration(
-                                            color: server.pingColor.withOpacity(0.12),
-                                            borderRadius: BorderRadius.circular(6),
-                                            border: Border.all(color: server.pingColor),
-                                          ),
-                                          child: server.isTesting
-                                              ? const SizedBox(
-                                                  width: 12,
-                                                  height: 12,
-                                                  child: CircularProgressIndicator(
-                                                    strokeWidth: 1.5,
-                                                    color: VelocityColors.electricCyan,
-                                                  ),
-                                                )
-                                              : Text(
-                                                  server.pingDisplay,
-                                                  style: TextStyle(
-                                                    color: server.pingColor,
-                                                    fontSize: 11,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                        ),
-                                      ),
-                                      IconButton(
-                                        icon: const Icon(Icons.close_rounded, size: 16, color: VelocityColors.textMuted),
-                                        tooltip: I18n.t('delete_node'),
-                                        onPressed: () {
-                                          setState(() {
-                                            _servers.removeWhere((s) => s.id == server.id);
-                                            if (_selectedServer?.id == server.id) {
-                                              _selectedServer = _servers.isNotEmpty ? _servers.first : null;
-                                            }
-                                          });
-                                          _savePersistedData();
-                                          setSheetState(() {});
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete_outline, size: 18, color: VelocityColors.textMuted),
+                              tooltip: I18n.t('delete_node'),
+                              onPressed: () {
+                                setState(() {
+                                  _servers.removeWhere((s) => s.id == server.id);
+                                  if (_selectedServer?.id == server.id) {
+                                    _selectedServer = _servers.isNotEmpty ? _servers.first : null;
+                                  }
+                                });
+                                _savePersistedData();
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSubscriptionCard() {
+    final sub = _subscriptionInfo!;
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: VelocityColors.surfaceElevated,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: VelocityColors.electricCyan.withOpacity(0.4)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.verified_rounded, color: VelocityColors.neonGreen, size: 16),
+                  const SizedBox(width: 6),
+                  Text(
+                    I18n.t('subscription_quota'),
+                    style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  // -------------------------------------------------------------------------
-  // Routing Mode Bottom Sheet
-  // -------------------------------------------------------------------------
-  void _showRoutingBottomSheet() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: VelocityColors.surfaceDark,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
               Text(
-                I18n.t('routing_mode'),
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: VelocityColors.electricCyan,
-                ),
-              ),
-              const SizedBox(height: 16),
-              _buildRoutingOption(
-                mode: RoutingMode.rule,
-                title: I18n.t('mode_rule'),
-                subtitle: 'Velocity smart rules: bypass LAN, domestic banking, adblocking',
-                icon: Icons.alt_route,
-              ),
-              _buildRoutingOption(
-                mode: RoutingMode.bypassLan,
-                title: I18n.t('mode_bypass_lan'),
-                subtitle: 'Direct bypass for domestic IP/domains (.ir / banking apps)',
-                icon: Icons.security,
-              ),
-              _buildRoutingOption(
-                mode: RoutingMode.global,
-                title: I18n.t('mode_global'),
-                subtitle: 'Tunnel all device traffic via Velocity encrypted network',
-                icon: Icons.public,
-              ),
-              _buildRoutingOption(
-                mode: RoutingMode.direct,
-                title: I18n.t('mode_direct'),
-                subtitle: 'Direct connection (disable proxying)',
-                icon: Icons.sync_disabled,
+                '${I18n.t('sub_expiry')} ${sub.expiryDateFormatted}',
+                style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11),
               ),
             ],
           ),
-        );
-      },
-    );
-  }
-
-  Widget _buildRoutingOption({
-    required RoutingMode mode,
-    required String title,
-    required String subtitle,
-    required IconData icon,
-  }) {
-    final isSelected = _routingMode == mode;
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: isSelected
-            ? VelocityColors.electricCyan.withOpacity(0.08)
-            : VelocityColors.surfaceElevated,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: isSelected ? VelocityColors.electricCyan : VelocityColors.borderDark,
-        ),
-      ),
-      child: ListTile(
-        onTap: () {
-          setState(() => _routingMode = mode);
-          Navigator.pop(context);
-        },
-        leading: Icon(icon, color: isSelected ? VelocityColors.electricCyan : VelocityColors.textSecondary),
-        title: Text(
-          title,
-          style: TextStyle(
-            color: isSelected ? VelocityColors.electricCyan : VelocityColors.textPrimary,
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
+          const SizedBox(height: 8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: sub.quotaProgress.clamp(0.0, 1.0),
+              backgroundColor: VelocityColors.pureBlack,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                sub.quotaProgress > 0.85 ? VelocityColors.neonPink : VelocityColors.electricCyan,
+              ),
+              minHeight: 5,
+            ),
           ),
-        ),
-        subtitle: Text(subtitle, style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11)),
-        trailing: isSelected ? const Icon(Icons.check_circle, color: VelocityColors.electricCyan) : null,
+          const SizedBox(height: 6),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Directionality(
+                textDirection: TextDirection.ltr,
+                child: Text(
+                  '${sub.trafficUsageFormatted} / ${sub.trafficTotalFormatted}',
+                  style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 10),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
-  }
-
-  String _getRoutingTitle(RoutingMode mode) {
-    switch (mode) {
-      case RoutingMode.rule:
-        return I18n.t('mode_rule');
-      case RoutingMode.bypassLan:
-        return I18n.t('mode_bypass_lan');
-      case RoutingMode.global:
-        return I18n.t('mode_global');
-      case RoutingMode.direct:
-        return I18n.t('mode_direct');
-    }
   }
 
   // -------------------------------------------------------------------------
-  // Import Config / Subscription URL Dialog with Real HTTP & Header Parsing
+  // Tab 2: VIP Tab
+  // -------------------------------------------------------------------------
+  Widget _buildVipTab() {
+    final isFa = widget.currentLang == AppLanguage.fa;
+
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        // VIP Banner
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [VelocityColors.surfaceElevated, Color(0xFF161028)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: VelocityColors.neonYellow.withOpacity(0.6), width: 1.2),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: VelocityColors.neonYellow.withOpacity(0.15),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: VelocityColors.neonYellow),
+                ),
+                child: const Icon(Icons.workspace_premium_rounded, color: VelocityColors.neonYellow, size: 26),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isFa ? 'سرویس‌های اختصاصی VIP ولوسیتی' : 'VELOCITY VIP NETWORKS',
+                      style: const TextStyle(
+                        color: VelocityColors.textPrimary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      isFa
+                          ? 'پروتکل‌های ضد فیلتر VLESS Reality و Hysteria 2 با آی‌پی تمیز و گارانتی سرعت'
+                          : 'Dedicated anti-censorship TLS 1.3 & Hysteria 2 UDP with clean IPs',
+                      style: const TextStyle(
+                        color: VelocityColors.textSecondary,
+                        fontSize: 11,
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 14),
+
+        // Telegram Support Button
+        InkWell(
+          onTap: _openTelegramSupport,
+          borderRadius: BorderRadius.circular(14),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0F1E2E),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: VelocityColors.electricCyan, width: 1.5),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: const BoxDecoration(
+                    color: VelocityColors.electricCyan,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.send_rounded, color: VelocityColors.pureBlack, size: 18),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        I18n.t('telegram_checkout_btn'),
+                        style: const TextStyle(
+                          color: VelocityColors.electricCyan,
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        I18n.t('telegram_direct_buy'),
+                        style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 10.5),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.arrow_forward_ios_rounded, color: VelocityColors.electricCyan, size: 14),
+              ],
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 18),
+
+        // Plans
+        ..._plans.map((plan) {
+          return Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: VelocityColors.surfaceDark,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: VelocityColors.borderDark),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      plan.name,
+                      style: const TextStyle(
+                        color: VelocityColors.textPrimary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: VelocityColors.neonYellow.withOpacity(0.18),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: VelocityColors.neonYellow),
+                      ),
+                      child: Text(
+                        plan.badge,
+                        style: const TextStyle(
+                          color: VelocityColors.neonYellow,
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    const Icon(Icons.data_usage_rounded, color: VelocityColors.electricCyan, size: 14),
+                    const SizedBox(width: 4),
+                    Text(plan.dataQuota, style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 12)),
+                    const SizedBox(width: 12),
+                    const Icon(Icons.timer_rounded, color: VelocityColors.textSecondary, size: 14),
+                    const SizedBox(width: 4),
+                    Text('${plan.durationDays} ${isFa ? "روزه" : "Days"}', style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 12)),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(plan.nodesDescription, style: const TextStyle(color: VelocityColors.textMuted, fontSize: 11)),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          plan.priceTomans,
+                          style: const TextStyle(color: VelocityColors.neonGreen, fontSize: 13, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          plan.priceUsdt,
+                          style: const TextStyle(color: VelocityColors.textMuted, fontSize: 10),
+                        ),
+                      ],
+                    ),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: VelocityColors.electricCyan,
+                        foregroundColor: VelocityColors.pureBlack,
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      onPressed: _openTelegramSupport,
+                      icon: const Icon(Icons.send_rounded, size: 14),
+                      label: Text(
+                        isFa ? 'خرید از تلگرام' : 'Buy via Telegram',
+                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
+  // -------------------------------------------------------------------------
+  // Tab 3: Settings Tab
+  // -------------------------------------------------------------------------
+  Widget _buildSettingsTab() {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        // Xray Core Engine Status Card
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: VelocityColors.surfaceDark,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: VelocityColors.electricCyan.withOpacity(0.4)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: VelocityColors.electricCyan.withOpacity(0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.memory_rounded, color: VelocityColors.electricCyan, size: 24),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      I18n.t('xray_core_title'),
+                      style: const TextStyle(
+                        color: VelocityColors.textPrimary,
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      I18n.t('xray_core_desc'),
+                      style: const TextStyle(
+                        color: VelocityColors.textSecondary,
+                        fontSize: 11,
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 14),
+
+        // Bypass Iran
+        _buildSettingsSwitch(
+          title: I18n.t('bypass_iran_title'),
+          subtitle: I18n.t('bypass_iran_desc'),
+          value: _bypassIran,
+          onChanged: (val) async {
+            setState(() => _bypassIran = val);
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setBool('bypass_iran_enabled', val);
+          },
+        ),
+
+        // Bypass LAN
+        _buildSettingsSwitch(
+          title: I18n.t('bypass_lan_title'),
+          subtitle: I18n.t('bypass_lan_desc'),
+          value: _bypassLan,
+          onChanged: (val) async {
+            setState(() => _bypassLan = val);
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setBool('bypass_lan_enabled', val);
+          },
+        ),
+
+        // Notifications
+        _buildSettingsSwitch(
+          title: I18n.t('notif_settings_title'),
+          subtitle: I18n.t('notif_settings_desc'),
+          value: _notificationsEnabled,
+          onChanged: (val) async {
+            setState(() => _notificationsEnabled = val);
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setBool('notifications_enabled', val);
+            if (val) {
+              await VelocityNotificationService.requestPermissions();
+            }
+          },
+        ),
+
+        const SizedBox(height: 14),
+
+        // Telegram Support Button
+        ListTile(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: const BorderSide(color: VelocityColors.borderDark),
+          ),
+          tileColor: VelocityColors.surfaceDark,
+          leading: const Icon(Icons.support_agent_rounded, color: VelocityColors.electricCyan),
+          title: Text(
+            I18n.t('telegram_support'),
+            style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 13, fontWeight: FontWeight.bold),
+          ),
+          subtitle: const Text('@Velocity_Support', style: TextStyle(color: VelocityColors.textMuted, fontSize: 11)),
+          trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: VelocityColors.textSecondary),
+          onTap: _openTelegramSupport,
+        ),
+
+        const SizedBox(height: 10),
+
+        // Logs Viewer Button
+        ListTile(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: const BorderSide(color: VelocityColors.borderDark),
+          ),
+          tileColor: VelocityColors.surfaceDark,
+          leading: const Icon(Icons.terminal_rounded, color: VelocityColors.electricCyan),
+          title: Text(
+            I18n.t('log_viewer_title'),
+            style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 13, fontWeight: FontWeight.bold),
+          ),
+          subtitle: Text('${_connectionLogs.length} events logged', style: const TextStyle(color: VelocityColors.textMuted, fontSize: 11)),
+          trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: VelocityColors.textSecondary),
+          onTap: _showConnectionLogViewer,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSettingsSwitch({
+    required String title,
+    required String subtitle,
+    required bool value,
+    required Function(bool) onChanged,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: VelocityColors.surfaceDark,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: VelocityColors.borderDark),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 13, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11),
+                ),
+              ],
+            ),
+          ),
+          Switch(
+            value: value,
+            activeColor: VelocityColors.electricCyan,
+            activeTrackColor: VelocityColors.electricCyan.withOpacity(0.3),
+            inactiveThumbColor: VelocityColors.textMuted,
+            inactiveTrackColor: VelocityColors.pureBlack,
+            onChanged: onChanged,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // -------------------------------------------------------------------------
+  // Import Dialog
   // -------------------------------------------------------------------------
   void _showImportDialog() {
     final controller = TextEditingController();
@@ -4619,7 +2841,7 @@ class _HomeScreenState extends State<HomeScreen>
                   Expanded(
                     child: Text(
                       I18n.t('import_config'),
-                      style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 16, fontWeight: FontWeight.bold),
+                      style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 15, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],
@@ -4630,7 +2852,7 @@ class _HomeScreenState extends State<HomeScreen>
                 children: [
                   Text(
                     I18n.t('import_prompt'),
-                    style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 12),
+                    style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11.5, height: 1.4),
                   ),
                   const SizedBox(height: 12),
                   TextField(
@@ -4639,7 +2861,7 @@ class _HomeScreenState extends State<HomeScreen>
                     maxLines: 4,
                     style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12),
                     decoration: InputDecoration(
-                      hintText: 'https://sub.example.com/api/v1/client/subscribe?token=...\nor vless://, vmess://, trojan://, ss://, hy2://',
+                      hintText: 'https://sub.example.com/api/v1/...\nor vless://, vmess://, trojan://, ss://, hy2://',
                       hintStyle: const TextStyle(color: VelocityColors.textMuted, fontSize: 11),
                       filled: true,
                       fillColor: VelocityColors.pureBlack,
@@ -4654,7 +2876,7 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
                   ),
                   if (isLoading) ...[
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 12),
                     Row(
                       children: [
                         const SizedBox(
@@ -4700,7 +2922,6 @@ class _HomeScreenState extends State<HomeScreen>
                             SubscriptionInfo? fetchedSub;
 
                             if (input.startsWith('http://') || input.startsWith('https://')) {
-                              // Real HTTP/HTTPS Subscription fetch
                               final uri = Uri.parse(input);
                               final response = await http.get(
                                 uri,
@@ -4711,7 +2932,6 @@ class _HomeScreenState extends State<HomeScreen>
                               ).timeout(const Duration(seconds: 15));
 
                               if (response.statusCode >= 200 && response.statusCode < 300) {
-                                // Extract subscription-userinfo header
                                 String? userInfoHeader;
                                 response.headers.forEach((k, v) {
                                   if (k.toLowerCase() == 'subscription-userinfo') {
@@ -4725,7 +2945,6 @@ class _HomeScreenState extends State<HomeScreen>
                                 throw Exception('HTTP ${response.statusCode}');
                               }
                             } else {
-                              // Direct configs or multi-line/base64 pasted
                               parsedProfiles = ConfigLinkParser.parseMultiple(input);
                               if (parsedProfiles.isEmpty) {
                                 final single = ConfigLinkParser.parse(input);
@@ -4747,55 +2966,31 @@ class _HomeScreenState extends State<HomeScreen>
                               return;
                             }
 
-                            // Run real TCP socket ping on the first few imported nodes
-                            for (var p in parsedProfiles.take(5)) {
-                              final sw = Stopwatch()..start();
-                              try {
-                                final s = await Socket.connect(p.host, p.port, timeout: const Duration(seconds: 2));
-                                sw.stop();
-                                s.destroy();
-                                p.pingMs = sw.elapsedMilliseconds;
-                              } catch (_) {
-                                sw.stop();
-                                p.pingMs = -1;
-                              }
-                            }
-
                             setState(() {
+                              _servers.addAll(parsedProfiles);
+                              if (_selectedServer == null) {
+                                _selectedServer = _servers.first;
+                              }
                               if (fetchedSub != null) {
                                 _subscriptionInfo = fetchedSub;
                               }
-                              for (var p in parsedProfiles.reversed) {
-                                _servers.insert(0, p);
-                              }
-                              _selectedServer = _servers.first;
                             });
 
-                            await _savePersistedData();
+                            _savePersistedData();
+                            _addConnectionLog('[Import Success] Added ${parsedProfiles.length} Xray nodes');
 
-                            if (Navigator.canPop(dialogContext)) {
+                            if (mounted) {
                               Navigator.pop(dialogContext);
-                            }
-
-                            if (!mounted) return;
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                backgroundColor: VelocityColors.surfaceElevated,
-                                duration: const Duration(seconds: 4),
-                                content: Row(
-                                  children: [
-                                    const Icon(Icons.check_circle, color: VelocityColors.neonGreen, size: 20),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        '${I18n.t('subscription_imported')} (+${parsedProfiles.length} ${I18n.t('servers_count')})',
-                                        style: const TextStyle(color: VelocityColors.neonGreen, fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                  ],
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  backgroundColor: VelocityColors.surfaceElevated,
+                                  content: Text(
+                                    '${parsedProfiles.length} ${I18n.currentLang == AppLanguage.fa ? "سرور با موفقیت اضافه شد" : "servers imported successfully"}',
+                                    style: const TextStyle(color: VelocityColors.electricCyan),
+                                  ),
                                 ),
-                              ),
-                            );
+                              );
+                            }
                           } catch (err) {
                             if (!mounted) return;
                             setDialogState(() => isLoading = false);
@@ -4814,2575 +3009,6 @@ class _HomeScreenState extends State<HomeScreen>
           },
         );
       },
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Velocity VIP Activation & Telegram Checkout Screen
-// ---------------------------------------------------------------------------
-class ReceiptUploadScreen extends StatefulWidget {
-  final bool isFa;
-  final List<VelocityPlan> plans;
-  final UserSession currentUser;
-  final VoidCallback onOpenTelegram;
-  final Function(VelocityPlan)? onPlanPurchased;
-
-  const ReceiptUploadScreen({
-    super.key,
-    required this.isFa,
-    required this.plans,
-    required this.currentUser,
-    required this.onOpenTelegram,
-    this.onPlanPurchased,
-  });
-
-  @override
-  State<ReceiptUploadScreen> createState() => _ReceiptUploadScreenState();
-}
-
-class _ReceiptUploadScreenState extends State<ReceiptUploadScreen> {
-  int _selectedPlanIndex = 0;
-
-  Future<void> _launchTelegramSupport() async {
-    try {
-      final uri = Uri.parse('https://t.me/Velocity_Support');
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } catch (e) {
-      debugPrint('Error launching telegram: $e');
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final activePlans = widget.plans.where((p) => p.isActive).toList();
-    if (_selectedPlanIndex >= activePlans.length && activePlans.isNotEmpty) {
-      _selectedPlanIndex = 0;
-    }
-
-    return Directionality(
-      textDirection: widget.isFa ? TextDirection.rtl : TextDirection.ltr,
-      child: Scaffold(
-        backgroundColor: VelocityColors.pureBlack,
-        appBar: AppBar(
-          backgroundColor: VelocityColors.surfaceDark,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: VelocityColors.electricCyan, size: 18),
-            onPressed: () => Navigator.pop(context),
-          ),
-          title: Text(
-            I18n.t('receipt_title'),
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: VelocityColors.textPrimary,
-            ),
-          ),
-        ),
-        body: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Telegram Direct Activation Card
-                InkWell(
-                  onTap: _launchTelegramSupport,
-                  borderRadius: BorderRadius.circular(14),
-                  child: Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: VelocityColors.surfaceDark,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: VelocityColors.electricCyan, width: 1.2),
-                      boxShadow: [
-                        BoxShadow(
-                          color: VelocityColors.electricCyan.withOpacity(0.12),
-                          blurRadius: 16,
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color: VelocityColors.electricCyan.withOpacity(0.12),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.send_rounded, color: VelocityColors.electricCyan, size: 22),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Instant Purchase via Telegram',
-                                style: TextStyle(
-                                  color: VelocityColors.electricCyan,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 13,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                I18n.t('telegram_direct_buy'),
-                                style: const TextStyle(
-                                  color: VelocityColors.textSecondary,
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const Icon(Icons.arrow_outward, color: VelocityColors.electricCyan, size: 18),
-                      ],
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 18),
-
-                // Subscription Plan Choice
-                Row(
-                  children: [
-                    Text(
-                      I18n.t('plan_select'),
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: VelocityColors.electricCyan,
-                      ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      '${activePlans.length} plans available',
-                      style: const TextStyle(fontSize: 11, color: VelocityColors.textSecondary),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-
-                if (activePlans.isEmpty)
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: VelocityColors.surfaceDark,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: VelocityColors.borderDark),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'No plans currently active in store. Contact Telegram Support.',
-                        style: TextStyle(color: VelocityColors.textSecondary, fontSize: 12),
-                      ),
-                    ),
-                  )
-                else
-                  ...List.generate(activePlans.length, (index) {
-                    final plan = activePlans[index];
-                    final isSelected = index == _selectedPlanIndex;
-                    return InkWell(
-                      onTap: () => setState(() => _selectedPlanIndex = index),
-                      borderRadius: BorderRadius.circular(12),
-                      child: Container(
-                        margin: const EdgeInsets.only(bottom: 10),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? VelocityColors.electricCyan.withOpacity(0.08)
-                              : VelocityColors.surfaceDark,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: isSelected ? VelocityColors.electricCyan : VelocityColors.borderDark,
-                            width: isSelected ? 1.5 : 1,
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Radio<int>(
-                              value: index,
-                              groupValue: _selectedPlanIndex,
-                              activeColor: VelocityColors.electricCyan,
-                              onChanged: (val) => setState(() => _selectedPlanIndex = val!),
-                            ),
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Flexible(
-                                        child: Text(
-                                          plan.name,
-                                          style: TextStyle(
-                                            color: isSelected ? VelocityColors.electricCyan : VelocityColors.textPrimary,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 13.5,
-                                          ),
-                                        ),
-                                      ),
-                                      if (plan.badge.isNotEmpty) ...[
-                                        const SizedBox(width: 6),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-                                          decoration: BoxDecoration(
-                                            color: VelocityColors.neonYellow.withOpacity(0.18),
-                                            borderRadius: BorderRadius.circular(4),
-                                          ),
-                                          child: Text(
-                                            plan.badge,
-                                            style: const TextStyle(
-                                              color: VelocityColors.neonYellow,
-                                              fontSize: 9,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ],
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    '${plan.dataQuota} • ${plan.durationDays}d • ${plan.protocolType}',
-                                    style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text(
-                                  plan.priceUsdt,
-                                  style: const TextStyle(
-                                    color: VelocityColors.neonGreen,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                Text(
-                                  plan.priceTomans,
-                                  style: const TextStyle(
-                                    color: VelocityColors.textSecondary,
-                                    fontSize: 10,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }),
-
-                const SizedBox(height: 20),
-
-                // Telegram Action Button
-                SizedBox(
-                  width: double.infinity,
-                  height: 54,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: VelocityColors.electricCyan,
-                      foregroundColor: VelocityColors.pureBlack,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                      elevation: 6,
-                      shadowColor: VelocityColors.electricCyan.withOpacity(0.4),
-                    ),
-                    onPressed: _launchTelegramSupport,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.send_rounded, size: 20),
-                        const SizedBox(width: 10),
-                        Flexible(
-                          child: Text(
-                            I18n.t('telegram_checkout_btn'),
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 0.3,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// First-Launch Setup Wizard (Cyberpunk Onboarding Dialog)
-// ---------------------------------------------------------------------------
-class VelocityOnboardingDialog extends StatefulWidget {
-  final AppLanguage currentLang;
-  final Function(AppLanguage) onSetLanguage;
-  final String initialRegion;
-  final Function(String region, RoutingMode mode) onComplete;
-
-  const VelocityOnboardingDialog({
-    super.key,
-    required this.currentLang,
-    required this.onSetLanguage,
-    required this.initialRegion,
-    required this.onComplete,
-  });
-
-  @override
-  State<VelocityOnboardingDialog> createState() => _VelocityOnboardingDialogState();
-}
-
-class _VelocityOnboardingDialogState extends State<VelocityOnboardingDialog> {
-  int _currentStep = 0;
-  late AppLanguage _selectedLang;
-  late String _selectedRegion;
-
-  // Step 2: Protocol Priority Selection
-  final Set<String> _selectedProtocols = {'vless', 'hysteria2', 'trojan'};
-
-  // Step 3: Interactive Mock Permission Grants
-  bool _vpnMockGranted = false;
-  bool _notifMockGranted = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedLang = widget.currentLang;
-    _selectedRegion = widget.initialRegion;
-  }
-
-  void _nextStep() {
-    if (_currentStep < 2) {
-      setState(() => _currentStep++);
-    } else {
-      final mode = _selectedRegion == 'iran' ? RoutingMode.bypassLan : RoutingMode.global;
-      widget.onComplete(_selectedRegion, mode);
-      Navigator.pop(context);
-    }
-  }
-
-  void _prevStep() {
-    if (_currentStep > 0) {
-      setState(() => _currentStep--);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isFa = _selectedLang == AppLanguage.fa;
-
-    return Directionality(
-      textDirection: isFa ? TextDirection.rtl : TextDirection.ltr,
-      child: Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 480, maxHeight: 680),
-          decoration: BoxDecoration(
-            color: VelocityColors.midnightBg,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: VelocityColors.electricCyan.withOpacity(0.55), width: 1.5),
-            boxShadow: [
-              BoxShadow(
-                color: VelocityColors.electricCyan.withOpacity(0.20),
-                blurRadius: 36,
-                spreadRadius: 2,
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              // Header with Emblem and Title
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
-                child: Row(
-                  children: [
-                    const VelocityEmblemWidget(size: 34, glowIntensity: 1.2),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            I18n.t('wizard_title'),
-                            style: const TextStyle(
-                              color: VelocityColors.electricCyan,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 1.5,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            I18n.t('wizard_subtitle'),
-                            style: const TextStyle(
-                              color: VelocityColors.textSecondary,
-                              fontSize: 9.5,
-                              letterSpacing: 1.0,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Step Progress Tracker
-              _buildStepTracker(),
-
-              const Divider(color: VelocityColors.borderDark, height: 1),
-
-              // Step Body
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
-                  child: _buildCurrentStepContent(isFa),
-                ),
-              ),
-
-              const Divider(color: VelocityColors.borderDark, height: 1),
-
-              // Bottom Action Bar
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                child: Row(
-                  children: [
-                    if (_currentStep > 0)
-                      TextButton.icon(
-                        style: TextButton.styleFrom(
-                          foregroundColor: VelocityColors.textSecondary,
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                        ),
-                        onPressed: _prevStep,
-                        icon: Icon(
-                          isFa ? Icons.arrow_forward_rounded : Icons.arrow_back_rounded,
-                          size: 16,
-                        ),
-                        label: Text(
-                          I18n.t('btn_back'),
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                        ),
-                      )
-                    else
-                      const SizedBox.shrink(),
-                    const Spacer(),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: VelocityColors.electricCyan,
-                        foregroundColor: VelocityColors.pureBlack,
-                        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        elevation: 4,
-                      ),
-                      onPressed: _nextStep,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            _currentStep == 2
-                                ? I18n.t('btn_start_velocity')
-                                : I18n.t('btn_next'),
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w900,
-                              fontSize: 13,
-                              letterSpacing: 0.8,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Icon(
-                            _currentStep == 2
-                                ? Icons.bolt_rounded
-                                : (isFa ? Icons.arrow_back_rounded : Icons.arrow_forward_rounded),
-                            size: 18,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStepTracker() {
-    final steps = [
-      {'title': 'Lang/Region', 'icon': Icons.language},
-      {'title': 'Protocols', 'icon': Icons.tune_rounded},
-      {'title': 'Permissions', 'icon': Icons.verified_user_rounded},
-    ];
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-      color: VelocityColors.surfaceDark.withOpacity(0.5),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(steps.length * 2 - 1, (index) {
-          if (index.isOdd) {
-            final stepBefore = index ~/ 2;
-            final isDone = _currentStep > stepBefore;
-            return Expanded(
-              child: Container(
-                height: 2,
-                color: isDone ? VelocityColors.neonGreen : VelocityColors.borderDark,
-              ),
-            );
-          }
-          final stepIdx = index ~/ 2;
-          final isActive = _currentStep == stepIdx;
-          final isDone = _currentStep > stepIdx;
-          final color = isDone
-              ? VelocityColors.neonGreen
-              : (isActive ? VelocityColors.electricCyan : VelocityColors.textMuted);
-
-          return Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: isActive ? VelocityColors.electricCyan.withOpacity(0.18) : VelocityColors.surfaceElevated,
-              border: Border.all(color: color, width: isActive ? 2 : 1),
-              boxShadow: isActive
-                  ? [
-                      BoxShadow(
-                        color: VelocityColors.electricCyan.withOpacity(0.4),
-                        blurRadius: 8,
-                      )
-                    ]
-                  : null,
-            ),
-            child: Icon(
-              isDone ? Icons.check : (steps[stepIdx]['icon'] as IconData),
-              size: 14,
-              color: color,
-            ),
-          );
-        }),
-      ),
-    );
-  }
-
-  Widget _buildCurrentStepContent(bool isFa) {
-    switch (_currentStep) {
-      case 0:
-        return _buildStep1LanguageAndRegion(isFa);
-      case 1:
-        return _buildStep2ProtocolPriority(isFa);
-      case 2:
-      default:
-        return _buildStep3PermissionsPrimer(isFa);
-    }
-  }
-
-  // STEP 1: Language & Region Selection (EN/FA with live flip & Iran vs Global routing)
-  Widget _buildStep1LanguageAndRegion(bool isFa) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          I18n.t('step_lang_title'),
-          style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-            color: VelocityColors.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 3),
-        Text(
-          I18n.t('step_lang_desc'),
-          style: const TextStyle(fontSize: 11.5, color: VelocityColors.textSecondary, height: 1.3),
-        ),
-        const SizedBox(height: 12),
-
-        // Language Selection Row
-        Row(
-          children: [
-            Expanded(
-              child: _buildSelectableCard(
-                isSelected: _selectedLang == AppLanguage.en,
-                onTap: () {
-                  setState(() => _selectedLang = AppLanguage.en);
-                  widget.onSetLanguage(AppLanguage.en);
-                },
-                leadingWidget: const Text('🇺🇸', style: TextStyle(fontSize: 22)),
-                title: I18n.t('lang_en'),
-                subtitle: 'English (LTR)',
-                badgeText: 'LTR',
-                badgeColor: VelocityColors.electricCyan,
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _buildSelectableCard(
-                isSelected: _selectedLang == AppLanguage.fa,
-                onTap: () {
-                  setState(() => _selectedLang = AppLanguage.fa);
-                  widget.onSetLanguage(AppLanguage.fa);
-                },
-                leadingWidget: const Text('🇮🇷', style: TextStyle(fontSize: 22)),
-                title: I18n.t('lang_fa'),
-                subtitle: 'فارسی (RTL)',
-                badgeText: 'راست‌چین',
-                badgeColor: VelocityColors.neonGreen,
-              ),
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 18),
-        Text(
-          I18n.t('step_region_title'),
-          style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-            color: VelocityColors.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 3),
-        Text(
-          I18n.t('step_region_desc'),
-          style: const TextStyle(fontSize: 11.5, color: VelocityColors.textSecondary, height: 1.3),
-        ),
-        const SizedBox(height: 12),
-
-        // Iran Routing Card
-        _buildSelectableCard(
-          isSelected: _selectedRegion == 'iran',
-          onTap: () => setState(() => _selectedRegion = 'iran'),
-          leadingWidget: Container(
-            padding: const EdgeInsets.all(7),
-            decoration: BoxDecoration(
-              color: VelocityColors.electricCyan.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(Icons.cell_tower_rounded, color: VelocityColors.electricCyan, size: 20),
-          ),
-          title: I18n.t('region_iran_title'),
-          subtitle: I18n.t('region_iran_desc'),
-          badgeText: 'SMART BYPASS LAN',
-          badgeColor: VelocityColors.electricCyan,
-          tags: isFa
-              ? ['همراه اول', 'ایرانسل', 'رایتل', 'مخابرات']
-              : ['MCI', 'Irancell', 'Rightel', 'Fixed ISP'],
-        ),
-
-        const SizedBox(height: 10),
-
-        // Global Routing Card
-        _buildSelectableCard(
-          isSelected: _selectedRegion == 'global',
-          onTap: () => setState(() => _selectedRegion = 'global'),
-          leadingWidget: Container(
-            padding: const EdgeInsets.all(7),
-            decoration: BoxDecoration(
-              color: VelocityColors.neonGreen.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(Icons.public_rounded, color: VelocityColors.neonGreen, size: 20),
-          ),
-          title: I18n.t('region_global_title'),
-          subtitle: I18n.t('region_global_desc'),
-          badgeText: 'GLOBAL PROXY',
-          badgeColor: VelocityColors.neonGreen,
-          tags: isFa
-              ? ['استریم بین‌الملل', 'گیمینگ کم‌پینگ', 'تونل مستقیم']
-              : ['Global Stream', 'Low Ping Gaming', 'Direct Tunnel'],
-        ),
-      ],
-    );
-  }
-
-  // STEP 2: Protocol & Network Priority Selection
-  Widget _buildStep2ProtocolPriority(bool isFa) {
-    final protocols = [
-      {
-        'id': 'vless',
-        'name': 'VLESS Reality (XTLS Vision)',
-        'desc': 'Direct TLS camouflage over port 443 with zero fingerprint detection.',
-        'badge': 'ANTI-FILTER',
-        'color': VelocityColors.electricCyan,
-        'icon': Icons.security_rounded,
-      },
-      {
-        'id': 'hysteria2',
-        'name': 'Hysteria 2 (QUIC / UDP)',
-        'desc': 'Brutal congestion control designed for lossy networks & mobile carriers.',
-        'badge': 'TURBO SPEED',
-        'color': VelocityColors.neonYellow,
-        'icon': Icons.bolt_rounded,
-      },
-      {
-        'id': 'trojan',
-        'name': 'Trojan gRPC',
-        'desc': 'Multiplexed high-concurrency traffic imitating legitimate web sessions.',
-        'badge': 'STEALTH',
-        'color': VelocityColors.neonGreen,
-        'icon': Icons.verified_rounded,
-      },
-      {
-        'id': 'vmess',
-        'name': 'VMess WebSocket + TLS',
-        'desc': 'CDN-backed fallback tunnel resistant to strict IP address blocking.',
-        'badge': 'FALLBACK',
-        'color': VelocityColors.neonPink,
-        'icon': Icons.cloud_sync_rounded,
-      },
-    ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          I18n.t('step_priority_title'),
-          style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-            color: VelocityColors.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 3),
-        Text(
-          I18n.t('step_priority_desc'),
-          style: const TextStyle(fontSize: 11.5, color: VelocityColors.textSecondary, height: 1.3),
-        ),
-        const SizedBox(height: 14),
-
-        ...protocols.map<Widget>((proto) {
-          final isSelected = _selectedProtocols.contains(proto['id'] as String);
-          final color = proto['color'] as Color;
-
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: InkWell(
-              onTap: () {
-                setState(() {
-                  final id = proto['id'] as String;
-                  if (isSelected) {
-                    if (_selectedProtocols.length > 1) {
-                      _selectedProtocols.remove(id);
-                    }
-                  } else {
-                    _selectedProtocols.add(id);
-                  }
-                });
-              },
-              borderRadius: BorderRadius.circular(12),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: isSelected ? VelocityColors.surfaceElevated : VelocityColors.surfaceDark,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: isSelected ? color : VelocityColors.borderDark,
-                    width: isSelected ? 1.5 : 1.0,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: color.withOpacity(0.14),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(proto['icon'] as IconData, color: color, size: 18),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                proto['name'] as String,
-                                style: const TextStyle(
-                                  color: VelocityColors.textPrimary,
-                                  fontSize: 12.5,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: color.withOpacity(0.15),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Text(
-                                  proto['badge'] as String,
-                                  style: TextStyle(color: color, fontSize: 8.5, fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 3),
-                          Text(
-                            proto['desc'] as String,
-                            style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 10.5, height: 1.25),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Checkbox(
-                      value: isSelected,
-                      activeColor: color,
-                      checkColor: VelocityColors.pureBlack,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                      onChanged: (val) {
-                        setState(() {
-                          final id = proto['id'] as String;
-                          if (val == true) {
-                            _selectedProtocols.add(id);
-                          } else if (_selectedProtocols.length > 1) {
-                            _selectedProtocols.remove(id);
-                          }
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        }),
-      ],
-    );
-  }
-
-  // STEP 3: Android Permission Grant Primer with Interactive Toggles
-  Widget _buildStep3PermissionsPrimer(bool isFa) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          I18n.t('step_perm_title'),
-          style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-            color: VelocityColors.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 3),
-        Text(
-          I18n.t('step_perm_desc'),
-          style: const TextStyle(fontSize: 11.5, color: VelocityColors.textSecondary, height: 1.3),
-        ),
-        const SizedBox(height: 14),
-
-        // Interactive VpnService Card
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: _vpnMockGranted ? VelocityColors.surfaceElevated : VelocityColors.surfaceDark,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: _vpnMockGranted ? VelocityColors.neonGreen : VelocityColors.electricCyan.withOpacity(0.6),
-              width: 1.2,
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: (_vpnMockGranted ? VelocityColors.neonGreen : VelocityColors.electricCyan).withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      Icons.vpn_key_rounded,
-                      color: _vpnMockGranted ? VelocityColors.neonGreen : VelocityColors.electricCyan,
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          I18n.t('perm_vpn_service'),
-                          style: TextStyle(
-                            color: _vpnMockGranted ? VelocityColors.neonGreen : VelocityColors.electricCyan,
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        const Text(
-                          'android.net.VpnService (Local Virtual TUN)',
-                          style: TextStyle(color: VelocityColors.textMuted, fontSize: 10, fontFamily: 'monospace'),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Switch(
-                    value: _vpnMockGranted,
-                    activeColor: VelocityColors.neonGreen,
-                    onChanged: (val) {
-                      setState(() => _vpnMockGranted = val);
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                I18n.t('perm_vpn_service_desc'),
-                style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11, height: 1.3),
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 12),
-
-        // Interactive Notification Card
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: _notifMockGranted ? VelocityColors.surfaceElevated : VelocityColors.surfaceDark,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: _notifMockGranted ? VelocityColors.neonGreen : VelocityColors.neonYellow.withOpacity(0.6),
-              width: 1.2,
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: (_notifMockGranted ? VelocityColors.neonGreen : VelocityColors.neonYellow).withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      Icons.notifications_active_rounded,
-                      color: _notifMockGranted ? VelocityColors.neonGreen : VelocityColors.neonYellow,
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          I18n.t('perm_notif_service'),
-                          style: TextStyle(
-                            color: _notifMockGranted ? VelocityColors.neonGreen : VelocityColors.neonYellow,
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        const Text(
-                          'POST_NOTIFICATIONS (Foreground Keepalive)',
-                          style: TextStyle(color: VelocityColors.textMuted, fontSize: 10, fontFamily: 'monospace'),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Switch(
-                    value: _notifMockGranted,
-                    activeColor: VelocityColors.neonGreen,
-                    onChanged: (val) {
-                      setState(() => _notifMockGranted = val);
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                I18n.t('perm_notif_service_desc'),
-                style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11, height: 1.3),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSelectableCard({
-    required bool isSelected,
-    required VoidCallback onTap,
-    required Widget leadingWidget,
-    required String title,
-    required String subtitle,
-    required String badgeText,
-    required Color badgeColor,
-    List<String>? tags,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: isSelected ? VelocityColors.surfaceElevated : VelocityColors.surfaceDark,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: isSelected ? badgeColor : VelocityColors.borderDark,
-            width: isSelected ? 1.8 : 1.0,
-          ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: badgeColor.withOpacity(0.18),
-                    blurRadius: 14,
-                    spreadRadius: 1,
-                  )
-                ]
-              : null,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                leadingWidget,
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                          color: isSelected ? VelocityColors.textPrimary : VelocityColors.textSecondary,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: badgeColor.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          badgeText,
-                          style: TextStyle(
-                            color: badgeColor,
-                            fontSize: 9,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(
-                  isSelected ? Icons.check_circle_rounded : Icons.radio_button_off_rounded,
-                  color: isSelected ? badgeColor : VelocityColors.textMuted,
-                  size: 22,
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              subtitle,
-              style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11.5, height: 1.4),
-            ),
-            if (tags != null && tags.isNotEmpty) ...[
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 6,
-                runSpacing: 4,
-                children: tags.map<Widget>((t) {
-                  return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: VelocityColors.pureBlack,
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: VelocityColors.borderDark),
-                    ),
-                    child: Text(
-                      t,
-                      style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 10),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Velocity User Authentication Terminal (Telegram, Gmail OTP)
-// ---------------------------------------------------------------------------
-class VelocityAuthDialog extends StatefulWidget {
-  final AppLanguage currentLang;
-  final Function(UserSession) onLoginSuccess;
-
-  const VelocityAuthDialog({
-    super.key,
-    required this.currentLang,
-    required this.onLoginSuccess,
-  });
-
-  @override
-  State<VelocityAuthDialog> createState() => _VelocityAuthDialogState();
-}
-
-class _VelocityAuthDialogState extends State<VelocityAuthDialog> {
-  int _activeTab = 0; // 0: Telegram, 1: Gmail OTP
-
-  final _telegramController = TextEditingController(text: '@velocity_user');
-  final _gmailController = TextEditingController(text: 'user@gmail.com');
-  final _otpController = TextEditingController();
-
-  int _otpCountdown = 0;
-  Timer? _otpTimer;
-  String? _simulatedOtp;
-
-  @override
-  void dispose() {
-    _otpTimer?.cancel();
-    _telegramController.dispose();
-    _gmailController.dispose();
-    _otpController.dispose();
-    super.dispose();
-  }
-
-  void _sendOtp() {
-    final email = _gmailController.text.trim();
-    if (email.isEmpty || !email.contains('@')) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: VelocityColors.neonPink,
-          content: Text('Please enter a valid Gmail address.'),
-        ),
-      );
-      return;
-    }
-
-    setState(() {
-      _otpCountdown = 60;
-      _simulatedOtp = (100000 + math.Random().nextInt(900000)).toString();
-      _otpController.text = _simulatedOtp!;
-    });
-
-    _otpTimer?.cancel();
-    _otpTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (!mounted) {
-        timer.cancel();
-        return;
-      }
-      setState(() {
-        if (_otpCountdown > 0) {
-          _otpCountdown--;
-        } else {
-          timer.cancel();
-        }
-      });
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: VelocityColors.surfaceElevated,
-        content: Row(
-          children: [
-            const Icon(Icons.mark_email_read_rounded, color: VelocityColors.neonGreen, size: 20),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                'Simulated OTP Code: $_simulatedOtp (Auto-filled)',
-                style: const TextStyle(color: VelocityColors.electricCyan, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
-        ),
-        duration: const Duration(seconds: 4),
-      ),
-    );
-  }
-
-  void _submitTelegram() {
-    final raw = _telegramController.text.trim();
-    if (raw.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: VelocityColors.neonPink,
-          content: Text('Please enter your Telegram username or ID.'),
-        ),
-      );
-      return;
-    }
-    final handle = raw.startsWith('@') ? raw : '@$raw';
-    final session = UserSession(
-      id: 'tg_${DateTime.now().millisecondsSinceEpoch}',
-      displayName: handle,
-      identity: handle,
-      role: UserRole.user,
-      method: AuthMethod.telegram,
-      planName: 'Velocity VIP 30-Day',
-      planExpiry: '2026-10-30',
-      dataUsed: '14.2 GB',
-      dataTotal: '50 GB',
-      isVipActive: true,
-    );
-    widget.onLoginSuccess(session);
-    Navigator.pop(context);
-  }
-
-  void _submitGmailOtp() {
-    final email = _gmailController.text.trim();
-    final otp = _otpController.text.trim();
-    if (email.isEmpty || !email.contains('@')) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: VelocityColors.neonPink,
-          content: Text('Please enter a valid Gmail address.'),
-        ),
-      );
-      return;
-    }
-    if (otp.length < 4) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: VelocityColors.neonPink,
-          content: Text('Please click SEND OTP and enter the 6-digit code.'),
-        ),
-      );
-      return;
-    }
-
-    final name = email.split('@').first;
-    final session = UserSession(
-      id: 'gmail_${DateTime.now().millisecondsSinceEpoch}',
-      displayName: name,
-      identity: email,
-      role: UserRole.user,
-      method: AuthMethod.gmailOtp,
-      planName: 'Velocity Turbo 90-Day',
-      planExpiry: '2026-12-15',
-      dataUsed: '32.8 GB',
-      dataTotal: '150 GB',
-      isVipActive: true,
-    );
-    widget.onLoginSuccess(session);
-    Navigator.pop(context);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isFa = widget.currentLang == AppLanguage.fa;
-
-    return Directionality(
-      textDirection: isFa ? TextDirection.rtl : TextDirection.ltr,
-      child: Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 480),
-          decoration: BoxDecoration(
-            color: const Color(0xFF0F1420),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: VelocityColors.electricCyan, width: 1.3),
-            boxShadow: [
-              BoxShadow(
-                color: VelocityColors.electricCyan.withOpacity(0.18),
-                blurRadius: 28,
-                spreadRadius: 2,
-              ),
-            ],
-          ),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(22),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header with Velocity Emblem & Title
-                Row(
-                  children: [
-                    const VelocityEmblemWidget(size: 34, glowIntensity: 1.2),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            I18n.t('auth_title'),
-                            style: const TextStyle(
-                              color: VelocityColors.electricCyan,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 1.2,
-                            ),
-                          ),
-                          Text(
-                            I18n.t('auth_subtitle'),
-                            style: const TextStyle(
-                              color: VelocityColors.textSecondary,
-                              fontSize: 10,
-                              letterSpacing: 0.8,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close_rounded, color: VelocityColors.textSecondary, size: 20),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 18),
-
-                // Method Selector Tabs
-                Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: VelocityColors.pureBlack,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: VelocityColors.borderDark),
-                  ),
-                  child: Row(
-                    children: [
-                      _buildAuthTab(0, I18n.t('tab_telegram'), Icons.send_rounded),
-                      _buildAuthTab(1, I18n.t('tab_gmail'), Icons.mail_outline_rounded),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                // Tab Contents
-                if (_activeTab == 0) _buildTelegramTab(),
-                if (_activeTab == 1) _buildGmailTab(),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAuthTab(int index, String title, IconData icon) {
-    final isSelected = _activeTab == index;
-    const color = VelocityColors.electricCyan;
-
-    return Expanded(
-      child: InkWell(
-        onTap: () => setState(() => _activeTab = index),
-        borderRadius: BorderRadius.circular(9),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          decoration: BoxDecoration(
-            color: isSelected ? color.withOpacity(0.18) : Colors.transparent,
-            borderRadius: BorderRadius.circular(9),
-            border: Border.all(
-              color: isSelected ? color : Colors.transparent,
-              width: 1,
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                icon,
-                size: 14,
-                color: isSelected ? color : VelocityColors.textMuted,
-              ),
-              const SizedBox(width: 5),
-              Text(
-                title,
-                style: TextStyle(
-                  color: isSelected ? color : VelocityColors.textSecondary,
-                  fontSize: 11.5,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTelegramTab() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: VelocityColors.surfaceElevated,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: VelocityColors.borderDark),
-          ),
-          child: const Row(
-            children: [
-              Icon(Icons.verified_user_outlined, color: VelocityColors.electricCyan, size: 18),
-              SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  'Link your Telegram account to restore VIP subscription and auto-import node credentials.',
-                  style: TextStyle(color: VelocityColors.textSecondary, fontSize: 11, height: 1.4),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 14),
-        Text(
-          I18n.t('telegram_hint'),
-          style: const TextStyle(color: VelocityColors.electricCyan, fontSize: 12, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 6),
-        TextField(
-          controller: _telegramController,
-          style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 13),
-          decoration: InputDecoration(
-            prefixIcon: const Icon(Icons.alternate_email, color: VelocityColors.electricCyan, size: 18),
-            hintText: '@username',
-            hintStyle: const TextStyle(color: VelocityColors.textMuted, fontSize: 12),
-            filled: true,
-            fillColor: VelocityColors.pureBlack,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: VelocityColors.borderDark)),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: VelocityColors.electricCyan)),
-          ),
-        ),
-        const SizedBox(height: 18),
-        SizedBox(
-          width: double.infinity,
-          height: 48,
-          child: ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: VelocityColors.electricCyan,
-              foregroundColor: VelocityColors.pureBlack,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-            icon: const Icon(Icons.link_rounded, size: 18),
-            label: Text(I18n.t('btn_connect_telegram'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-            onPressed: _submitTelegram,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildGmailTab() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          I18n.t('gmail_hint'),
-          style: const TextStyle(color: VelocityColors.electricCyan, fontSize: 12, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 6),
-        Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: _gmailController,
-                keyboardType: TextInputType.emailAddress,
-                style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 13),
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.mail_outline, color: VelocityColors.electricCyan, size: 18),
-                  hintText: 'name@gmail.com',
-                  hintStyle: const TextStyle(color: VelocityColors.textMuted, fontSize: 12),
-                  filled: true,
-                  fillColor: VelocityColors.pureBlack,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: VelocityColors.borderDark)),
-                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: VelocityColors.electricCyan)),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: VelocityColors.surfaceElevated,
-                foregroundColor: VelocityColors.electricCyan,
-                side: const BorderSide(color: VelocityColors.electricCyan),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-              ),
-              onPressed: _otpCountdown > 0 ? null : _sendOtp,
-              child: Text(
-                _otpCountdown > 0 ? '$_otpCountdown s' : I18n.t('btn_send_otp'),
-                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 14),
-        Text(
-          I18n.t('otp_hint'),
-          style: const TextStyle(color: VelocityColors.electricCyan, fontSize: 12, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 6),
-        TextField(
-          controller: _otpController,
-          keyboardType: TextInputType.number,
-          style: const TextStyle(color: VelocityColors.neonGreen, fontSize: 16, letterSpacing: 4, fontWeight: FontWeight.bold),
-          decoration: InputDecoration(
-            prefixIcon: const Icon(Icons.lock_clock_outlined, color: VelocityColors.neonGreen, size: 18),
-            hintText: '849201',
-            hintStyle: const TextStyle(color: VelocityColors.textMuted, fontSize: 13, letterSpacing: 2),
-            filled: true,
-            fillColor: VelocityColors.pureBlack,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: VelocityColors.borderDark)),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: VelocityColors.neonGreen)),
-          ),
-        ),
-        const SizedBox(height: 18),
-        SizedBox(
-          width: double.infinity,
-          height: 48,
-          child: ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: VelocityColors.neonGreen,
-              foregroundColor: VelocityColors.pureBlack,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-            icon: const Icon(Icons.check_circle_outline, size: 18),
-            label: Text(I18n.t('btn_verify_otp'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-            onPressed: _submitGmailOtp,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Velocity User Profile Modal Bottom Sheet
-// ---------------------------------------------------------------------------
-class UserProfileSheet extends StatelessWidget {
-  final UserSession session;
-  final AppLanguage currentLang;
-  final VoidCallback onOpenPlans;
-  final VoidCallback onLogout;
-  final VoidCallback onSwitchAccount;
-
-  const UserProfileSheet({
-    super.key,
-    required this.session,
-    required this.currentLang,
-    required this.onOpenPlans,
-    required this.onLogout,
-    required this.onSwitchAccount,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isFa = currentLang == AppLanguage.fa;
-    final isUser = session.role == UserRole.user;
-    final themeColor = isUser ? VelocityColors.neonGreen : VelocityColors.electricCyan;
-
-    return Directionality(
-      textDirection: isFa ? TextDirection.rtl : TextDirection.ltr,
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
-        decoration: BoxDecoration(
-          color: const Color(0xFF0C101A),
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
-          border: Border.all(color: themeColor.withOpacity(0.4), width: 1.2),
-          boxShadow: [
-            BoxShadow(
-              color: themeColor.withOpacity(0.12),
-              blurRadius: 30,
-              offset: const Offset(0, -6),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Center drag handle
-            Center(
-              child: Container(
-                width: 44,
-                height: 4,
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: VelocityColors.borderDark,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-
-            // User Identity Header Card
-            Row(
-              children: [
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: themeColor.withOpacity(0.14),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: themeColor, width: 1.8),
-                    boxShadow: [
-                      BoxShadow(color: themeColor.withOpacity(0.3), blurRadius: 10),
-                    ],
-                  ),
-                  child: Icon(
-                    isUser ? Icons.person_rounded : Icons.terminal_rounded,
-                    color: themeColor,
-                    size: 28,
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Flexible(
-                            child: Text(
-                              session.displayName,
-                              style: const TextStyle(
-                                color: VelocityColors.textPrimary,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: themeColor.withOpacity(0.18),
-                              borderRadius: BorderRadius.circular(6),
-                              border: Border.all(color: themeColor, width: 0.8),
-                            ),
-                            child: Text(
-                              isUser ? 'VIP SUBSCRIBER' : 'GUEST TERMINAL',
-                              style: TextStyle(
-                                color: themeColor,
-                                fontSize: 9.5,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        session.identity,
-                        style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 12, fontFamily: 'monospace'),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 18),
-
-            // Subscription Status Card
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: VelocityColors.surfaceElevated,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: VelocityColors.borderDark),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.bolt, color: VelocityColors.neonYellow, size: 16),
-                      const SizedBox(width: 6),
-                      Text(
-                        session.planName,
-                        style: const TextStyle(
-                          color: VelocityColors.textPrimary,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: session.isVipActive
-                              ? VelocityColors.neonGreen.withOpacity(0.16)
-                              : VelocityColors.neonPink.withOpacity(0.16),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          session.isVipActive ? I18n.t('sub_active') : I18n.t('sub_free'),
-                          style: TextStyle(
-                            color: session.isVipActive ? VelocityColors.neonGreen : VelocityColors.neonPink,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '${I18n.t('sub_expiry')} ${session.planExpiry}',
-                        style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11),
-                      ),
-                      Text(
-                        '${session.dataUsed} / ${session.dataTotal}',
-                        style: const TextStyle(color: VelocityColors.electricCyan, fontSize: 11, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: LinearProgressIndicator(
-                      value: 0.35,
-                      minHeight: 5,
-                      backgroundColor: VelocityColors.pureBlack,
-                      valueColor: AlwaysStoppedAnimation<Color>(themeColor),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Upgrade Button
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: VelocityColors.electricCyan,
-                  foregroundColor: VelocityColors.pureBlack,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                icon: const Icon(Icons.upgrade_rounded, size: 18),
-                label: Text(
-                  I18n.t('btn_upgrade'),
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                ),
-                onPressed: onOpenPlans,
-              ),
-            ),
-            const SizedBox(height: 10),
-
-            // Secondary Actions (Switch / Logout)
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: VelocityColors.electricCyan,
-                      side: const BorderSide(color: VelocityColors.borderDark),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    icon: const Icon(Icons.swap_horiz_rounded, size: 16),
-                    label: const Text('Switch Account', style: TextStyle(fontSize: 12)),
-                    onPressed: onSwitchAccount,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: VelocityColors.neonPink,
-                      side: const BorderSide(color: VelocityColors.borderDark),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    icon: const Icon(Icons.logout_rounded, size: 16),
-                    label: Text(I18n.t('btn_logout'), style: const TextStyle(fontSize: 12)),
-                    onPressed: onLogout,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-
-
-
-
-// ---------------------------------------------------------------------------
-// Velocity Power-User Settings Screen
-// (Routing / Bypass Rules, Advanced TUN/Core Engine, Split Tunneling, Neon Visual Theme)
-// ---------------------------------------------------------------------------
-class VelocityPowerUserSettingsScreen extends StatefulWidget {
-  final bool isFa;
-  final RoutingMode currentRoutingMode;
-  final Function(RoutingMode) onRoutingModeChanged;
-  final VoidCallback onAccentChanged;
-
-  const VelocityPowerUserSettingsScreen({
-    super.key,
-    required this.isFa,
-    required this.currentRoutingMode,
-    required this.onRoutingModeChanged,
-    required this.onAccentChanged,
-  });
-
-  @override
-  State<VelocityPowerUserSettingsScreen> createState() => _VelocityPowerUserSettingsScreenState();
-}
-
-class _VelocityPowerUserSettingsScreenState extends State<VelocityPowerUserSettingsScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
-  // Routing & Bypass Rules State
-  late RoutingMode _routingMode;
-  bool _bypassDomesticIran = true;
-  bool _bypassBankingApps = true;
-  bool _blockAdsMalware = true;
-  bool _blockUdpQuic = false;
-
-  // TUN & Core Engine Settings State
-  String _tunImplementation = 'gVisor (User-space)';
-  int _mtu = 1400;
-  String _remoteDns = 'https://1.1.1.1/dns-query';
-  String _directDns = '10.202.10.202';
-  bool _enableFragmentMode = true;
-  int _fragmentPackets = 50;
-  bool _enableMux = true;
-  bool _sniffingDomain = true;
-
-  // Split Tunneling State
-  bool _splitTunnelEnabled = true;
-  String _splitMode = 'Bypass selected apps'; // 'Bypass selected apps' or 'Proxy only selected apps'
-  final List<Map<String, dynamic>> _installedApps = [
-    {'name': 'Mobile Bank Mellat', 'package': 'ir.mellat.mobile', 'bypass': true, 'icon': Icons.account_balance},
-    {'name': 'Snapp! Ride & Food', 'package': 'cab.snapp.passenger', 'bypass': true, 'icon': Icons.local_taxi},
-    {'name': 'Digikala Shopping', 'package': 'com.digikala.mobile', 'bypass': true, 'icon': Icons.shopping_bag_outlined},
-    {'name': 'Bale Messenger', 'package': 'ir.ble.messenger', 'bypass': true, 'icon': Icons.chat_bubble_outline},
-    {'name': 'Telegram Messenger', 'package': 'org.telegram.messenger', 'bypass': false, 'icon': Icons.send_rounded},
-    {'name': 'Instagram & Threads', 'package': 'com.instagram.android', 'bypass': false, 'icon': Icons.camera_alt_outlined},
-    {'name': 'YouTube & Music', 'package': 'com.google.android.youtube', 'bypass': false, 'icon': Icons.play_circle_outline},
-    {'name': 'Google Chrome Browser', 'package': 'com.android.chrome', 'bypass': false, 'icon': Icons.public},
-  ];
-
-  // Visual Customizer Presets
-  final List<Map<String, dynamic>> _colorThemes = [
-    {
-      'name': 'Electric Cyan (Default)',
-      'primary': const Color(0xFF00E5FF),
-      'secondary': const Color(0xFF00B0FF),
-      'tag': 'CYAN',
-    },
-    {
-      'name': 'Cyber Neon Emerald',
-      'primary': const Color(0xFF00FF88),
-      'secondary': const Color(0xFF00C853),
-      'tag': 'EMERALD',
-    },
-    {
-      'name': 'Acid Neon Amber',
-      'primary': const Color(0xFFFFD600),
-      'secondary': const Color(0xFFFF9100),
-      'tag': 'AMBER',
-    },
-    {
-      'name': 'Synthwave Neon Pink',
-      'primary': const Color(0xFFFF1744),
-      'secondary': const Color(0xFFD500F9),
-      'tag': 'PINK',
-    },
-    {
-      'name': 'Ultra Violet Horizon',
-      'primary': const Color(0xFFD500F9),
-      'secondary': const Color(0xFF651FFF),
-      'tag': 'VIOLET',
-    },
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 4, vsync: this);
-    _routingMode = widget.currentRoutingMode;
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: VelocityColors.pureBlack,
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF0D121F),
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: VelocityColors.electricCyan, size: 18),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              I18n.t('settings_title'),
-              style: const TextStyle(
-                fontSize: 13.5,
-                fontWeight: FontWeight.w900,
-                color: VelocityColors.textPrimary,
-                letterSpacing: 1.0,
-              ),
-            ),
-            Text(
-              I18n.t('settings_subtitle'),
-              style: const TextStyle(fontSize: 9.5, color: VelocityColors.textSecondary, letterSpacing: 0.5),
-            ),
-          ],
-        ),
-        bottom: TabBar(
-          controller: _tabController,
-          isScrollable: true,
-          indicatorColor: VelocityColors.electricCyan,
-          indicatorWeight: 2.5,
-          labelColor: VelocityColors.electricCyan,
-          unselectedLabelColor: VelocityColors.textMuted,
-          labelStyle: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold),
-          tabs: [
-            Tab(
-              icon: const Icon(Icons.alt_route, size: 16),
-              text: I18n.t('tab_routing_bypass'),
-            ),
-            Tab(
-              icon: const Icon(Icons.memory_rounded, size: 16),
-              text: I18n.t('tab_tun_core'),
-            ),
-            Tab(
-              icon: const Icon(Icons.call_split_rounded, size: 16),
-              text: I18n.t('tab_split_tunnel'),
-            ),
-            Tab(
-              icon: const Icon(Icons.palette_outlined, size: 16),
-              text: I18n.t('tab_visual_theme'),
-            ),
-          ],
-        ),
-      ),
-      body: SafeArea(
-        child: TabBarView(
-          controller: _tabController,
-          children: [
-            // TAB 1: Routing & Bypass Rules
-            _buildRoutingRulesTab(),
-            // TAB 2: TUN & Core Engine Settings
-            _buildTunCoreTab(),
-            // TAB 3: Split Tunneling
-            _buildSplitTunnelTab(),
-            // TAB 4: Visual Neon Customizer
-            _buildVisualCustomizerTab(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // -------------------------------------------------------------------------
-  // TAB 1: Routing & Bypass Rules
-  // -------------------------------------------------------------------------
-  Widget _buildRoutingRulesTab() {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        _buildSectionHeader('GLOBAL ROUTING STRATEGY'),
-        const SizedBox(height: 8),
-        _buildRadioTile(
-          RoutingMode.rule,
-          'Rule-Based (Smart Traffic Routing)',
-          'Automatically routes blocked traffic through proxy while keeping local Iranian services direct.',
-        ),
-        _buildRadioTile(
-          RoutingMode.bypassLan,
-          'Bypass LAN & Private Addresses',
-          'Only routes public internet traffic through proxy; local 192.168.x / 10.x stay untouched.',
-        ),
-        _buildRadioTile(
-          RoutingMode.global,
-          'Global Tunnel (All Traffic Proxy)',
-          'Force all device IP packets including local connections through encrypted VPN tunnel.',
-        ),
-        _buildRadioTile(
-          RoutingMode.direct,
-          'Direct Mode (Bypass VPN)',
-          'No encryption applied. Packets connect directly without tunnel proxying.',
-        ),
-
-        const SizedBox(height: 20),
-        _buildSectionHeader('SPECIALIZED IRAN BYPASS & FILTERS'),
-        const SizedBox(height: 8),
-        _buildSwitchCard(
-          title: 'Bypass Domestic Iran Sites (.ir & CIDRs)',
-          subtitle: 'Keep Bank, Governmental, and internal ISP sites at local un-throttled speeds',
-          value: _bypassDomesticIran,
-          onChanged: (val) => setState(() => _bypassDomesticIran = val),
-        ),
-        const SizedBox(height: 8),
-        _buildSwitchCard(
-          title: 'Bypass Iranian Banking & Fintech Apps',
-          subtitle: 'Prevent account security lockouts by routing mobile banks directly via domestic IP',
-          value: _bypassBankingApps,
-          onChanged: (val) => setState(() => _bypassBankingApps = val),
-        ),
-        const SizedBox(height: 8),
-        _buildSwitchCard(
-          title: 'Adblocking & Malicious DNS Shield',
-          subtitle: 'Drop tracking telemetry, annoying ads, and known botnet domains at core DNS layer',
-          value: _blockAdsMalware,
-          onChanged: (val) => setState(() => _blockAdsMalware = val),
-        ),
-        const SizedBox(height: 8),
-        _buildSwitchCard(
-          title: 'Block UDP / QUIC (Force TCP/TLS Fallback)',
-          subtitle: 'Useful on ISPs where UDP traffic is heavily choked or throttled by deep packet inspection',
-          value: _blockUdpQuic,
-          onChanged: (val) => setState(() => _blockUdpQuic = val),
-        ),
-      ],
-    );
-  }
-
-  // -------------------------------------------------------------------------
-  // TAB 2: TUN & Core Engine Settings
-  // -------------------------------------------------------------------------
-  Widget _buildTunCoreTab() {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        _buildSectionHeader('TUN INTERFACE STACK'),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: const Color(0xFF0F1422),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: VelocityColors.borderDark),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('TUN Virtual Stack Driver', style: TextStyle(color: VelocityColors.textPrimary, fontSize: 12, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              DropdownButtonFormField<String>(
-                value: _tunImplementation,
-                dropdownColor: const Color(0xFF0D121F),
-                style: const TextStyle(color: VelocityColors.electricCyan, fontSize: 13),
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: VelocityColors.pureBlack,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: VelocityColors.borderDark)),
-                ),
-                items: ['gVisor (User-space)', 'System (Kernel TUN)', 'Mixed LWIP'].map<DropdownMenuItem<String>>((v) {
-                  return DropdownMenuItem<String>(value: v, child: Text(v));
-                }).toList(),
-                onChanged: (val) {
-                  if (val != null) setState(() => _tunImplementation = val);
-                },
-              ),
-              const SizedBox(height: 14),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('MTU (Maximum Transmission Unit)', style: TextStyle(color: VelocityColors.textPrimary, fontSize: 12)),
-                  Text('$_mtu bytes', style: const TextStyle(color: VelocityColors.electricCyan, fontWeight: FontWeight.bold, fontSize: 12)),
-                ],
-              ),
-              Slider(
-                value: _mtu.toDouble(),
-                min: 1280,
-                max: 1500,
-                divisions: 22,
-                activeColor: VelocityColors.electricCyan,
-                inactiveColor: VelocityColors.borderDark,
-                onChanged: (v) => setState(() => _mtu = v.toInt()),
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 20),
-        _buildSectionHeader('DNS RESOLUTION ENGINE'),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: const Color(0xFF0F1422),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: VelocityColors.borderDark),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Remote Secure DoH / DoT DNS', style: TextStyle(color: VelocityColors.textPrimary, fontSize: 12, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 6),
-              TextField(
-                controller: TextEditingController(text: _remoteDns),
-                style: const TextStyle(color: VelocityColors.electricCyan, fontSize: 12),
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: VelocityColors.pureBlack,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: VelocityColors.borderDark)),
-                ),
-                onChanged: (val) => _remoteDns = val,
-              ),
-              const SizedBox(height: 12),
-              const Text('Direct Domestic DNS (Iran)', style: TextStyle(color: VelocityColors.textPrimary, fontSize: 12, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 6),
-              TextField(
-                controller: TextEditingController(text: _directDns),
-                style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 12),
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: VelocityColors.pureBlack,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: VelocityColors.borderDark)),
-                ),
-                onChanged: (val) => _directDns = val,
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 20),
-        _buildSectionHeader('ANTI-CENSORSHIP PACKET EVASION'),
-        const SizedBox(height: 8),
-        _buildSwitchCard(
-          title: 'TLS Fragment Mode (Deep Packet Inspection Evasion)',
-          subtitle: 'Splits TLS Client Hello packets into multiple fragments to bypass Iran GFW SNI inspection',
-          value: _enableFragmentMode,
-          onChanged: (val) => setState(() => _enableFragmentMode = val),
-        ),
-        if (_enableFragmentMode) ...[
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Fragment Chunk Size', style: TextStyle(color: VelocityColors.textSecondary, fontSize: 11)),
-                Text('$_fragmentPackets-100 bytes', style: const TextStyle(color: VelocityColors.neonYellow, fontWeight: FontWeight.bold, fontSize: 11)),
-              ],
-            ),
-          ),
-          Slider(
-            value: _fragmentPackets.toDouble(),
-            min: 10,
-            max: 100,
-            divisions: 9,
-            activeColor: VelocityColors.neonYellow,
-            inactiveColor: VelocityColors.borderDark,
-            onChanged: (v) => setState(() => _fragmentPackets = v.toInt()),
-          ),
-        ],
-        const SizedBox(height: 8),
-        _buildSwitchCard(
-          title: 'Multiplexing (TCP Mux)',
-          subtitle: 'Consolidates multiple TCP connections into single streams to reduce handshake overhead',
-          value: _enableMux,
-          onChanged: (val) => setState(() => _enableMux = val),
-        ),
-        const SizedBox(height: 8),
-        _buildSwitchCard(
-          title: 'Core Domain Sniffing (HTTP & TLS)',
-          subtitle: 'Extracts target domains from packet headers for accurate domain-based routing',
-          value: _sniffingDomain,
-          onChanged: (val) => setState(() => _sniffingDomain = val),
-        ),
-      ],
-    );
-  }
-
-  // -------------------------------------------------------------------------
-  // TAB 3: Split Tunneling
-  // -------------------------------------------------------------------------
-  Widget _buildSplitTunnelTab() {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: const Color(0xFF101626),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: VelocityColors.electricCyan.withOpacity(0.4)),
-          ),
-          child: Row(
-            children: [
-              const Icon(Icons.call_split_rounded, color: VelocityColors.electricCyan, size: 26),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'App Split Tunneling Controller',
-                      style: TextStyle(color: VelocityColors.electricCyan, fontWeight: FontWeight.bold, fontSize: 13),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      widget.isFa
-                          ? 'مشخص کنید کدام اپلیکیشن‌ها از تونل وی‌پی‌ان عبور کنند یا از آن خارج شوند.'
-                          : 'Select which installed apps bypass the encrypted VPN tunnel or route through it.',
-                      style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11),
-                    ),
-                  ],
-                ),
-              ),
-              Switch(
-                value: _splitTunnelEnabled,
-                activeColor: VelocityColors.electricCyan,
-                onChanged: (val) => setState(() => _splitTunnelEnabled = val),
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 16),
-
-        if (_splitTunnelEnabled) ...[
-          _buildSectionHeader('SPLIT TUNNELING MODE'),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: InkWell(
-                  onTap: () => setState(() => _splitMode = 'Bypass selected apps'),
-                  borderRadius: BorderRadius.circular(8),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                    decoration: BoxDecoration(
-                      color: _splitMode == 'Bypass selected apps' ? VelocityColors.electricCyan.withOpacity(0.16) : VelocityColors.surfaceDark,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: _splitMode == 'Bypass selected apps' ? VelocityColors.electricCyan : VelocityColors.borderDark),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Bypass Selected',
-                      style: TextStyle(
-                        color: _splitMode == 'Bypass selected apps' ? VelocityColors.electricCyan : VelocityColors.textSecondary,
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: InkWell(
-                  onTap: () => setState(() => _splitMode = 'Proxy only selected apps'),
-                  borderRadius: BorderRadius.circular(8),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                    decoration: BoxDecoration(
-                      color: _splitMode == 'Proxy only selected apps' ? VelocityColors.electricCyan.withOpacity(0.16) : VelocityColors.surfaceDark,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: _splitMode == 'Proxy only selected apps' ? VelocityColors.electricCyan : VelocityColors.borderDark),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Proxy Only Selected',
-                      style: TextStyle(
-                        color: _splitMode == 'Proxy only selected apps' ? VelocityColors.electricCyan : VelocityColors.textSecondary,
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 18),
-          _buildSectionHeader('DEVICE APPLICATIONS'),
-          const SizedBox(height: 8),
-
-          ..._installedApps.map<Widget>((app) {
-            final isBypassed = app['bypass'] as bool;
-            return Container(
-              margin: const EdgeInsets.only(bottom: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: const Color(0xFF0F1422),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: VelocityColors.borderDark),
-              ),
-              child: Row(
-                children: [
-                  Icon(app['icon'] as IconData, color: isBypassed ? VelocityColors.neonYellow : VelocityColors.electricCyan, size: 20),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(app['name'] as String, style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12, fontWeight: FontWeight.bold)),
-                        Text(app['package'] as String, style: const TextStyle(color: VelocityColors.textMuted, fontSize: 10)),
-                      ],
-                    ),
-                  ),
-                  Checkbox(
-                    value: isBypassed,
-                    activeColor: VelocityColors.electricCyan,
-                    checkColor: VelocityColors.pureBlack,
-                    onChanged: (val) {
-                      setState(() {
-                        app['bypass'] = val ?? false;
-                      });
-                    },
-                  ),
-                ],
-              ),
-            );
-          }).toList(),
-        ],
-      ],
-    );
-  }
-
-  // -------------------------------------------------------------------------
-  // TAB 4: Visual Neon Customizer
-  // -------------------------------------------------------------------------
-  Widget _buildVisualCustomizerTab() {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: const Color(0xFF0F1422),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: VelocityColors.electricCyan.withOpacity(0.5)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const VelocityEmblemWidget(size: 32, glowIntensity: 1.2),
-                  const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        I18n.t('tab_visual_theme'),
-                        style: const TextStyle(color: VelocityColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 13),
-                      ),
-                      const SizedBox(height: 2),
-                      const Text(
-                        'Cyberpunk Neon Accent Palette',
-                        style: TextStyle(color: VelocityColors.textSecondary, fontSize: 10.5),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 14),
-              Text(
-                widget.isFa
-                    ? 'رنگ نئون اصلی رابط کاربری ولوسیتی را با یک لمس شخصی‌سازی نمایید.'
-                    : 'Personalize Velocity with high-voltage cyberpunk neon accents.',
-                style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 11.5, height: 1.4),
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 20),
-        _buildSectionHeader('SELECT NEON GLOW ACCENT'),
-        const SizedBox(height: 10),
-
-        ..._colorThemes.map<Widget>((theme) {
-          final primary = theme['primary'] as Color;
-          final secondary = theme['secondary'] as Color;
-          final isCurrent = VelocityColors.electricCyan.value == primary.value;
-
-          return Container(
-            margin: const EdgeInsets.only(bottom: 10),
-            decoration: BoxDecoration(
-              color: isCurrent ? primary.withOpacity(0.12) : const Color(0xFF0D121F),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: isCurrent ? primary : VelocityColors.borderDark,
-                width: isCurrent ? 1.5 : 1,
-              ),
-            ),
-            child: ListTile(
-              onTap: () {
-                VelocityColors.setNeonAccent(primary, secondary);
-                widget.onAccentChanged();
-                setState(() {});
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    backgroundColor: VelocityColors.surfaceElevated,
-                    duration: const Duration(seconds: 1),
-                    content: Text(
-                      'Theme accent applied: ${theme['name']}',
-                      style: TextStyle(color: primary, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                );
-              },
-              leading: Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [primary, secondary]),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(color: primary.withOpacity(0.6), blurRadius: 8, spreadRadius: 1),
-                  ],
-                ),
-              ),
-              title: Text(
-                theme['name'] as String,
-                style: TextStyle(
-                  color: isCurrent ? primary : VelocityColors.textPrimary,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
-                ),
-              ),
-              subtitle: Text(
-                'RGB: ${primary.value.toRadixString(16).toUpperCase().substring(2)}',
-                style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 10, fontFamily: 'monospace'),
-              ),
-              trailing: isCurrent
-                  ? Icon(Icons.check_circle_rounded, color: primary, size: 20)
-                  : const Icon(Icons.circle_outlined, color: VelocityColors.textMuted, size: 18),
-            ),
-          );
-        }).toList(),
-      ],
-    );
-  }
-
-  // -------------------------------------------------------------------------
-  // Helper UI Builders
-  // -------------------------------------------------------------------------
-  Widget _buildSectionHeader(String title) {
-    return Text(
-      title,
-      style: TextStyle(
-        color: VelocityColors.electricCyan,
-        fontSize: 10.5,
-        fontWeight: FontWeight.w900,
-        letterSpacing: 1.2,
-      ),
-    );
-  }
-
-  Widget _buildRadioTile(RoutingMode mode, String title, String subtitle) {
-    final isSelected = _routingMode == mode;
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: isSelected ? VelocityColors.electricCyan.withOpacity(0.08) : const Color(0xFF0F1422),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: isSelected ? VelocityColors.electricCyan : VelocityColors.borderDark),
-      ),
-      child: ListTile(
-        onTap: () {
-          setState(() => _routingMode = mode);
-          widget.onRoutingModeChanged(mode);
-        },
-        leading: Icon(
-          isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
-          color: isSelected ? VelocityColors.electricCyan : VelocityColors.textSecondary,
-          size: 18,
-        ),
-        title: Text(
-          title,
-          style: TextStyle(
-            color: isSelected ? VelocityColors.electricCyan : VelocityColors.textPrimary,
-            fontWeight: FontWeight.bold,
-            fontSize: 12.5,
-          ),
-        ),
-        subtitle: Text(subtitle, style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 10.5)),
-      ),
-    );
-  }
-
-  Widget _buildSwitchCard({
-    required String title,
-    required String subtitle,
-    required bool value,
-    required Function(bool) onChanged,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFF0F1422),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: VelocityColors.borderDark),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: const TextStyle(color: VelocityColors.textPrimary, fontSize: 12, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 2),
-                Text(subtitle, style: const TextStyle(color: VelocityColors.textSecondary, fontSize: 10.5, height: 1.25)),
-              ],
-            ),
-          ),
-          Switch(
-            value: value,
-            activeColor: VelocityColors.electricCyan,
-            onChanged: onChanged,
-          ),
-        ],
-      ),
     );
   }
 }

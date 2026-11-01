@@ -34,6 +34,9 @@ jobs:
           flutter config --enable-android
           flutter create . --platforms=android --org=com.velocity.vpn
           rm -f android/app/build.gradle.kts
+          echo "android.bundle.enableUncompressedNativeLibs=false" >> android/gradle.properties
+          echo "android.useAndroidX=true" >> android/gradle.properties
+          echo "android.enableJetifier=true" >> android/gradle.properties
 
       - name: Install dependencies
         run: flutter pub get
@@ -44,9 +47,9 @@ jobs:
       - name: Create Release and Upload APK
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.2
-          name: "Velocity VPN v1.0.2"
-          body: "Official Release of Velocity VPN Android Client"
+          tag_name: v1.0.3
+          name: "Velocity VPN v1.0.3"
+          body: "Official Release with Embedded Xray Core (v26) & Polished Cyberpunk UI"
           draft: false
           prerelease: false
           files: build/app/outputs/flutter-apk/app-release.apk

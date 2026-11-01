@@ -27,6 +27,15 @@ android {
         multiDexEnabled true
     }
 
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+
     buildTypes {
         release {
             signingConfig signingConfigs.debug
