@@ -661,10 +661,14 @@ class ConfigLinkParser {
     }
 
     final flag = detectCountryFlag(name, host);
+    // Strip any leading flag emoji / country-code prefix from the display name
+    // so the tile shows: [Flag Widget] → [Clean Name & Protocol]
+    final cleanName = name.replaceAll(
+      RegExp(r'^[\u{1F1E0}-\u{1F1FF}]{2}\s*', unicode: true), '').trim();
 
     return ServerProfile(
       id: '${DateTime.now().microsecondsSinceEpoch}_${math.Random().nextInt(9999)}',
-      name: name,
+      name: cleanName.isNotEmpty ? cleanName : name,
       countryCode: flag,
       protocol: protocol,
       host: host,
@@ -1001,6 +1005,11 @@ class _HomeScreenState extends State<HomeScreen>
   ServerProfile? _selectedServer;
   SubscriptionInfo? _subscriptionInfo;
 
+  // Multi-subscription registry: url → SubscriptionInfo
+  // The active subscription URL key drives which servers are shown.
+  final Map<String, SubscriptionInfo> _allSubscriptions = {};
+  String? _activeSubUrl;
+
   // First-launch and permissions lifecycle
   bool _hasCompletedOnboarding = false;
   bool _vpnPermissionGranted = false;
@@ -1223,15 +1232,31 @@ class _HomeScreenState extends State<HomeScreen>
       final selectedId = prefs.getString('selected_server_id');
       final subJson = prefs.getString('subscription_info');
 
+      // Load multi-subscription registry
+      final allSubsJson = prefs.getString('all_subscriptions');
+      if (allSubsJson != null && allSubsJson.isNotEmpty) {
+        final map = jsonDecode(allSubsJson) as Map<String, dynamic>;
+        _allSubscriptions.clear();
+        map.forEach((url, val) {
+          _allSubscriptions[url] =
+              SubscriptionInfo.fromJson(val as Map<String, dynamic>);
+        });
+      }
+      _activeSubUrl = prefs.getString('active_sub_url');
+
       if (serversJson != null && serversJson.isNotEmpty) {
         final List<dynamic> decodedList = jsonDecode(serversJson);
-        final loadedServers = decodedList.map((item) => ServerProfile.fromJson(item as Map<String, dynamic>)).toList();
+        final loadedServers = decodedList
+            .map((item) => ServerProfile.fromJson(item as Map<String, dynamic>))
+            .toList();
         if (loadedServers.isNotEmpty) {
           setState(() {
             _servers.clear();
             _servers.addAll(loadedServers);
             if (selectedId != null) {
-              _selectedServer = _servers.firstWhere((s) => s.id == selectedId, orElse: () => _servers.first);
+              _selectedServer = _servers.firstWhere(
+                  (s) => s.id == selectedId,
+                  orElse: () => _servers.first);
             } else {
               _selectedServer = _servers.first;
             }
@@ -1243,6 +1268,13 @@ class _HomeScreenState extends State<HomeScreen>
         final subMap = jsonDecode(subJson) as Map<String, dynamic>;
         setState(() {
           _subscriptionInfo = SubscriptionInfo.fromJson(subMap);
+        });
+      }
+      // Bind quota card to active subscription if available
+      if (_activeSubUrl != null &&
+          _allSubscriptions.containsKey(_activeSubUrl)) {
+        setState(() {
+          _subscriptionInfo = _allSubscriptions[_activeSubUrl];
         });
       }
     } catch (_) {}
@@ -1259,9 +1291,45 @@ class _HomeScreenState extends State<HomeScreen>
         await prefs.remove('selected_server_id');
       }
       if (_subscriptionInfo != null) {
-        await prefs.setString('subscription_info', jsonEncode(_subscriptionInfo!.toJson()));
+        await prefs.setString(
+            'subscription_info', jsonEncode(_subscriptionInfo!.toJson()));
+      }
+      // Persist multi-subscription registry
+      if (_allSubscriptions.isNotEmpty) {
+        final allSubsMap = _allSubscriptions
+            .map((url, info) => MapEntry(url, info.toJson()));
+        await prefs.setString('all_subscriptions', jsonEncode(allSubsMap));
+      }
+      if (_activeSubUrl != null) {
+        await prefs.setString('active_sub_url', _activeSubUrl!);
       }
     } catch (_) {}
+  }
+
+  /// Switch to a different stored subscription: clears current servers,
+  /// loads only the servers belonging to [subUrl], and updates the quota card.
+  Future<void> _switchSubscription(String subUrl) async {
+    if (!_allSubscriptions.containsKey(subUrl)) return;
+    final prefs = await SharedPreferences.getInstance();
+    final key = 'servers_for_${Uri.encodeComponent(subUrl)}';
+    final stored = prefs.getString(key);
+    setState(() {
+      _activeSubUrl = subUrl;
+      _subscriptionInfo = _allSubscriptions[subUrl];
+      _servers.clear();
+      _selectedServer = null;
+    });
+    if (stored != null && stored.isNotEmpty) {
+      final List<dynamic> decoded = jsonDecode(stored);
+      final loaded = decoded
+          .map((e) => ServerProfile.fromJson(e as Map<String, dynamic>))
+          .toList();
+      setState(() {
+        _servers.addAll(loaded);
+        _selectedServer = _servers.isNotEmpty ? _servers.first : null;
+      });
+    }
+    await _savePersistedData();
   }
 
   @override
@@ -1562,15 +1630,33 @@ class _HomeScreenState extends State<HomeScreen>
         );
       }
     } else if (_vpnState == VpnState.connected) {
+      // Immediately mark as disconnecting so the button unlocks right away
       setState(() => _vpnState = VpnState.disconnecting);
-      await Future.delayed(const Duration(milliseconds: 600));
+
+      // 1. Stop VPN tunnel via method channel (Android VpnService)
+      try {
+        const _channel = MethodChannel('com.velocity.vpn/control');
+        await _channel.invokeMethod('stopVpn');
+      } catch (_) {
+        // Native channel absent in debug / non-Android builds – ignore
+      }
+
+      // 2. Cancel ALL foreground notifications immediately
+      try {
+        await FlutterLocalNotificationsPlugin().cancelAll();
+      } catch (_) {}
+
+      await Future.delayed(const Duration(milliseconds: 400));
       if (!mounted) return;
+
+      // 3. Stop speed / duration timers and reset all telemetry to zero
       _stopTelemetry();
-      await VelocityNotificationService.cancelVpnNotification();
+
       setState(() {
         _vpnState = VpnState.disconnected;
-        _downloadSpeedKb = 0;
-        _uploadSpeedKb = 0;
+        _downloadSpeedKb = 0.0;
+        _uploadSpeedKb = 0.0;
+        _connectedSeconds = 0;
       });
     }
   }
@@ -1601,8 +1687,30 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   // -------------------------------------------------------------------------
-  // Ping Latency Runner
+  // Ping Latency Runner — real TCP handshake (Hiddify-style Socket.connect)
   // -------------------------------------------------------------------------
+  /// Measures true socket latency by opening a TCP connection to [host]:[port]
+  /// and immediately closing it.  Returns the round-trip in ms, or -1 on
+  /// timeout / error (displayed as "Timeout" in the UI).
+  Future<int> _tcpPing(String host, int port) async {
+    final sw = Stopwatch()..start();
+    Socket? sock;
+    try {
+      sock = await Socket.connect(
+        host,
+        port,
+        timeout: const Duration(milliseconds: 1500),
+      );
+      sw.stop();
+      return sw.elapsedMilliseconds;
+    } catch (_) {
+      sw.stop();
+      return -1; // timeout / unreachable
+    } finally {
+      sock?.destroy();
+    }
+  }
+
   Future<void> _pingAllServers() async {
     setState(() {
       for (var s in _servers) {
@@ -1610,18 +1718,15 @@ class _HomeScreenState extends State<HomeScreen>
       }
     });
 
-    for (var server in _servers) {
-      await Future.delayed(const Duration(milliseconds: 220));
+    // Ping servers concurrently for speed, then update state per result
+    await Future.wait(_servers.map((server) async {
+      final ms = await _tcpPing(server.host, server.port);
       if (!mounted) return;
-      final rnd = math.Random();
-      final base = server.protocol == VpnProtocol.hysteria2
-          ? 70
-          : (server.protocol == VpnProtocol.vless ? 78 : 118);
       setState(() {
-        server.pingMs = base + rnd.nextInt(40) - 10;
+        server.pingMs = ms;
         server.isTesting = false;
       });
-    }
+    }));
   }
 
   // -------------------------------------------------------------------------
@@ -2967,10 +3072,7 @@ class _HomeScreenState extends State<HomeScreen>
     }
   }
 
-  Future<int> _simulatePing(String host, int port) async {
-    await Future.delayed(const Duration(milliseconds: 150));
-    return 45 + (host.hashCode.abs() % 95);
-  }
+  Future<int> _simulatePing(String host, int port) => _tcpPing(host, port);
 
   // -------------------------------------------------------------------------
   // Import Config / Subscription URL Dialog with Real HTTP & Header Parsing
@@ -3133,12 +3235,27 @@ class _HomeScreenState extends State<HomeScreen>
                             setState(() {
                               if (fetchedSub != null) {
                                 _subscriptionInfo = fetchedSub;
+                                // Register in multi-subscription map and set active
+                                _allSubscriptions[input] = fetchedSub!;
+                                _activeSubUrl = input;
+                              }
+                              // Clear previous servers when switching to a new subscription URL
+                              if (fetchedSub != null) {
+                                _servers.clear();
                               }
                               for (var p in parsedProfiles.reversed) {
                                 _servers.insert(0, p);
                               }
                               _selectedServer = _servers.first;
                             });
+
+                            // Persist servers scoped to this subscription URL
+                            if (fetchedSub != null) {
+                              final prefs = await SharedPreferences.getInstance();
+                              final key = 'servers_for_${Uri.encodeComponent(input)}';
+                              await prefs.setString(key,
+                                  jsonEncode(parsedProfiles.map((s) => s.toJson()).toList()));
+                            }
 
                             await _savePersistedData();
 

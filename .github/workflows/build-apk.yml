@@ -3,13 +3,19 @@ name: Build and Release Velocity VPN
 on:
   workflow_dispatch:
   push:
+    tags:
+      - 'v*'
     branches: [ main ]
 
 permissions:
   contents: write
 
 jobs:
-  build:
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Android APK
+  # ─────────────────────────────────────────────────────────────────────────────
+  build-android:
+    name: Build Android APK
     runs-on: ubuntu-latest
 
     steps:
@@ -29,17 +35,14 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Recreate Android Harness
-        run: |
-          flutter create . --platforms=android --org=com.velocity.vpn
+      - name: Recreate Android harness
+        run: flutter create . --platforms=android --org=com.velocity.vpn
 
       - name: Enable Core Library Desugaring
         run: |
           TARGET_GRADLE="android/app/build.gradle"
           if [ -f "$TARGET_GRADLE" ]; then
-            # فعال‌سازی desugaring در compileOptions
             sed -i '/compileOptions {/a \        coreLibraryDesugaringEnabled true' "$TARGET_GRADLE"
-            # افزودن کتابخانه desugar به dependencies
             sed -i '/dependencies {/a \    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.0.4"' "$TARGET_GRADLE"
           fi
 
@@ -52,17 +55,141 @@ jobs:
             dart run flutter_launcher_icons || true
           fi
 
-      - name: Build Android APK
+      - name: Build Android APK (release)
         run: flutter build apk --release
 
-      - name: Create Release and Upload APK
+      - name: Rename APK
+        run: |
+          cp build/app/outputs/flutter-apk/app-release.apk \
+             Velocity-VPN-Android.apk
+
+      - name: Upload Android artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: Velocity-VPN-Android.apk
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Windows x64
+  # ─────────────────────────────────────────────────────────────────────────────
+  build-windows:
+    name: Build Windows x64
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Enable Windows desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Windows release
+        run: flutter build windows --release
+
+      - name: Zip Windows build
+        shell: pwsh
+        run: |
+          Compress-Archive `
+            -Path build\windows\x64\runner\Release\* `
+            -DestinationPath Velocity-VPN-Windows-x64.zip
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-zip
+          path: Velocity-VPN-Windows-x64.zip
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # iOS unsigned IPA
+  # ─────────────────────────────────────────────────────────────────────────────
+  build-ios:
+    name: Build iOS (unsigned IPA)
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build iOS release (no-codesign)
+        run: |
+          flutter build ios --release --no-codesign
+
+      - name: Package unsigned IPA
+        run: |
+          mkdir -p Payload
+          cp -r build/ios/iphoneos/Runner.app Payload/
+          zip -qr Velocity-VPN-iOS-unsigned.ipa Payload/
+          rm -rf Payload
+
+      - name: Upload iOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-ipa
+          path: Velocity-VPN-iOS-unsigned.ipa
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # GitHub Release — attach all three binaries
+  # ─────────────────────────────────────────────────────────────────────────────
+  release:
+    name: Create GitHub Release
+    needs: [build-android, build-windows, build-ios]
+    runs-on: ubuntu-latest
+    # Only publish a release on version tags; on branch pushes just build.
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Download Android APK
+        uses: actions/download-artifact@v4
+        with:
+          name: android-apk
+
+      - name: Download Windows ZIP
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-zip
+
+      - name: Download iOS IPA
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-ipa
+
+      - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.2
-          name: "Velocity VPN v1.0.2"
-          body: "Official Release with Desugaring and Custom Icon"
+          name: "Velocity VPN ${{ github.ref_name }}"
+          body: |
+            ## Velocity VPN ${{ github.ref_name }}
+
+            | Platform | File |
+            |----------|------|
+            | 🤖 Android | `Velocity-VPN-Android.apk` |
+            | 🪟 Windows x64 | `Velocity-VPN-Windows-x64.zip` |
+            | 🍎 iOS (unsigned) | `Velocity-VPN-iOS-unsigned.ipa` |
+
+            > **iOS note:** sideload with AltStore / Sideloadly or re-sign with your own certificate.
           draft: false
           prerelease: false
-          files: build/app/outputs/flutter-apk/app-release.apk
+          files: |
+            Velocity-VPN-Android.apk
+            Velocity-VPN-Windows-x64.zip
+            Velocity-VPN-iOS-unsigned.ipa
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
